@@ -253,9 +253,4 @@ Matrix4.prototype = {
 // Just for Node.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = Matrix4;
-  let m         = new Matrix4();
-  let u         = [1, 2, 3, 4];
-  let v         = m.transformVector(u);
-  console.log("Matrix4:" + m);
-  console.log("v:" + v);
 }

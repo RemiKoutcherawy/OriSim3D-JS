@@ -1,4 +1,4 @@
-// file 'test/testCommand.js
+// file 'test/test.ModelDeep.js.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
@@ -114,19 +114,16 @@ test('Split Bug 3', function () {
   ok(model.segments.length === 17, "segs :"+model.segments.length);
   ok(checkFaces(model));
 });
-test('Rotate Bug 1', function () {
+test('Turn Bug 1', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // d -200 -200 200 -200  200 200 -200 200 ty 180  c 3 0
 
   model.turn(2, 180);
-  console.log("Points:"+model.points);
-  model.splitCross(model.points[3], model.points[0]);
-  console.log("Points:"+model.points);
 
+  model.splitCross(model.points[3], model.points[0]);
   ok(Math.round(model.points[4].xf) === -200,"Got:"+model.points[4].xf);
   ok(Math.round(model.points[5].xf) === 200,"Got:"+model.points[5].xf);
-
   ok(model.segments.length === 7, "segs :"+model.segments.length);
   ok(checkFaces(model));
 });

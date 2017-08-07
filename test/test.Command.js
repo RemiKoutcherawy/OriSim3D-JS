@@ -1,4 +1,4 @@
-// file 'test/testCommand.js
+// file 'test/test.Command.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
@@ -24,7 +24,7 @@ test('tokenize', function() {
   let cde = new Command(model);
   let text = 'a b t 2000 f 4 180 0) mo 2 0';
   cde.tokenize(text);
-  ok(cde.todo.length === 12,"Got:"+cde.todo.length);
+  ok(cde.toko.length === 12,"Got:"+cde.toko.length);
 });
 test('readfile', function() {
   let model = new Model();
@@ -38,7 +38,7 @@ test('execute d define', function() {
   let model = new Model();
   let cde = new Command(model);
   cde.tokenize('d -200 -200 200 -200 200 200 -200 200');
-  ok(cde.todo.length === 9,"got:"+cde.todo.length);
+  ok(cde.toko.length === 9,"got:"+cde.toko.length);
   let iTok = cde.execute();
   ok(iTok === 9,"got:"+iTok);
   ok(model.points.length === 4,"got:"+model.points.length);
@@ -142,7 +142,6 @@ test('command', function() {
   ok(model.segments.length === 8,"got:"+model.segments.length);
   ok(model.points.length === 5,"got:"+model.points.length);
 });
-
 test('command tx ty tz', function() {
   let model = new Model();
   let cde = new Command(model);

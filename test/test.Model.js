@@ -1,4 +1,4 @@
-// file 'test/testCommand.js
+// file 'test/test.Model.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
@@ -321,8 +321,8 @@ test('splitFaceByPlane Strange case', function () {
   ok(model.segments.length === 7, "segs :"+model.segments.length);
   ok(model.points.length === 7, "points :"+model.points.length);
 });
-// Split all face by plane
-test('splitFacesByPlane all faces by', function () {
+// Split all faces by a plane
+test('splitFacesByPlane all faces by plane', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
@@ -342,7 +342,7 @@ test('splitFacesByPlane all faces by', function () {
   ok(model.points.length === 5, "points :"+model.points.length);
 });
 // Split list face by two points
-test('splitFacesByPlane list faces by', function () {
+test('splitFacesByPlane list faces by plane', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // Make a list from faces numbers
@@ -371,7 +371,7 @@ test('splitFacesByPlane list faces by', function () {
   ok(model.points.length === 5, "points :"+model.points.length);
 });
 // Split all face across
-test('splitFacesByPlane all faces across', function () {
+test('splitFacesByPlane all faces across points', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
@@ -454,7 +454,6 @@ test('splitLineToLine', function () {
   ok(model.segments.length === 5, "segs:"+model.segments.length);
   ok(model.points.length === 4, "points:"+model.points.length);
 });
-
 // Angle
 test('computeAngle Warn', function () {
   let model = new Model();
@@ -533,7 +532,6 @@ function listPoints(model, n) {
   }
   return list;
 }
-
 // Rotate
 test('rotate list', function () {
   let model = new Model();
@@ -583,52 +581,60 @@ test('rotate list', function () {
   ok(Math.round(pt.y) === -200,"Got:"+pt.y);
   ok(Math.round(pt.z) === 0,"Got:"+pt.z);
 });
-
 // Turn
 test('Turn', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p = model.points[0];
-  ok(p.x === -200,"Got"+p.x);
-  ok(p.y === -200,"Got"+p.y);
+  ok(p.x === -200,"Got:"+p.x);
+  ok(p.y === -200,"Got:"+p.y);
 
   model.turn(1, 180);
-  ok(p.x === -200,"Got"+p.x);
-  ok(p.y === 200,"Got"+p.y);
+  ok(p.x === -200,"Got:"+p.x);
+  ok(p.y === 200,"Got:"+p.y);
 
   model.turn(2, 180);
-  ok(p.x === 200,"Got"+p.x);
-  ok(p.y === 200,"Got"+p.y);
+  ok(p.x === 200,"Got:"+p.x);
+  ok(p.y === 200,"Got:"+p.y);
 
   model.turn(3, 180);
-  ok(Math.round(p.x) === -200,"Got"+p.x);
-  ok(Math.round(p.y) === -200,"Got"+p.y);
+  ok(Math.round(p.x) === -200,"Got:"+p.x);
+  ok(Math.round(p.y) === -200,"Got:"+p.y);
 });
-
 // Adjust
-test('Adjust', function () {
+test('Adjust Point', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p = model.points[0];
-  let s = model.segments[0];
+  let s0 = model.segments[0];
+  let s3 = model.segments[3];
   p.x = -100;
+  p.y = -100;
+  p.z = -100;
+  // One point against all segments
   let max = model.adjust(p);
-  ok(Math.round(p.x) === -200,"Got"+p.x);
-  ok(max < 0.01,"Got"+max);
-  p.x = -400;
-  max = model.adjust(p, [s]);
-  ok(Math.round(p.x) === -200,"Got"+p.x);
-  ok(max < 0.01,"Got"+max);
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(Math.round(s3.length3d()) === 400,"Got:"+s3.length3d());
+  ok(max < 0.001,"Got:"+max);
+  p.x = -300;
+  p.y = -300;
+  p.z = -300;
+  // One point against one segment
+  max = model.adjust(p, [s0]);
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(max < 0.001,"Got:"+max);
 });
-
-test('Adjust List', function () {
+test('Adjust List of Points', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
-  let s = model.segments[0];
-  p0.x = -100;
+  let s0 = model.segments[0];
+  let s1 = model.segments[1];
+  p0.x = -100; // instead of -200
+  p1.x = 100;  // instead of 200
   let max = model.adjustList([p0, p1]);
-  ok(Math.round(p0.x) === -200,"Got"+p0.x);
-  ok(max < 0.01,"Got"+max);
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(Math.round(s1.length3d()) === 400,"Got:"+s1.length3d());
+  ok(max < 0.001,"Got:"+max);
 });

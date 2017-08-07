@@ -1,0 +1,28 @@
+{
+  "name": "orisim3d-js",
+  "version": "1.0.0",
+  "description": "Origami simulation 3D with WebGL",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "Origami",
+    "JavaScript",
+    "Webgl",
+    "3d"
+  ],
+  "author": "Remi Koutcherawy",
+  "license": "UNLICENCED",
+  "devDependencies": {
+    "mocha": "^3.5.0"
+  },
+  "dependencies": {}
+}

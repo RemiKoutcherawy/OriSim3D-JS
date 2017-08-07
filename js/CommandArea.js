@@ -8,9 +8,6 @@ if (typeof module !== 'undefined' && module.exports) {
 
 // CommandArea constructor
 function CommandArea(command, textArea) {
-  if (textArea === null){
-    return
-  }
   // Add Key press EventListener
   textArea.addEventListener('keypress', CommandArea.keypress);
   // Static variables

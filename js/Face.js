@@ -24,7 +24,7 @@ Face.prototype = {
   // Compute Face normal
   computeFaceNormal: function () {
     if (this.points.length < 3) {
-      console.log("Pb Face < 3pts:" + this);
+      console.log("Warn Face < 3pts:" + this);
       return null;
     }
     for (let i = 0; i < this.points.length - 2; i++) {

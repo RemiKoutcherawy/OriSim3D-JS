@@ -13,7 +13,6 @@ function View3d(model, canvas3d, canvas3dtext) {
   this.model  = model;
   this.canvas3d = canvas3d;
   this.canvas3dtext = canvas3dtext;
-  // console.log("canvas3d:"+canvas3d+" canvas3dtext:"+canvas3dtext);
   this.gl = this.canvas3d.getContext('webgl');
 
   // Initialisation
@@ -235,7 +234,6 @@ View3d.prototype = {
       gl.activeTexture(gl.TEXTURE0);
       View3d.loadTexture(gl, textureFront, u_SamplerFront, image_front, 0 );
       // Textures dimensions
-      // console.log("front w:"+image_front.width+" h:"+image_front.height);
       that.wTexFront = 400; //image_front.width;
       that.hTexFront = 400; //image_front.height;
     };
@@ -255,7 +253,6 @@ View3d.prototype = {
       gl.activeTexture(gl.TEXTURE1);
       View3d.loadTexture(gl, textureBack, u_SamplerBack, image_back, 1 );
       // Textures dimensions
-      // console.log("back w:"+image_back.width+" h:"+image_back.height);
       that.wTexBack = 400; //image_back.width;
       that.hTexBack = 400; //image_back.height;
     };
@@ -387,7 +384,7 @@ View3d.prototype = {
     // var pixelX = (clipspace[0] *  0.5 + 0.5) * gl.canvas.width;
     // var pixelY = (clipspace[1] * -0.5 + 0.5) * gl.canvas.height;
     // // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillText("someMsg", 10, 10);
+    ctx.fillText("Message", 100, 100);
   }
 };
 

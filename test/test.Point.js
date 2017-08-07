@@ -1,4 +1,4 @@
-// file 'test/testCommand.js
+// file 'test/test.Point.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
