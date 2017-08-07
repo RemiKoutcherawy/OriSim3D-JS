@@ -23,8 +23,6 @@ function Command(model) {
   this.za           = [0, 0, 0, 0];
   // Interpolator used in anim() to map tn (time normalized) to tni (time interpolated)
   this.interpolator = Interpolator.LinearInterpolator;
-  // Angle used for fold as a starting value when animation starts
-  this.angleBefore  = 0;
   // Coefficient to multiply value given in Offset commands
   this.kOffset      = 0.2; // 0.2 for real rendering, can be 10 to debug
 }
@@ -36,6 +34,7 @@ const State = {idle:0, run:1, anim:2, pause:3, undo:4};
 // Class methods
 Command.prototype = {
   constructor:Command,
+
   // Tokenize, split the String in this.toko Array of String @testOK
   tokenize:function (input) {
     let text  = input.replace(/[\);]/g, ' rparent');
@@ -45,6 +44,7 @@ Command.prototype = {
     this.iTok = 0;
     return this.toko;
   },
+
   // Read a File @testOK
   readfile:function (filename) {
     let text = null;
@@ -55,10 +55,10 @@ Command.prototype = {
     }
     // If we are in browser XHR is needed
     else {
-      const request              = new XMLHttpRequest();
+      const request = new XMLHttpRequest();
       request.onreadystatechange = function () {
         if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-          const type = request.getResponseHeader("Content-Type");
+          let type = request.getResponseHeader("Content-Type");
           if (type.match(/^text/)) { // Make sure response is text
             text = request.responseText;
           }
@@ -66,7 +66,8 @@ Command.prototype = {
           console.log("Error ? state:" + request.readyState + " status:" + request.status);
         }
       };
-      // XMLHttpRequest.open(method, url, async) Here async = false !
+      // XMLHttpRequest.open(method, url, async)
+      // Here async = false ! => Warning from Firefox, Chrome,
       request.open('GET', filename, false);
       request.send(null);
     }
@@ -126,7 +127,7 @@ Command.prototype = {
       let s1 = model.segments[toko[iTok++]];
       model.splitLineToLine(s0, s1);
     }
-    // Segment split
+    // Segment split TODO test
     // "s : split seg numerator denominator"
     else if (toko[iTok] === "s" || toko[iTok] === "split") {
       // Split set by N/D
@@ -148,34 +149,15 @@ Command.prototype = {
       model.rotate(s, angle, list);
       iTok = this.iTok;
     }
-    // "f : fold to angle"
-    else if (toko[iTok] === "f" || toko[iTok] === "fold") {
-      iTok++;
-      let s = model.segments[toko[iTok++]];
-      // Cache current angle at start of animation
-      if (this.tpi === 0)
-        this.angleBefore = model.computeAngle(s);
-      let angle = ((toko[iTok++] - this.angleBefore) * (this.tni - this.tpi));
-      let list  = this.listPoints(iTok);
-      // Reverse segment to have the first point on left face
-      if (this.tpi === 0 && model.faceRight(s.p1, s.p2).points.indexOf(list[0]) !== -1)
-        s.reverse();
-      model.rotate(s, angle, list);
-    }
-    // Adjust points
+    // Adjust all or listed points
     // "a : adjust"
     else if (toko[iTok] === "a") {
       // Adjust Points in 3D to fit 3D length
       iTok++;
-      model.adjust(model.points);
+      let list  = this.listPoints(iTok);
+      let liste = list.length === 0 ? model.points : list;
+      let dmax = model.adjustList(liste);
     }
-    // // Adjust with only given segments
-    // else if (toko[iTok] === "as") { // "as : adjust set segments"
-    //   // Adjust Points in 3D to fit 3D length
-    //   iTok++;
-    //   let p0 = model.points.get(toko[iTok++]);
-    //   model.adjustSegments(p0, model.segments);
-    // }
     //
     // else if (toko[iTok] === "flat") { // "flat : z = 0"
     //   // Move all let to z = 0
@@ -264,7 +246,9 @@ Command.prototype = {
     // Zooms
     else if (toko[iTok] === "z") { // "z : Zoom scale,x,y"
       iTok++;
-      let scale   = toko[iTok++], x = toko[iTok++], y = toko[iTok++];
+      let scale   = toko[iTok++];
+      let x = toko[iTok++];
+      let y = toko[iTok++];
       // for animation
       let ascale  = ((1 + this.tni * (scale - 1)) / (1 + this.tpi * (scale - 1)));
       let bfactor = (scale * (this.tni / ascale - this.tpi));
@@ -281,7 +265,7 @@ Command.prototype = {
         this.za[2] = -(b[1] + b[3]) / 2;
       }
       let scale   = ((1 + this.tni * (this.za[0] - 1)) / (1 + this.tpi * (this.za[0] - 1)));
-      let bfactor = (this.za[0] * (this.tni / scale - this.tpi));
+      let bfactor = this.za[0] * (this.tni / scale - this.tpi);
       model.move(this.za[1] * bfactor, this.za[2] * bfactor, 0, null);
       model.scaleModel(scale);
     }
@@ -373,8 +357,21 @@ Command.prototype = {
     return list;
   },
 
+  // Make a list from following segments numbers @testOK
+  listSegments:function (iTok) {
+    let list = [];
+    while (Number.isInteger(Number(this.toko[iTok]))) {
+      list.push(this.model.segments[this.toko[iTok++]]);
+    }
+    // Keep incremented parameter passed by value
+    this.iTok = iTok;
+    return list;
+  },
+
+  // Main entry Point
   // Execute list of commands
   command:function (cde) {
+    // console.log("State:"+Object.keys(State)[1]);
 // -- State Idle tokenize list of command
     if (this.state === State.idle) {
       if (cde === "u") {
@@ -490,7 +487,7 @@ Command.prototype = {
 
       let iBefore = this.iTok;
 
-// Execute one command
+      // Execute one command
       let iReached = this.execute();
 
       // Push modified model

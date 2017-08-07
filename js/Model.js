@@ -306,6 +306,7 @@ Model.prototype = {
 
   // Origami
   // Split Face f by plane pl @testOK except on <:> denerate poly
+  // Complex by design
   splitFaceByPlane:function (f1, pl) {
     let front     = []; // Front side
     let back      = []; // Back side
@@ -626,7 +627,7 @@ Model.prototype = {
           pm.z += s.p2.z + (s.p1.z - s.p2.z) * r;
         }
       }
-      // Average position taking all segments
+      // Set Point with average position taking all segments
       if (segs.length !== 0) {
         p.x = pm.x / segs.length;
         p.y = pm.y / segs.length;
@@ -644,6 +645,9 @@ Model.prototype = {
         let p = list[j];
         let segs = this.searchSegmentsOnePoint(p);
         let d = this.adjust(p, segs);
+        if (Math.abs(d) > dmax) {
+          dmax = Math.abs(d);
+        }
       }
     }
     return dmax;

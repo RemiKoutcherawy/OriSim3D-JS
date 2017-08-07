@@ -28,15 +28,23 @@ if (typeof window !== 'undefined') {
     // Bind all in OriSim3d
     new Orisim3d(model, view2d, view3d);
 
+    let first = true;
+
     // Animation loop
     function loop() {
-
+      if (first){
+        // Read Cocotte
+        command.command("read models/cocotte.txt");
+        first  = false;
+      }
       if (model.change ){
         if (view2d !== null) {
           view2d.draw();
         }
-        if (view3d !== null){
+        if (view3d !== null) {
+          console.time("init");
           view3d.initBuffers();
+          console.timeEnd("init");
         }
         model.change = !!command.anim() || view3d.wTexFront === 0;
       }
@@ -44,7 +52,7 @@ if (typeof window !== 'undefined') {
       view3d.draw();
       requestAnimationFrame(loop);
     }
-    // model.change = true;
+
     requestAnimationFrame(loop);
   }
 }

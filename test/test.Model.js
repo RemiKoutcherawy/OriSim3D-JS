@@ -623,6 +623,14 @@ test('Adjust Point', function () {
   max = model.adjust(p, [s0]);
   ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
   ok(max < 0.001,"Got:"+max);
+  p.x = -300;
+  p.y = -300;
+  p.z = -300;
+  // Two points against all segments
+  let p1 = model.points[2];
+  max = model.adjustList([p, p1]);
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(max < 0.001,"Got:"+max);
 });
 test('Adjust List of Points', function () {
   let model = new Model();

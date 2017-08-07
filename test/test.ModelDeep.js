@@ -22,7 +22,7 @@ before(function () {
 function listPoints(model, n) {
   let list = [];
   let i = 1; // argument 0 is model
-  while (Number.isisInteger(Number(arguments[i]))) {
+  while (Number.isInteger(Number(arguments[i]))) {
     list.push(model.points[arguments[i++]]);
   }
   return list;
@@ -52,11 +52,11 @@ function isCCW (poly2d) {
     }
   }
   // Take points on either side of lowest
-  let next = (iymin == n - 1) ? 0 : iymin+1;
-  let previous = (iymin == 0) ? n-1 : iymin-1;
+  let next = (iymin === n - 1) ? 0 : iymin+1;
+  let previous = (iymin === 0) ? n-1 : iymin-1;
   // If not aligned ccw is of the sign of area
   let ccw = area2(poly2d, previous, iymin, next);
-  if (ccw == 0) {
+  if (ccw === 0) {
     // If horizontally aligned compare x
     ccw = poly2d[2*next] - poly2d[2*previous];
   }

@@ -384,7 +384,7 @@ View3d.prototype = {
     // var pixelX = (clipspace[0] *  0.5 + 0.5) * gl.canvas.width;
     // var pixelY = (clipspace[1] * -0.5 + 0.5) * gl.canvas.height;
     // // ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillText("Message", 100, 100);
+    // ctx.fillText("Message", 100, 100);
   }
 };
 

@@ -95,7 +95,19 @@ test('listPoints', function() {
   ok(list[0].y === -200,"got:"+list[0].y);
   ok(list[0].z === 0,"got:"+list[0].z);
 });
-
+test('listSegments', function() {
+  let model = new Model();
+  model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
+  let cde = new Command(model);
+  cde.tokenize('1 0 2');
+  let list = cde.listSegments(0);
+  ok(list.length === 3,"got:"+list.length);
+  // Second segment '0' should be at [1]
+  let s0 = model.segments[0];
+  let s1 = model.segments[1];
+  ok(list[1] === s0,"got:"+list[0]);
+  ok(list[0] === s1,"got:"+list[0]);
+});
 test('execute rotate list', function() {
   let model = new Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
@@ -137,10 +149,28 @@ test('command', function() {
   cde.command('c 0 2 c 1 3');
   ok(model.segments.length === 8,"got:"+model.segments.length);
   ok(model.points.length === 5,"got:"+model.points.length);
-
   cde.command('d -200 -200 200 -200 200 200 -200 200 c 0 2 c 1 3');
   ok(model.segments.length === 8,"got:"+model.segments.length);
   ok(model.points.length === 5,"got:"+model.points.length);
+});
+test('command adjust points', function() {
+  let model = new Model();
+  let cde = new Command(model);
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  let p1 = model.points[1];
+  let s0 = model.segments[0];
+  let s1 = model.segments[1];
+  p0.x = -100; // instead of -200
+  p1.x = 100;  // instead of 200
+  cde.command('a');
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(Math.round(s1.length3d()) === 400,"Got:"+s1.length3d());
+  p0.x = -100; // instead of -200
+  p1.x = 100;  // instead of 200
+  cde.command('a 0 1');
+  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
+  ok(Math.round(s1.length3d()) === 400,"Got:"+s1.length3d());
 });
 test('command tx ty tz', function() {
   let model = new Model();
@@ -161,7 +191,7 @@ test('command ty One Point', function() {
   cde.command('c 0 1 c 1 2');
   cde.command('ty 180');
   cde.command('c 0 4');
-  "d -200 -200 200 -200 200 200 -200 200 c 0 1 c 1 2 ty 180 c 0 4"
+  // "d -200 -200 200 -200 200 200 -200 200 c 0 1 c 1 2 ty 180 c 0 4"
   // Problème corrigé
   console.log("P11 :"+model.points[11]+" xf:"+model.points[11].xf);
   ok(model.points[0].xf === -200,"got:"+model.points[0].xf);
