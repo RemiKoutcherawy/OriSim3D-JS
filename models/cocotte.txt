@@ -1,47 +1,41 @@
 // Cocotte
 d -200 200 -200 -200 200 -200 200 200
-// Marque les medianes et diagonales
+// Marque les médianes et diagonales
 c 0 1 c 0 3 c 0 2 c 1 3
-// Marque les demis bords
+// Marque les demi-bords
 c 0 8 c 8 3 c 0 4 c 4 1
 // Marque les coins
 c 6 0 c 6 1 c 6 2 c 6 3
-// Retourne
+// Retourne iad interpolateur accelerate decelerate
 iad
 t 500 ty 180)
 // Replie le coin et retourne
 t 1000 r 48 180 21 0 10)
+o 1 24 0 7 25 // Offset requi pour pas que les faces se superposent
 t 500 ty 180)
 // Bord haut
-t 500 r 37 180 8 17 3)
+t 1000 r 35 179 8 17 3) // Pas mal
 t 500 r 55 90 17 3 a 3 19)
-// Coté droit
-t 500 r 29 180 5 22 2 a 19 3 17)
+// Côté droit
+t 1000 r 29 179 5 22 2 a 19 3 17)
 t 500 r 54 -45 19 3 17)
-t 100 r 55 -30 17 a 3)
+t 100 r 55 -30 17 a 3) // Ferme la patte
 // Oreille bas
-t 500 r 53 -90 22 2 a 18)
-t 500 r 45 180 1 12 7 a 18 2 22 )
-t 100 r 53 -20 22 a 18 2)
-t 500 r 53 -70 18 2 22 a 22 )
-// oreille bas gauche
-t 500 r 50 -90 12 1 a 24)
-t 500 r 23 180 4 a 24 1 12 )
-t 100 r 50 -80 12 1 24)
+t 500 r 53 -90 22 2 a 2 18) // Bof à revoir
+t 1000 r 45 179 1 12 7 a 18 2 22)
+t 500 r 53 -87 22 2 18 a 18 2)
+t 100 r 52 30 18 a 2) // Ferme la patte
+// Oreille bas gauche
+t 500 r 50 -90 1 12 a 1 24)
+t 1000 r 23 179 4 a 24 1 12)
+t 500 r 50 -87 12 1 24 a 24 1)
+t 100 r 50 -30 24 a 1) // Ferme la patte
 // Replie en ouvrant le bec
 t 500 r 16 -90 10 8 20 17 16 14 3 19 r 40 -90 0)
 t 500 r 16 -80 10 8 20 17 16 14 3 19 a 0)
+// Ajuste à peu près
+r 24 10 4 r 37 -10 8
+r 29 -5 5 8 r 23 -5 7 4
 // Montre
 iao t 1000 zf) t 1000 tz -45) t 1000 zf)
-iso t 4000 ty 360) igb
-end
-
-// Ouvre la tête
-t 500 r 20 -4 22 r 20 4 13 a 3)
-// Ouvre les pattes
-t 1000 f 33 0 5 a 13 f 37 0 6 a 22)
-// Ouvre le corps 
-t 500 r 31 -4  4 r 31 4 8 a 24 18 2)
-// Enleve tous les offsets
-om 0
-
+iso t 4000 ty 360)
