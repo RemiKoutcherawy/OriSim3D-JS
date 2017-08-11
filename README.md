@@ -4,7 +4,7 @@ Do not fork - Work in progress
 ===
 OriSim3D origami folding simulation with WebGL.
 
-Demo : [Demo en Local](https://remikoutcherawy.github.io/vue3dLocal.html) 
+Demo : [Demo one file containing all](https://remikoutcherawy.github.io/vue3dLocal.html) 
 
 
 This application is derived from
