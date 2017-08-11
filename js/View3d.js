@@ -322,8 +322,10 @@ View3d.prototype = {
   },
   // Mouse pressed
   mousedown:function (ev) {
-    const x    = ev.clientX;
-    const y    = ev.clientY;
+    ev.preventDefault();
+    var touches = ev.changedTouches ? ev.changedTouches[ 0 ] : ev;
+    const x    = touches.clientX;
+    const y    = touches.clientY;
     // Start dragging
     const rect = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
@@ -334,14 +336,17 @@ View3d.prototype = {
   },
   // Mouse released
   mouseup:function () {
+    ev.preventDefault();
     View3d.dragging = false;
   },
   // Mouse move
   mousemove:function (ev) {
-    const x    = ev.clientX;
-    const y    = ev.clientY;
+    ev.preventDefault();
+    var touches = ev.changedTouches ? ev.changedTouches[ 0 ] : ev;
+    const x    = touches.clientX;
+    const y    = touches.clientY;
     if (View3d.dragging) {
-      if (ev.shiftKey || ev.altKey) {
+      if (ev.shiftKey || ev.altKey || touches.length > 0) {
         // Zoom
         View3d.scale -= (y - View3d.lastY) / 300;
       } else {
