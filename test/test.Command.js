@@ -1,4 +1,4 @@
-// file 'test/test.Command.js
+// file 'test/testCommand.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
@@ -7,6 +7,7 @@ if (typeof module !== 'undefined' && module.exports) {
   var Command = require('../js/Command.js');
   var Model = require('../js/Model.js');
   var Point = require('../js/Point.js');
+  var Interpolator = require('../js/Interpolator.js');
 }
 //
 function ok(expr, msg) {
@@ -95,19 +96,7 @@ test('listPoints', function() {
   ok(list[0].y === -200,"got:"+list[0].y);
   ok(list[0].z === 0,"got:"+list[0].z);
 });
-test('listSegments', function() {
-  let model = new Model();
-  model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
-  let cde = new Command(model);
-  cde.tokenize('1 0 2');
-  let list = cde.listSegments(0);
-  ok(list.length === 3,"got:"+list.length);
-  // Second segment '0' should be at [1]
-  let s0 = model.segments[0];
-  let s1 = model.segments[1];
-  ok(list[1] === s0,"got:"+list[0]);
-  ok(list[0] === s1,"got:"+list[0]);
-});
+
 test('execute rotate list', function() {
   let model = new Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
@@ -149,29 +138,12 @@ test('command', function() {
   cde.command('c 0 2 c 1 3');
   ok(model.segments.length === 8,"got:"+model.segments.length);
   ok(model.points.length === 5,"got:"+model.points.length);
+
   cde.command('d -200 -200 200 -200 200 200 -200 200 c 0 2 c 1 3');
   ok(model.segments.length === 8,"got:"+model.segments.length);
   ok(model.points.length === 5,"got:"+model.points.length);
 });
-test('command adjust points', function() {
-  let model = new Model();
-  let cde = new Command(model);
-  model.init([-200,-200, 200,-200, 200,200, -200,200]);
-  let p0 = model.points[0];
-  let p1 = model.points[1];
-  let s0 = model.segments[0];
-  let s1 = model.segments[1];
-  p0.x = -100; // instead of -200
-  p1.x = 100;  // instead of 200
-  cde.command('a');
-  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
-  ok(Math.round(s1.length3d()) === 400,"Got:"+s1.length3d());
-  p0.x = -100; // instead of -200
-  p1.x = 100;  // instead of 200
-  cde.command('a 0 1');
-  ok(Math.round(s0.length3d()) === 400,"Got:"+s0.length3d());
-  ok(Math.round(s1.length3d()) === 400,"Got:"+s1.length3d());
-});
+
 test('command tx ty tz', function() {
   let model = new Model();
   let cde = new Command(model);
@@ -193,10 +165,10 @@ test('command ty One Point', function() {
   cde.command('c 0 4');
   // "d -200 -200 200 -200 200 200 -200 200 c 0 1 c 1 2 ty 180 c 0 4"
   // Problème corrigé
-  console.log("P11 :"+model.points[11]+" xf:"+model.points[11].xf);
   ok(model.points[0].xf === -200,"got:"+model.points[0].xf);
   ok(model.points[11].xf === -100,"got:"+model.points[11].xf);
 });
+
 test('end', function() {
   let model = new Model();
   let cde = new Command(model);
@@ -204,4 +176,40 @@ test('end', function() {
   cde.command('d -200 -200 200 -200 200 200 -200 200 end c 0 2 c 1 3');
   ok(model.segments.length === 4,"got:"+model.segments.length);
   ok(model.points.length === 4,"got:"+model.points.length);
+});
+
+// Interpolator
+test('Interpolator', function () {
+  let model = new Model();
+  let cde = new Command(model);
+  cde.command('d -200 -200 200 -200 200 200 -200 200');
+  cde.command('il');
+  ok(cde.interpolator === Interpolator.LinearInterpolator,"Got"+cde.interpolator);
+  cde.command('iad');
+  ok(cde.interpolator === Interpolator.AccelerateDecelerateInterpolator,"Got"+cde.interpolator);
+  cde.command('iso');
+  ok(cde.interpolator === Interpolator.SpringOvershootInterpolator,"Got"+cde.interpolator);
+  cde.command('isb');
+  ok(cde.interpolator === Interpolator.SpringBounceInterpolator,"Got"+cde.interpolator);
+  cde.command('igb');
+  ok(cde.interpolator === Interpolator.GravityBounceInterpolator,"Got"+cde.interpolator);
+  cde.command('ib');
+  ok(cde.interpolator === Interpolator.BounceInterpolator,"Got"+cde.interpolator);
+  cde.command('io');
+  ok(cde.interpolator === Interpolator.OvershootInterpolator,"Got"+cde.interpolator);
+  cde.command('ia');
+  ok(cde.interpolator === Interpolator.AnticipateInterpolator,"Got"+cde.interpolator);
+  cde.command('iao');
+  ok(cde.interpolator === Interpolator.AnticipateOvershootInterpolator,"Got"+cde.interpolator);
+});
+
+// Offset
+test('command offset', function() {
+  let model = new Model();
+  let cde = new Command(model);
+  cde.command('d -200 -200 200 -200 200 200 -200 200');
+  cde.command('c 0 2');
+  cde.command('o 42  1');
+  ok(model.faces[0].offset === 0,"Got:"+model.faces[0].offset);
+  ok(model.faces[1].offset === 42,"Got:"+model.faces[1].offset);
 });

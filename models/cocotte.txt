@@ -7,43 +7,36 @@ c 0 8 c 8 3 c 0 4 c 4 1
 // Marque les coins
 c 6 0 c 6 1 c 6 2 c 6 3
 // Retourne
+iad
 t 500 ty 180)
 // Replie le coin et retourne
 t 1000 r 48 180 21 0 10)
 t 500 ty 180)
 // Bord haut
-t 1000 r 37 180 8 17 3)
-t 1000 r 55 90 17 3 a 3 19)
+t 500 r 37 180 8 17 3)
+t 500 r 55 90 17 3 a 3 19)
 // Coté droit
-t 1000 r 29 180 5 22 2 a 19 3 17)
-t 1000 r 54 -45 19 3 17)
+t 500 r 29 180 5 22 2 a 19 3 17)
+t 500 r 54 -45 19 3 17)
 t 100 r 55 -30 17 a 3)
 // Oreille bas
-t 1000 r 53 -90 22 2 a 18)
-t 1000 r 45 180 1 12 7 a 18 2 22 )
+t 500 r 53 -90 22 2 a 18)
+t 500 r 45 180 1 12 7 a 18 2 22 )
 t 100 r 53 -20 22 a 18 2)
-t 1000 r 53 -70 18 2 22 a 22 )
+t 500 r 53 -70 18 2 22 a 22 )
 // oreille bas gauche
-t 1000 r 50 -90 12 1 a 24)
-t 1000 r 23 180 4 a 24 1 12 )
-t 1000 r 50 -80 12 1 24)
+t 500 r 50 -90 12 1 a 24)
+t 500 r 23 180 4 a 24 1 12 )
+t 100 r 50 -80 12 1 24)
+// Replie en ouvrant le bec
+t 500 r 16 -90 10 8 20 17 16 14 3 19 r 40 -90 0)
+t 500 r 16 -80 10 8 20 17 16 14 3 19 a 0)
+// Montre
+iao t 1000 zf) t 1000 tz -45) t 1000 zf)
+iso t 4000 ty 360) igb
 end
 
-// Ajuste avant de replier
-mo 7 8 4 5 6 mo 11 22 mo 23 13 a 21 18 20 10
-// Replie
-t 500 ty 180)
-od -1
-t 2000 f 20 175 11 22 9 0 20 10 19) // 180-5=175
-od -3 0 6 25 17 2 26 20 24 8 18 11 9 1 16
-// Redresse la queue 
-t 500 f 54 12 15 1 21) // 10 centre mais apres le bec il faut +2
-// Ouvre le bec  
-t 500 ty 180)
-t 2000 f 51 -75 23 13 17 16 18 24 2) 
-t 2000 r 42 -90 3)
-t 2000 r 51 -100 23 13 17 16 18 24 2 a 3) // reste 10 pour clore 
-// Ouvre la tête 
+// Ouvre la tête
 t 500 r 20 -4 22 r 20 4 13 a 3)
 // Ouvre les pattes
 t 1000 f 33 0 5 a 13 f 37 0 6 a 22)
@@ -51,6 +44,4 @@ t 1000 f 33 0 5 a 13 f 37 0 6 a 22)
 t 500 r 31 -4  4 r 31 4 8 a 24 18 2)
 // Enleve tous les offsets
 om 0
-// Montre
-iao t 1000 zf) t 1000 tz -45) t 1000 zf)
-iso t 4000 ty 360) igb
+

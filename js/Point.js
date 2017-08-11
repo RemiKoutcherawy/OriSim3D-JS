@@ -1,6 +1,4 @@
 // File:src/Point.js
-"use strict";
-
 // Point to hold Points
 // 3D : x y z
 // Flat crease pattern : xf, yf
@@ -78,8 +76,8 @@ Point.prototype = {
   },
   // Normalize as a vector
   norm:function () {
-    let lg = this.length();
-    return this.scale(1 / lg);
+    var lg = this.length();
+    return this.scale(1.0 / lg);
   },
 
   // String representation
@@ -102,36 +100,36 @@ Point.prototype = {
 Point.dot = function dot(a, b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 };
-// New Vector A + B
-Point.add = function add(A, B) {
-  return new Point(A.x + B.x, A.y + B.y, A.z + B.z);
+// New Vector a + b
+Point.add = function add(a, b) {
+  return new Point(a.x + b.x, a.y + b.y, a.z + b.z);
 };
-// New Vector A - B
-Point.sub = function sub(A, B) {
-  return new Point(A.x - B.x, A.y - B.y, A.z - B.z);
+// New Vector a - b
+Point.sub = function sub(a, b) {
+  return new Point(a.x - b.x, a.y - b.y, a.z - b.z);
 };
 // Return 0 if Point is near x,y,z
 Point.compare3d = function compare3D(p1, p2, y, z) {
   if (arguments.length === 2) {
     // compare3D (p1, p2)
-    let dx2 = (p1.x - p2.x) * (p1.x - p2.x);
-    let dy2 = (p1.y - p2.y) * (p1.y - p2.y);
-    let dz2 = (p1.z - p2.z) * (p1.z - p2.z);
-    let d   = dx2 + dy2 + dz2;
+    var dx2 = (p1.x - p2.x) * (p1.x - p2.x);
+    var dy2 = (p1.y - p2.y) * (p1.y - p2.y);
+    var dz2 = (p1.z - p2.z) * (p1.z - p2.z);
+    var d   = dx2 + dy2 + dz2;
     return d > 1 ? d : 0;
   } else {
     // compare3D (p1, x,y,z)
-    let dx2 = (p1.x - p2) * (p1.x - p2);
-    let dy2 = (p1.y - y) * (p1.y - y);
-    let dz2 = (p1.z - z) * (p1.z - z);
-    let d   = dx2 + dy2 + dz2;
+    var dx2 = (p1.x - p2) * (p1.x - p2);
+    var dy2 = (p1.y - y) * (p1.y - y);
+    var dz2 = (p1.z - z) * (p1.z - z);
+    var d   = dx2 + dy2 + dz2;
     return d > 1 ? d : 0;
   }
 };
 // Return 0 if Point is near xf,yf
 Point.compare2d = function compare2D(p1, p2) {
-  let dx2 = (p1.xf - p2.xf) * (p1.xf - p2.xf);
-  let dy2 = (p1.yf - p2.yf) * (p1.yf - p2.yf);
+  var dx2 = (p1.xf - p2.xf) * (p1.xf - p2.xf);
+  var dy2 = (p1.yf - p2.yf) * (p1.yf - p2.yf);
   return Math.sqrt(dx2 + dy2);
 };
 

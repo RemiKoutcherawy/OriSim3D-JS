@@ -1,7 +1,5 @@
 // File: js/Face.js
-"use strict";
-
-// Dependencies : import them before Model in browser
+// Dependencies : import them before Face.js in browser
 if (typeof module !== 'undefined' && module.exports) {
   const Point = require('./Point.js');
 }
@@ -15,7 +13,6 @@ function Face() {
   this.offset    = 0;
 }
 // Static values
-Face.EPSILON = 0.1;
 
 // Class methods
 Face.prototype = {
@@ -37,7 +34,7 @@ Face.prototype = {
       this.normal[0] = u[1] * v[2] - u[2] * v[1];
       this.normal[1] = u[2] * v[0] - u[0] * v[2];
       this.normal[2] = u[0] * v[1] - u[1] * v[0];
-      if (Math.abs(this.normal[0]) + Math.abs(this.normal[1]) + Math.abs(this.normal[2]) > Face.EPSILON) {
+      if (Math.abs(this.normal[0]) + Math.abs(this.normal[1]) + Math.abs(this.normal[2]) > 0.1) {
         break;
       }
     }

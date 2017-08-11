@@ -1,4 +1,4 @@
-// file 'test/test.ModelDeep.js.js
+// file 'test/testCommand.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 
@@ -53,10 +53,10 @@ function isCCW (poly2d) {
   }
   // Take points on either side of lowest
   let next = (iymin === n - 1) ? 0 : iymin+1;
-  let previous = (iymin === 0) ? n-1 : iymin-1;
+  let previous = (iymin == 0) ? n-1 : iymin-1;
   // If not aligned ccw is of the sign of area
   let ccw = area2(poly2d, previous, iymin, next);
-  if (ccw === 0) {
+  if (ccw == 0) {
     // If horizontally aligned compare x
     ccw = poly2d[2*next] - poly2d[2*previous];
   }
@@ -114,16 +114,19 @@ test('Split Bug 3', function () {
   ok(model.segments.length === 17, "segs :"+model.segments.length);
   ok(checkFaces(model));
 });
-test('Turn Bug 1', function () {
+test('Rotate Bug 1', function () {
   let model = new Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // d -200 -200 200 -200  200 200 -200 200 ty 180  c 3 0
 
   model.turn(2, 180);
-
+  console.log("Points:"+model.points);
   model.splitCross(model.points[3], model.points[0]);
+  console.log("Points:"+model.points);
+
   ok(Math.round(model.points[4].xf) === -200,"Got:"+model.points[4].xf);
   ok(Math.round(model.points[5].xf) === 200,"Got:"+model.points[5].xf);
+
   ok(model.segments.length === 7, "segs :"+model.segments.length);
   ok(checkFaces(model));
 });
