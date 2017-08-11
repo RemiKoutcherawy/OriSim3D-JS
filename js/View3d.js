@@ -336,7 +336,6 @@ View3d.prototype = {
   },
   // Mouse released
   mouseup:function () {
-    ev.preventDefault();
     View3d.dragging = false;
   },
   // Mouse move
