@@ -312,22 +312,35 @@ View3d.prototype = {
     // Last position of the mouse
     View3d.lastX = -1;
     View3d.lastY = -1;
+    View3d.touchtime = 0;
     this.canvas3dtext.addEventListener("mousedown", this.mousedown);
     this.canvas3dtext.addEventListener("mouseup", this.mouseup);
     this.canvas3dtext.addEventListener("mousemove", this.mousemove);
     this.canvas3dtext.addEventListener("touchstart", this.mousedown, false ); // For tactile screen
     this.canvas3dtext.addEventListener("touchend", this.mouseup, false );
     this.canvas3dtext.addEventListener("touchmove", this.mousemove, false );
-    this.canvas3dtext.addEventListener("dblclick", this.dblclick);
   },
   // Mouse pressed
   mousedown:function (ev) {
+    // For tactile devices "dblclick"
+    if (View3d.touchtime == 0) {
+      View3d.touchtime = new Date().getTime();
+    } else {
+      if (( (new Date().getTime()) - View3d.touchtime) < 800) {
+        View3d.currentAngle[0] = 0;
+        View3d.currentAngle[1] = 0;
+        View3d.scale           = 1.0;
+        View3d.touchtime       = 0;
+      } else {
+        View3d.touchtime = new Date().getTime();
+      }
+    }
     ev.preventDefault();
-    var touches = ev.changedTouches ? ev.changedTouches[ 0 ] : ev;
-    const x    = touches.clientX;
-    const y    = touches.clientY;
+    var touches = ev.changedTouches ? ev.changedTouches[0] : ev;
+    const x     = touches.clientX;
+    const y     = touches.clientY;
     // Start dragging
-    const rect = ev.target.getBoundingClientRect();
+    const rect  = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
       View3d.lastX    = x;
       View3d.lastY    = y;
@@ -335,7 +348,8 @@ View3d.prototype = {
     }
   },
   // Mouse released
-  mouseup:function () {
+  mouseup:function (ev) {
+    ev.preventDefault();
     View3d.dragging = false;
   },
   // Mouse move
@@ -345,9 +359,15 @@ View3d.prototype = {
     const x    = touches.clientX;
     const y    = touches.clientY;
     if (View3d.dragging) {
-      if (ev.shiftKey || ev.altKey || touches.length > 0) {
-        // Zoom
-        View3d.scale -= (y - View3d.lastY) / 300;
+      // Zoom with Shift on destop, two fingers on tactile
+      if (ev.shiftKey || (ev.scale !== undefined && ev.scale !== 1) ) {
+        if (ev.scale === undefined){
+          // Zoom on desktop
+          View3d.scale -= (y - View3d.lastY) / 300;
+        } else {
+          // Zoom on tactile
+          View3d.scale = ev.scale;
+        }
       } else {
         // Rotation
         const factor           = 300 / ev.target.height;
@@ -359,12 +379,6 @@ View3d.prototype = {
     }
     View3d.lastX = x;
     View3d.lastY = y;
-  },
-  // Mouse double click
-  dblclick:function () {
-    View3d.currentAngle[0] = 0;
-    View3d.currentAngle[1] = 0;
-    View3d.scale           = 1.0;
   },
 
   // Draw
