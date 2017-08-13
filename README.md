@@ -1,23 +1,22 @@
 OriSim3D 
 ===
+OriSim3D origami folding simulation with WebGL.
+
+
 Fork and Push requests welcomed
 ===
 OriSim3D origami folding simulation with WebGL.
 
 Demo : [Demo one file containing all](https://remikoutcherawy.github.io/vue3dLocal.html) 
 
-
 This application is a simplified version of
 https://github.com/RemiKoutcherawy/OriSim3D-Android
 
 ## Usage
 
-If you simply want to see, clone the repository with git:
+Download and save : [Demo](https://remikoutcherawy.github.io/vue3dLocal.html)
+You can open it locally, tweak it, it contains all javascript, no libraries.
 
-```bash
-git clone https://github.com/RemiKoutcherawy/OriSim3D-JS.git
-```
-Then open `'conception.html'` to test commands from html page.
 
 ## Comment est organisé le code ?
 Dans le répertoire `js` :
