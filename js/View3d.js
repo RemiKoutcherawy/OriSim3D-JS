@@ -266,6 +266,16 @@ View3d.prototype = {
     // image_back.src = './textures/back.jpg';
     // Do not require CORS
     image_back.src = window.document.getElementById("back").src;
+
+    // Tricky because <img style="display:none;" id="front" src="textures/front.jpg"/> has not loaded
+    const waitForLoaded = function(){
+      if(window.document.getElementById("front").complete === true
+        && window.document.getElementById("back").complete === true){
+      } else {
+        setTimeout(waitForLoaded,10); // try again in 100ms
+      }
+    }
+    setTimeout(waitForLoaded,10);
   },
 
   // Perspective and background

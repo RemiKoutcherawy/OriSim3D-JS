@@ -53,25 +53,21 @@ Command.prototype = {
     }
     // If we are in browser XHR or Script embedded
     else {
-      if (document.getElementById("cocotte")) {
-        text = document.getElementById("cocotte").text;
-      } else {
-        const request = new XMLHttpRequest();
-        request.onreadystatechange = function () {
-          if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
-            const type = request.getResponseHeader("Content-Type");
-            if (type.match(/^text/)) { // Make sure response is text
-              text = request.responseText;
-            }
-          } else if (request.readyState !== XMLHttpRequest.OPENED) {
-            console.log("Error ? state:" + request.readyState + " status:" + request.status);
+      const request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (request.readyState === XMLHttpRequest.DONE && request.status === 200) {
+          const type = request.getResponseHeader("Content-Type");
+          if (type.match(/^text/)) { // Make sure response is text
+            text = request.responseText;
           }
-        };
-        // XMLHttpRequest.open(method, url, async)
-        // Here async = false ! => Warning from Firefox, Chrome,
-        request.open('GET', filename, false);
-        request.send(null);
-      }
+        } else if (request.readyState !== XMLHttpRequest.OPENED) {
+          console.log("Error ? state:" + request.readyState + " status:" + request.status);
+        }
+      };
+      // XMLHttpRequest.open(method, url, async)
+      // Here async = false ! => Warning from Firefox, Chrome,
+      request.open('GET', filename, false);
+      request.send(null);
     }
     if (text === null) {
       console.log("Error reading:" + filename);
@@ -357,8 +353,8 @@ Command.prototype = {
       else if (cde.startsWith("read")) {
         var filename = cde.substring(5);
         if (filename.indexOf("script") !== -1) {
-          // Expect "read script cocotte" => filename="script cocotte" => id="cocotte"
-          // With a tag <script id="cocotte" type="not-javascript">d ...< /script> in html file
+          // Expect "read script cocotte.txt" => filename="script cocotte.txt" => id="cocotte.txt"
+          // With a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
           var id = filename.substring(7);
           cde    = document.getElementById(id).text;
         } else {

@@ -21,6 +21,9 @@ Orisim3d.prototype = {
   constructor:Orisim3d
 };
 
+// Global
+var orisim3d = {};
+
 // Main startup
 if (typeof window !== 'undefined') {
   window.onload = function () {
@@ -28,6 +31,7 @@ if (typeof window !== 'undefined') {
     var model = new Model();
     model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
     var command      = new Command(model);
+    orisim3d.command = command;
     var canvas2d     = window.document.getElementById('canvas2d');
     var view2d       = canvas2d ? new View2d(model, canvas2d) : null;
     var canvas3d     = window.document.getElementById('canvas3d');
@@ -46,7 +50,7 @@ if (typeof window !== 'undefined') {
       if (first) {
         // Read Cocotte Script
         // command.command("read script cocotte"); // For model buddled in html
-        command.command("read models/cocotte.txt"); // For xhr
+        // command.command("read models/cocotte.txt"); // For xhr
         first = false;
       }
       if (model.change) {
