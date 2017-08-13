@@ -11,7 +11,7 @@ function View3d(model, canvas3d, canvas3dtext) {
   this.model        = model;
   this.canvas3d     = canvas3d;
   this.canvas3dtext = canvas3dtext;
-  this.gl           = this.canvas3d.getContext('webgl');
+  this.gl           = this.canvas3d.getContext('webgl' || canvas.getContext( 'experimental-webgl' ));
 
   // Initialisation
   this.initWebGL();
@@ -240,9 +240,9 @@ View3d.prototype = {
       that.hTexFront = 400; //image_front.height;
     };
     // Require CORS
-    image_front.src = './textures/front.jpg';
+    // image_front.src = './textures/front.jpg';
     // Do not require CORS
-    // image_front.src = window.document.getElementById("front").src;
+    image_front.src = window.document.getElementById("front").src;
 
     // Create a texture object Back
     var textureBack = gl.createTexture();
@@ -263,9 +263,9 @@ View3d.prototype = {
       that.hTexBack = 400; //image_back.height;
     };
     // Require CORS
-    image_back.src = './textures/back.jpg';
+    // image_back.src = './textures/back.jpg';
     // Do not require CORS
-    // image_back.src = window.document.getElementById("back").src;
+    image_back.src = window.document.getElementById("back").src;
   },
 
   // Perspective and background
@@ -316,13 +316,13 @@ View3d.prototype = {
     this.canvas3dtext.addEventListener("mousedown", this.mousedown);
     this.canvas3dtext.addEventListener("mouseup", this.mouseup);
     this.canvas3dtext.addEventListener("mousemove", this.mousemove);
-    this.canvas3dtext.addEventListener("touchstart", this.mousedown, false ); // For tactile screen
-    this.canvas3dtext.addEventListener("touchend", this.mouseup, false );
-    this.canvas3dtext.addEventListener("touchmove", this.mousemove, false );
+    this.canvas3dtext.addEventListener("touchstart", this.mousedown, {capture: true} ); // For tactile screen
+    this.canvas3dtext.addEventListener("touchend", this.mouseup, {capture: true} );
+    this.canvas3dtext.addEventListener("touchmove", this.mousemove, {capture: true} );
   },
   // Mouse pressed
   mousedown:function (ev) {
-    // For tactile devices "dblclick"
+    // For tactile devices no "dblclick"
     if (View3d.touchtime == 0) {
       View3d.touchtime = new Date().getTime();
     } else {
