@@ -11,7 +11,7 @@ function View3d(model, canvas3d, canvas3dtext) {
   this.model        = model;
   this.canvas3d     = canvas3d;
   this.canvas3dtext = canvas3dtext;
-  this.gl           = this.canvas3d.getContext('webgl' || canvas.getContext( 'experimental-webgl' ));
+  this.gl           = this.canvas3d.getContext('webgl') || canvas.getContext('experimental-webgl');
 
   // Initialisation
   this.initWebGL();
