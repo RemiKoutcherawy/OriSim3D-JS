@@ -1,6 +1,6 @@
 // File: js/View3d.js
 // Dependencies : import them before View3d.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Model = require('./Model.js');
   var Matrix4 = require('./Matrix4.js');
 }
@@ -13,14 +13,14 @@ function View3d(model, canvas3d, canvas3dtext) {
   this.canvas3dtext = canvas3dtext;
   this.gl           = this.canvas3d.getContext('webgl') || canvas.getContext('experimental-webgl');
 
-  // Initialisation
-  this.initWebGL();
-
   // Textures dimensions
   this.wTexFront = 0; //640/2; // 640x905 ou 400x566 ou 256x256
   this.hTexFront = 0; // 905/2;
   this.wTexBack  = 0; //640/2; // Bizarre 256 normalement
   this.hTexBack  = 0; //905/2;
+
+  // Initialisation
+  this.initWebGL();
 }
 // Face Vertex
 View3d.FaceVertexShaderSrc   =
@@ -234,10 +234,8 @@ View3d.prototype = {
       gl.activeTexture(gl.TEXTURE0);
       View3d.loadTexture(gl, textureFront, u_SamplerFront, image_front, 0 );
       // Textures dimensions
-      // TODO Fix me
-      // console.log("front w:"+image_front.width+" h:"+image_front.height);
-      that.wTexFront = 400; //image_front.width;
-      that.hTexFront = 400; //image_front.height;
+      that.wTexFront = image_front.width;
+      that.hTexFront = image_front.height;
     };
     // Require CORS
     // image_front.src = './textures/front.jpg';
@@ -257,25 +255,24 @@ View3d.prototype = {
       gl.activeTexture(gl.TEXTURE1);
       View3d.loadTexture(gl, textureBack, u_SamplerBack, image_back, 1 );
       // Textures dimensions
-      // TODO Fix me
-      // console.log("back w:"+image_back.width+" h:"+image_back.height);
-      that.wTexBack = 400; //image_back.width;
-      that.hTexBack = 400; //image_back.height;
+      that.wTexBack = image_back.width;
+      that.hTexBack = image_back.height;
+      console.log(that.wTexBack+" "+that.hTexBack);
     };
     // Require CORS
     // image_back.src = './textures/back.jpg';
     // Do not require CORS
     image_back.src = window.document.getElementById("back").src;
 
-    // Tricky because <img style="display:none;" id="front" src="textures/front.jpg"/> has not loaded
-    const waitForLoaded = function(){
-      if(window.document.getElementById("front").complete === true
-        && window.document.getElementById("back").complete === true){
-      } else {
-        setTimeout(waitForLoaded,10); // try again in 100ms
-      }
-    }
-    setTimeout(waitForLoaded,10);
+    // // Tricky because <img style="display:none;" id="front" src="textures/front.jpg"/> has not loaded
+    // const waitForLoaded = function(){
+    //   if(window.document.getElementById("front").complete === true
+    //     && window.document.getElementById("back").complete === true){
+    //   } else {
+    //     setTimeout(waitForLoaded,10); // try again in 100ms
+    //   }
+    // }
+    // setTimeout(waitForLoaded,10);
   },
 
   // Perspective and background
@@ -326,9 +323,9 @@ View3d.prototype = {
     this.canvas3dtext.addEventListener("mousedown", this.mousedown);
     this.canvas3dtext.addEventListener("mouseup", this.mouseup);
     this.canvas3dtext.addEventListener("mousemove", this.mousemove);
-    this.canvas3dtext.addEventListener("touchstart", this.mousedown, {capture: true} ); // For tactile screen
-    this.canvas3dtext.addEventListener("touchend", this.mouseup, {capture: true} );
-    this.canvas3dtext.addEventListener("touchmove", this.mousemove, {capture: true} );
+    this.canvas3dtext.addEventListener("touchstart", this.mousedown, {capture: true, passive: true} ); // For tactile screen
+    this.canvas3dtext.addEventListener("touchend", this.mouseup, {capture: true, passive: true} );
+    this.canvas3dtext.addEventListener("touchmove", this.mousemove, {capture: true, passive: true} );
   },
   // Mouse pressed
   mousedown:function (ev) {
@@ -421,6 +418,6 @@ View3d.prototype = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = View3d;
 }
