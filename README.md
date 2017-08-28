@@ -7,15 +7,19 @@ Fork and Push requests welcomed
 ===
 OriSim3D origami folding simulation with WebGL.
 
-Demo : [Demo one file containing all](https://remikoutcherawy.github.io/vue3dLocal.html) 
+Demo : [one file no libs](https://remikoutcherawy.github.io/cocotte.html) 
 
-This application is a simplified version of
+This application is a work in progress from 
 https://github.com/RemiKoutcherawy/OriSim3D-Android
 
 ## Usage
 
-Download and save : [Demo](https://remikoutcherawy.github.io/vue3dLocal.html)
-You can open it locally, tweak it, it contains all javascript, no libraries.
+Download and open : [conception.html](https://remikoutcherawy.github.io/conception.html)
+You can use it to make up a model, tweak it, and make pull request.
+
+To bundle all files in `app.js`, lauch `node build.js`  
+This require `npm update --save-dev` to download mocha and uglify-es.
+
 
 
 ## Comment est organisé le code ?
@@ -63,7 +67,6 @@ Dans le répertoire `js` :
 - `CommandArea.js` : permet d'envoyer des commandes en mode texte, sur la page html affichée
   Très basique...
 - `Interpolator.js` : une suite de fonctions t : [0,1] => [0,1] qui donnent une impression aux mouvements
-- `Matrix4.js` : à supprimer, sert juste à View3d pour calculer un frustrum.
 
 Sous la racine : 
  - `conception.html` : affiche View2d, View3d et CommandArea 
@@ -125,8 +128,7 @@ Les commandes sont de 4 types :
 - Menu avec icones type Oripa pour saisir des points, segments et créer les plis.
 - Sauvegarde en SVG, CP, OBJ.
 - Chargement d'un CP, OPX.
-- Supprimer Matrix4.js qui ne sert pas à grand chose.
 - Mettre de la lumière, une image de fond et des ombres sur la vue WebGL.
-- Automatiser la création de `vue3dLocal.html`
+- Passer sous THREE.js 
 
  
