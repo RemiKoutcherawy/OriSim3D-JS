@@ -1,7 +1,7 @@
 // file 'test/testCommand.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
-
+NODE_ENV = true;
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
   var Point   = require('../js/Point.js');
@@ -120,9 +120,9 @@ test('Rotate Bug 1', function () {
   // d -200 -200 200 -200  200 200 -200 200 ty 180  c 3 0
 
   model.turn(2, 180);
-  console.log("Points:"+model.points);
+  // console.log("Points:"+model.points);
   model.splitCross(model.points[3], model.points[0]);
-  console.log("Points:"+model.points);
+  // console.log("Points:"+model.points);
 
   ok(Math.round(model.points[4].xf) === -200,"Got:"+model.points[4].xf);
   ok(Math.round(model.points[5].xf) === 200,"Got:"+model.points[5].xf);
