@@ -33,15 +33,16 @@ Menu.prototype = {
         // Highlight
         items[k].getElementsByTagName("rect")[0].style['stroke-width'] = "2px";
         // Search attribute <svg model="cocotte.txt".../>
-        var item = items[k].getAttribute("model");
-        if (item) {
+        var modelattr = items[k].getAttribute("model");
+        if (modelattr) {
           // Expect a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
-          var tag    = document.getElementById(item);
+          var tag = document.getElementById(modelattr);
           if (tag){
             // Global var : orisim3d
             var model = tag.textContent;
-            console.log("model:"+model);
-            // orisim3d.command.command(model);
+            if (typeof orisim3d !== "undefined"){
+              orisim3d.command.command(model);
+            }
           }
         }
       }

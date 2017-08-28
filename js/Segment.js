@@ -1,6 +1,6 @@
 // File: js/Segment.js
 // Dependencies : import them before Segment.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Point = require('./Point.js');
 }
 
@@ -209,6 +209,6 @@ Segment.closestLine = function closestLine(s1, s2) {
 };
 
 // For Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Segment;
 }

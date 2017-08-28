@@ -1,6 +1,6 @@
 // File: js/Model.js
 // Dependencies : import them before Model.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Point   = require('./Point.js');
   var Segment = require('./Segment.js');
   var Face    = require('./Face.js');
@@ -74,7 +74,6 @@ Model.prototype = {
   addSegment:function (p1, p2, type) {
     if (Point.compare3d(p1, p2) === 0) {
       console.log("Warn Add degenerate segment:" + p1);
-      console.log(new Error().stack);
       return null;
     }
     var s = new Segment(p1, p2, type);
@@ -172,12 +171,10 @@ Model.prototype = {
     // Compute angle in Degrees at this segment
     if (s.type === Segment.EDGE) {
       console.log("Warn Angle on Edge:" + s);
-      console.log(new Error().stack);
       return 0;
     }
     if (right === null || left === null) {
       console.log("Warn No right and left face for:" + s + " left:" + left + " right:" + right);
-      console.log(new Error().stack);
       return 0;
     }
     var nL  = left.computeFaceNormal();
@@ -216,7 +213,6 @@ Model.prototype = {
     if (list.length > 1) {
       console.log("Error More than one segment on 2 points:" + list.length
         + " " + list[0].p1 + list[0].p2 + " " + list[1].p1 + list[1].p2);
-      console.log(new Error().stack);
     }
     if (list.length === 0)
       return null;
@@ -248,14 +244,16 @@ Model.prototype = {
   },
   // Split segment on a point, add point to model, update faces containing segment @testOK
   splitSegmentOnPoint:function (s1, p) {
+    var pts = null, i = null;
+
     // Align Point p on segment s in 2D from coordinates in 3D
     this.align2dFrom3d(p, s1);
     // Add point P to first face.
     var l = this.searchFace(s1, null);
     if (l !== null && l.points.indexOf(p) === -1) {
       // Add after P2 or P1 for the left face (CCW)
-      var pts = l.points;
-      for (var i = 0; i < pts.length; i++) {
+      pts = l.points;
+      for (i = 0; i < pts.length; i++) {
         if (pts[i] === s1.p1
           && pts[i === pts.length - 1 ? 0 : i + 1] === s1.p2) {
           pts.splice(i + 1, 0, p);
@@ -271,9 +269,9 @@ Model.prototype = {
     // Add point P to second face.
     var r = this.searchFace(s1, l);
     if (r !== null && r.points.indexOf(p) === -1) {
-      var pts = r.points;
+      pts = r.points;
       // Add after P2 or P1 for the right face (CCW)
-      for (var i = 0; i < pts.length; i++) {
+      for (i = 0; i < pts.length; i++) {
         if (pts[i] === s1.p1 && pts[i === pts.length - 1 ? 0 : i + 1] === s1.p2) {
           pts.splice(i + 1, 0, p);
           break;
@@ -378,15 +376,15 @@ Model.prototype = {
       else if (bSide === -1) {  // b behind
         if (aSide === 1) {        // a in front
           // c4) edge cross add intersection to both sides
-          var j = pl.intersectPoint(b, a);
+          j = pl.intersectPoint(b, a);
           // Add i to model points
-          var i = this.addPoint(j);
+          i = this.addPoint(j);
           // Add 'i' to front and back sides
           front.push(i);
           back.push(i);
           // Examine segment a,b to split
-          var s     = this.searchSegmentTwoPoints(a, b);
-          var index = this.segments.indexOf(s);
+          s     = this.searchSegmentTwoPoints(a, b);
+          index = this.segments.indexOf(s);
           if (index !== -1) {
             // Set i 2D coordinates from 3D
             this.align2dFrom3d(i, s);
@@ -440,7 +438,7 @@ Model.prototype = {
           back.push(b);
           // Eventually add segment from last inter
           if (lastinter !== null && lastinter !== b) {
-            var s = this.searchSegmentTwoPoints(lastinter, b);
+            s = this.searchSegmentTwoPoints(lastinter, b);
             if (s === null) {
               this.addSegment(lastinter, b, Segment.PLAIN);
             }
@@ -618,13 +616,9 @@ Model.prototype = {
   evaluate:function () {
     // Iterate over all segments
     for (var i = 0; i < this.segments.length; i++) {
-      var s = this.segments[i];
-      var d = Math.abs(s.length2d() - s.length3d());
-      if (d < 0.1) {
-        s.highlight = false;
-      } else {
-        s.highlight = true;
-      }
+      var s       = this.segments[i];
+      var d       = Math.abs(s.length2d() - s.length3d());
+      s.highlight = d >= 0.1;
     }
   },
 
@@ -644,58 +638,6 @@ Model.prototype = {
       p.y = p0.y * k1 + p.y * k2;
       p.z = p0.z * k1 + p.z * k2;
     });
-  },
-  // Move on a line S0 all following points, k from 0 to 1 for animation
-  moveOnLine:function (s, k1, k2, pts) {
-    pts.forEach(function (p) {
-      // Point n = s0.closestLine(new Segment(p,p)).p1;
-      // First case if there is a segment joining point p and s search point common pc
-      var pc = null;
-      var pd = null;
-      this.segments.some(function (si) {
-        if (si.equals(p, s.p1)) {
-          pc = si.p2;
-          pd = s.p2;
-          return true;
-        } else if (si.equals(p, s.p2)) {
-          pc = si.p2;
-          pd = s.p1;
-          return true;
-        } else if (si.equals(s.p1, p)) {
-          pc = si.p1;
-          pd = s.p2;
-          return true;
-        } else if (si.equals(s.p2, p)) {
-          pc = si.p1;
-          pd = s.p1;
-          return true;
-        }
-      });
-      // if we have pc point common and pd point distant
-      if (pc !== null) {
-        // Turn p on pc pd (keep distance from Pc to P)
-        var pcp  = Math.sqrt((pc.x - p.x) * (pc.x - p.x)
-          + (pc.y - p.y) * (pc.y - p.y)
-          + (pc.z - p.z) * (pc.z - p.z));
-        var pcpd = Math.sqrt((pc.x - pd.x) * (pc.x - pd.x)
-          + (pc.y - pd.y) * (pc.y - pd.y)
-          + (pc.z - pd.z) * (pc.z - pd.z));
-        var k    = pcp / pcpd;
-        p.x      = (pc.x + k * (pd.x - pc.x)) * k1 + p.x * k2;
-        p.y      = (pc.y + k * (pd.y - pc.y)) * k1 + p.y * k2;
-        p.z      = (pc.z + k * (pd.z - pc.z)) * k1 + p.z * k2;
-      }
-      // Second case
-      else {
-        // console.log("Second case"); Oui ça arrive sur le bateau
-        // Project point
-        var pp = s.closestLine(new Segment(p, p)).p1;
-        // Move point p on projected pp
-        p.x    = (p.x + (pp.x - p.x)) * k1 + p.x * k2;
-        p.y    = (p.y + (pp.y - p.y)) * k1 + p.y * k2;
-        p.z    = (p.z + (pp.z - p.z)) * k1 + p.z * k2;
-      }
-    }, this);
   },
   // Move given or all points to z = 0
   flat:function (pts) {
@@ -813,6 +755,6 @@ Model.prototype = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Model;
 }

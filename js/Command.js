@@ -1,6 +1,6 @@
 // File: js/Command.js
 // Dependencies : import them before Command.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Model        = require('./Model.js');
   var Interpolator = require('./Interpolator.js');
 }
@@ -47,7 +47,7 @@ Command.prototype = {
   readfile:function (filename) {
     var text = null;
     // If we are in NodeJS fs is required
-    if (typeof require !== 'undefined') {
+    if (NODE_ENV === true && typeof require !== 'undefined') {
       const fs = require('fs');
       text     = fs.readFileSync(filename, 'utf-8');
     }
@@ -77,12 +77,13 @@ Command.prototype = {
 
   // Execute one command token on model
   execute:function () {
+    var list = [], a = null, b = null, angle = null, s = null, p = null;
+
     // Commands
     // "d : define" @testOK
     if (this.toko[this.iTok] === "d" || this.toko[this.iTok] === "define") {
       // Define sheet by N points x,y CCW
       this.iTok++;
-      var list = [];
       while (Number.isInteger(Number(this.toko[this.iTok]))) {
         list.push(this.toko[this.iTok++]);
       }
@@ -93,24 +94,24 @@ Command.prototype = {
     else if (this.toko[this.iTok] === "b" || this.toko[this.iTok] === "by") {
       // Split by two points
       this.iTok++;
-      var a = this.model.points[this.toko[this.iTok++]];
-      var b = this.model.points[this.toko[this.iTok++]];
+      a = this.model.points[this.toko[this.iTok++]];
+      b = this.model.points[this.toko[this.iTok++]];
       this.model.splitBy(a, b);
     }
     // "c : cross"  @testOK
     else if (this.toko[this.iTok] === "c" || this.toko[this.iTok] === "cross") {
       // Split across two points all (or just listed) faces
       this.iTok++;
-      var a = this.model.points[this.toko[this.iTok++]];
-      var b = this.model.points[this.toko[this.iTok++]];
+      a = this.model.points[this.toko[this.iTok++]];
+      b = this.model.points[this.toko[this.iTok++]];
       this.model.splitCross(a, b);
     }
     // "p : perpendicular"  @testOK
     else if (this.toko[this.iTok] === "p" || this.toko[this.iTok] === "perpendicular") {
       // Split perpendicular of line by point
       this.iTok++;
-      var s = this.model.segments[this.toko[this.iTok++]];
-      var p = this.model.points[this.toko[this.iTok++]];
+      s = this.model.segments[this.toko[this.iTok++]];
+      p = this.model.points[this.toko[this.iTok++]];
       this.model.splitOrtho(s, p);
     }
     // "lol : LineOnLine" TODO test
@@ -126,7 +127,7 @@ Command.prototype = {
     else if (this.toko[this.iTok] === "s" || this.toko[this.iTok] === "split") {
       // Split set by N/D
       this.iTok++;
-      var s = this.model.segments[this.toko[this.iTok++]];
+      s = this.model.segments[this.toko[this.iTok++]];
       var n = this.toko[this.iTok++];
       var d = this.toko[this.iTok++];
       this.model.splitSegmentByRatio(s, n / d);
@@ -137,20 +138,21 @@ Command.prototype = {
     else if (this.toko[this.iTok] === "r" || this.toko[this.iTok] === "rotate") {
       // Rotate Seg Angle Points with animation
       this.iTok++;
-      var s     = this.model.segments[this.toko[this.iTok++]];
-      var angle = (this.toko[this.iTok++] * (this.tni - this.tpi));
-      var list  = this.listPoints();
+      s     = this.model.segments[this.toko[this.iTok++]];
+      angle = (this.toko[this.iTok++] * (this.tni - this.tpi));
+      list  = this.listPoints();
       this.model.rotate(s, angle, list);
     }
     // "f : fold to angle"
     else if (this.toko[this.iTok] === "f" || this.toko[this.iTok] === "fold") {
       this.iTok++;
-      var s = this.model.segments[this.toko[this.iTok++]];
+      s = this.model.segments[this.toko[this.iTok++]];
       // Cache current angle at start of animation
-      if (this.tpi === 0)
+      if (this.tpi === 0){
         this.angleBefore = this.model.computeAngle(s);
-      var angle = ((this.toko[this.iTok++] - this.angleBefore) * (this.tni - this.tpi));
-      var list = this.listPoints();
+      }
+      angle = ((this.toko[this.iTok++] - this.angleBefore) * (this.tni - this.tpi));
+      list = this.listPoints();
       // Reverse segment to have the first point on left face
       if (this.tpi === 0 && this.model.faceRight(s.p1, s.p2).points.indexOf(list[0]) !== -1)
         s.reverse();
@@ -162,7 +164,7 @@ Command.prototype = {
     else if (this.toko[this.iTok] === "a" || this.toko[this.iTok] === "adjust") {
       // Adjust Points in 3D to fit 3D length
       this.iTok++;
-      var list  = this.listPoints();
+      list  = this.listPoints();
       var liste = list.length === 0 ? this.model.points : list;
       var dmax = this.model.adjustList(liste);
     }
@@ -173,7 +175,7 @@ Command.prototype = {
       // Offset by dz the list of faces : o dz f1 f2...
       this.iTok++;
       var dz = this.toko[this.iTok++] * this.kOffset;
-      var list  = this.listFaces();
+      list  = this.listFaces();
       this.model.offset(dz, list);
     }
 
@@ -218,7 +220,7 @@ Command.prototype = {
     // "z : Zoom scale x y" The zoom is centered on x y z=0
     else if (this.toko[this.iTok] === "z") {
       this.iTok++;
-      var scale   = this.toko[this.iTok++];
+      var scale = this.toko[this.iTok++];
       var x = this.toko[this.iTok++];
       var y = this.toko[this.iTok++];
       // for animation
@@ -231,14 +233,14 @@ Command.prototype = {
     else if (this.toko[this.iTok] === "zf") {
       this.iTok++;
       if (this.tpi === 0) {
-        var b      = this.model.get3DBounds();
+        b      = this.model.get3DBounds();
         var w      = 400;
         this.za[0] = w / Math.max(b[2] - b[0], b[3] - b[1]);
         this.za[1] = -(b[0] + b[2]) / 2;
         this.za[2] = -(b[1] + b[3]) / 2;
       }
-      var scale   = ((1 + this.tni * (this.za[0] - 1)) / (1 + this.tpi * (this.za[0] - 1)));
-      var bfactor = this.za[0] * (this.tni / scale - this.tpi);
+      scale   = ((1 + this.tni * (this.za[0] - 1)) / (1 + this.tpi * (this.za[0] - 1)));
+      bfactor = this.za[0] * (this.tni / scale - this.tpi);
       this.model.move(this.za[1] * bfactor, this.za[2] * bfactor, 0, null);
       this.model.scaleModel(scale);
     }
@@ -566,6 +568,6 @@ Command.prototype = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Command;
 }

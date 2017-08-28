@@ -1,6 +1,6 @@
 // File: js/Interpolator.js
 // Dependencies : import them before Command in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   // No dependencies
 }
 
@@ -105,6 +105,6 @@ var Interpolator = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Interpolator;
 }

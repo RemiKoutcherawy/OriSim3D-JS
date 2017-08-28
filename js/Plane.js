@@ -1,6 +1,6 @@
 // File: js/Plane.js
 // Dependencies : import them before Plane.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Point = require("./Point.js");
 }
 
@@ -86,6 +86,6 @@ Plane.prototype = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Plane;
 }

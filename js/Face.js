@@ -1,6 +1,6 @@
 // File: js/Face.js
 // Dependencies : import them before Face.js in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   const Point = require('./Point.js');
 }
 
@@ -62,6 +62,6 @@ Face.prototype = {
 };
 
 // Just for Node.js
-if (typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Face;
 }

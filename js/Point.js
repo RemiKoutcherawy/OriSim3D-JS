@@ -116,15 +116,16 @@ Point.compare3d = function compare3D(p1, p2, y, z) {
     var dy2 = (p1.y - p2.y) * (p1.y - p2.y);
     var dz2 = (p1.z - p2.z) * (p1.z - p2.z);
     var d   = dx2 + dy2 + dz2;
-    return d > 1 ? d : 0;
+    d = d > 1 ? d : 0;
   } else {
     // compare3D (p1, x,y,z)
-    var dx2 = (p1.x - p2) * (p1.x - p2);
-    var dy2 = (p1.y - y) * (p1.y - y);
-    var dz2 = (p1.z - z) * (p1.z - z);
-    var d   = dx2 + dy2 + dz2;
-    return d > 1 ? d : 0;
+    dx2 = (p1.x - p2) * (p1.x - p2);
+    dy2 = (p1.y - y) * (p1.y - y);
+    dz2 = (p1.z - z) * (p1.z - z);
+    d   = dx2 + dy2 + dz2;
+    d = d > 1 ? d : 0;
   }
+  return d;
 };
 // Return 0 if Point is near xf,yf
 Point.compare2d = function compare2D(p1, p2) {
@@ -132,8 +133,7 @@ Point.compare2d = function compare2D(p1, p2) {
   var dy2 = (p1.yf - p2.yf) * (p1.yf - p2.yf);
   return Math.sqrt(dx2 + dy2);
 };
-
-// For Node
-if (typeof module !== 'undefined' && module.exports) {
+// For Node, will be discarded by uglify
+if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = Point;
 }
