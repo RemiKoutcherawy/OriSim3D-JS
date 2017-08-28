@@ -240,8 +240,8 @@ View3d.prototype = {
     var textureBack = gl.createTexture();
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, textureBack);
-    // Placeholder One Pixel Color Yellow F3EE1B
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0xF3, 0xEE, 0x1B, 255]));
+    // Placeholder One Pixel Color Yellow FDEC43
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0xFD, 0xEC, 0x43, 0xFF]));
     var u_SamplerBack = gl.getUniformLocation(gl.faceShaderProgram, 'u_SamplerBack');
     gl.uniform1i(u_SamplerBack, 1);
 
