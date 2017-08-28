@@ -1,42 +1,63 @@
 // File: js/Menu.js
 // Menu Constructor
-function Menu() {
-  // Static values initialized in constructor
-  Menu.menuElement = window.document.getElementsByClassName('menu')[0];
-  Menu.menuElement.addEventListener('click', this.click);
-  Menu.hidden = true;
+function Menu(element) {
+  element.addEventListener('click', this.click);
 }
 // Class methods
 Menu.prototype = {
   constructor:Menu,
   click:function (ev) {
-    var items = window.document.getElementsByClassName('item');
-    // Menu open
-    if (Menu.hidden){
-      for(var i = 0; i < items.length; i++) {
+    var menu  = window.document.getElementsByClassName('menu')[0];
+    var items = menu.children;
+    // Menu open if click on first
+    if (ev.target === items[0] || ev.target.parentNode === items[0]) {
+      // Show all items
+      for (var i = 0; i < items.length; i++) {
         items[i].style.display = "block";
       }
-      Menu.hidden = false;
+      // Hide first item (☰)
+      items[0].style.display = "none";
     }
-    // Menu Close if click on top
-    else if (ev.target === Menu.menuElement) {
-      for(var j = 0; j < items.length; j++) {
+    // Menu Close if click on second item
+    else if (ev.target === items[1] || ev.target.parentNode === items[1]) {
+      // Hide all
+      for (var j = 0; j < items.length; j++) {
         items[j].style.display = "none";
       }
-      Menu.hidden = true;
+      // Show first item (x)
+      items[0].style.display = "block";
     }
-    // In all cases look for a <script id="modele" type="not-javascript"/> named after item
-    var modele = ev.target.innerText;
-    var script = window.document.getElementById(modele);
-    if (script){
-      // Global variable
-      orisim3d.command.command("read script "+modele);
+    // Select item
+    for (var k = 2; k < items.length; k++) {
+      if (items[k] === ev.target || items[k] === ev.target.parentNode || items[k] === ev.target.parentNode.parentNode) {
+        // Highlight
+        items[k].getElementsByTagName("rect")[0].style['stroke-width'] = "2px";
+        // Search attribute <svg model="cocotte.txt".../>
+        var item = items[k].getAttribute("model");
+        if (item) {
+          // Expect a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
+          var tag    = document.getElementById(item);
+          if (tag){
+            // Global var : orisim3d
+            var model = tag.textContent;
+            console.log("model:"+model);
+            // orisim3d.command.command(model);
+          }
+        }
+      }
+      else {
+        items[k].getElementsByTagName("rect")[0].style['stroke-width'] = "0.4px";
+      }
     }
   }
 };
+
 // New Menu on load
 if (typeof window !== 'undefined') {
   window.addEventListener("load", function () {
-    new Menu();
+    var nemuElement = window.document.getElementsByClassName('menu')[0];
+    if (nemuElement){
+      new Menu(nemuElement);
+    }
   })
 }
