@@ -39,11 +39,10 @@ const vsSource = `
       vTexCoordBack  = aTexCoordBack;
 
       // Lighting transform normal and dot with direction
-      highp vec3 lightColor = vec3(0.5, 0.5, 0.5); 
+      highp vec3 lightColor = vec3(0.8, 0.8, 0.8); 
       highp vec3 direction = vec3(0.0, 0.0, 1.0);  
-      highp vec4 normal = uModelViewMatrix * vec4(aVertexNormal, 1.0);
+      highp vec4 normal = normalize(uModelViewMatrix * vec4(aVertexNormal, 1.0));
       // dot product is negative for back face
-      // highp float dot = max(dot(normal.xyz, direction), -1.0);
       highp float dot = dot(normal.xyz, direction);
       
       // Pass to fragment
@@ -115,7 +114,7 @@ View3d.prototype = {
     gl.compileShader(vxShader);
     if (!gl.getShaderParameter(vxShader, gl.COMPILE_STATUS)) {
       alert("An error occurred compiling the shader: " + gl.getShaderInfoLog(vxShader));
-      gl.deleteShader(shader);
+      gl.deleteShader(vxShader);
     }
 
     // Fragment
@@ -124,7 +123,7 @@ View3d.prototype = {
     gl.compileShader(fgShader);
     if (!gl.getShaderParameter(fgShader, gl.COMPILE_STATUS)) {
       alert("An error occurred compiling the shader: " + gl.getShaderInfoLog(fgShader));
-      gl.deleteShader(shader);
+      gl.deleteShader(fgShader);
     }
 
     // Create the shader program
@@ -328,6 +327,7 @@ View3d.prototype = {
 
     // Model View Projection Matrix
     var mvp = View3d.projectionMatrix;
+
     // Choose portrait or landscape
     var ratio = this.canvas3d.width / this.canvas3d.height;
     var fov = 40;
@@ -354,6 +354,10 @@ View3d.prototype = {
 
     // Step back
     mvp[15] += 700;
+
+    // Set projection matrix
+    var projectionMatrix = gl.getUniformLocation(gl.program, 'uProjectionMatrix');
+    gl.uniformMatrix4fv(projectionMatrix, false, mvp);
   },
 
   // Resize canvas with client dimensions
@@ -423,7 +427,8 @@ View3d.prototype = {
       if (ev.shiftKey || (ev.scale !== undefined && ev.scale !== 1) ) {
         if (ev.scale === undefined){
           // Zoom on desktop
-          View3d.scale -= (y - View3d.lastY) / 300;
+          View3d.scale += (y - View3d.lastY) / 300.0;
+          View3d.scale = Math.max(View3d.scale, 0.0);
         } else {
           // Zoom on tactile
           View3d.scale = ev.scale;
@@ -449,12 +454,6 @@ View3d.prototype = {
     // Faces with texture shader
     gl.useProgram(gl.program);
 
-    // Static Projection for perspective
-    var m = View3d.projectionMatrix;
-    // Set projection matrix
-    var projectionMatrix = gl.getUniformLocation(gl.program, 'uProjectionMatrix');
-    gl.uniformMatrix4fv(projectionMatrix, false, m);
-
     // Current Model View for object
     var e = View3d.modelViewMatrix;
     // Rotation around X axis -> e
@@ -473,11 +472,11 @@ View3d.prototype = {
     f[2] = c*e[2]-s*e[10]; f[6] = e[6]; f[10] = c*e[10]+s*e[2]; f[14] = e[14];
     f[3] = c*e[3]-s*e[11]; f[7] = e[7]; f[11] = c*e[11]+s*e[3]; f[15] = e[15];
     // Scale f -> e and use e
-    s = View3d.scale;
-    e[0] = s*f[0]; e[4] = s*f[4]; e[8] = s*f[8];   e[12] = s*f[12];
-    e[1] = s*f[1]; e[5] = s*f[5]; e[9] = s*f[9];   e[13] = s*f[13];
-    e[2] = s*f[2]; e[6] = s*f[6]; e[10] = s*f[10]; e[14] = s*f[14];
-    e[3] = s*f[3]; e[7] = s*f[7]; e[11] = s*f[11]; e[15] = s*f[15];
+    var sc = View3d.scale;
+    e[0] = sc*f[0]; e[4] = sc*f[4]; e[8] = sc*f[8];   e[12] = f[12];
+    e[1] = sc*f[1]; e[5] = sc*f[5]; e[9] = sc*f[9];   e[13] = f[13];
+    e[2] = sc*f[2]; e[6] = sc*f[6]; e[10] = sc*f[10]; e[14] = f[14];
+    e[3] = f[3]; e[7] = f[7]; e[11] = f[11]; e[15] = f[15];
     var umv = gl.getUniformLocation(gl.program, 'uModelViewMatrix')
     gl.uniformMatrix4fv(umv, false, e);
 
