@@ -14,41 +14,79 @@ function View3d(model, canvas3d) {
   // Initialisation
   this.initWebGL();
 }
-// Face Vertex
-View3d.FaceVertexShaderSrc   =
-  'attribute vec4 a_Position;\n' +
-  'attribute vec2 a_TexCoordFront;\n' +
-  'attribute vec2 a_TexCoordBack;\n' +
-  'uniform mat4 u_MvMatrix;\n' +
-  'varying vec2 v_TexCoordFront;\n' +
-  'varying vec2 v_TexCoordBack;\n' +
-  'void main() {\n' +
-  '  gl_Position = u_MvMatrix * a_Position;\n' +
-  '  v_TexCoordFront = a_TexCoordFront;\n' +
-  '  v_TexCoordBack = a_TexCoordBack;\n' +
-  '}\n';
-// Face Fragment
-View3d.FaceFragmentShaderSrc =
-  '#ifdef GL_ES\n' +
-  'precision mediump float;\n' +
-  '#endif\n' +
-  'uniform sampler2D u_SamplerFront;\n' +
-  'uniform sampler2D u_SamplerBack;\n' +
-  'varying vec2 v_TexCoordFront;\n' +
-  'varying vec2 v_TexCoordBack;\n' +
-  'void main() {\n' +
-  'if (gl_FrontFacing){ \n' +
-  '  gl_FragColor = texture2D(u_SamplerFront, v_TexCoordFront);}\n' +
-  'else { \n' +
-  '  gl_FragColor = texture2D(u_SamplerBack, v_TexCoordBack); }\n' +
-  '}\n';
+// Vertex shader program
+const vsSource = `
+    attribute vec4 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTexCoordFront;
+    attribute vec2 aTexCoordBack;
+
+    uniform mat4 uModelViewMatrix;
+    uniform mat4 uProjectionMatrix;
+
+    varying highp vec2 vTexCoordFront;
+    varying highp vec2 vTexCoordBack;
+    varying highp vec3 vLighting;
+    varying vec4 vPos;
+
+    void main(void) {
+      // Vertex position
+      gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+      vPos = gl_Position;
+
+      // Pass to fragment
+      vTexCoordFront = aTexCoordFront;
+      vTexCoordBack  = aTexCoordBack;
+
+      // Lighting transform normal and dot with direction
+      highp vec3 lightColor = vec3(0.5, 0.5, 0.5); 
+      highp vec3 direction = vec3(0.0, 0.0, 1.0);  
+      highp vec4 normal = uModelViewMatrix * vec4(aVertexNormal, 1.0);
+      // dot product is negative for back face
+      // highp float dot = max(dot(normal.xyz, direction), -1.0);
+      highp float dot = dot(normal.xyz, direction);
+      
+      // Pass to fragment
+      vLighting = lightColor * dot;
+    }
+  `;
+
+// Fragment shader program
+const fsSource = `
+    precision highp float;
+
+    varying highp vec2 vTexCoordFront;
+    varying highp vec2 vTexCoordBack;
+    varying highp vec3 vLighting;
+    
+    uniform sampler2D uSamplerFront;
+    uniform sampler2D uSamplerBack;
+
+    void main(void) {
+      highp vec4 texelColor;
+      vec3 normal;
+      if (gl_FrontFacing) {
+        texelColor = texture2D(uSamplerFront, vTexCoordFront);
+        normal = texelColor.rgb * vLighting;
+      } else {
+        texelColor = texture2D(uSamplerBack,  vTexCoordBack);
+        normal = texelColor.rgb * vLighting * -1.0;
+      }
+      // Ambiant
+      vec3 ambiant = texelColor.rgb * 0.5;
+      // Ambiant + normal
+      gl_FragColor = vec4(ambiant + normal, texelColor.a);
+    }
+  `;
 
 // Current rotation angle ([x-axis, y-axis] degrees)
 View3d.currentAngle = [0.0, 0.0];
 View3d.scale        = 1.0;
-// Model view projection matrix for Perspective and Current
-View3d.g_MvpMatrix = new Float32Array(16);
-View3d.g_MvCurrentMatrix = new Float32Array(16);
+
+// Projection and model view matrix for Perspective and Current
+View3d.projectionMatrix = new Float32Array(16);
+View3d.modelViewMatrix  = new Float32Array(16);
+
 // Textures dimensions
 View3d.wTexFront = 1;
 View3d.hTexFront = 1;
@@ -70,35 +108,34 @@ View3d.prototype = {
   // Shaders
   initShaders:function () {
     const gl = this.gl;
-    // Face Vertex
+
+    // Vertex
     const vxShader = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vxShader, View3d.FaceVertexShaderSrc);
+    gl.shaderSource(vxShader, vsSource);
     gl.compileShader(vxShader);
     if (!gl.getShaderParameter(vxShader, gl.COMPILE_STATUS)) {
       alert("An error occurred compiling the shader: " + gl.getShaderInfoLog(vxShader));
+      gl.deleteShader(shader);
     }
-    // Face Fragment
+
+    // Fragment
     const fgShader = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fgShader, View3d.FaceFragmentShaderSrc);
+    gl.shaderSource(fgShader, fsSource);
     gl.compileShader(fgShader);
     if (!gl.getShaderParameter(fgShader, gl.COMPILE_STATUS)) {
       alert("An error occurred compiling the shader: " + gl.getShaderInfoLog(fgShader));
+      gl.deleteShader(shader);
     }
-    // Face Shader Program
-    const faceShaderProgram = gl.createProgram();
-    gl.attachShader(faceShaderProgram, vxShader);
-    gl.attachShader(faceShaderProgram, fgShader);
-    gl.linkProgram(faceShaderProgram);
-    // Use it
-    gl.useProgram(faceShaderProgram);
-    gl.faceShaderProgram       = faceShaderProgram;
-    // Attributes
-    const a_vertexPosAttribute = gl.getAttribLocation(faceShaderProgram, "a_Position");
-    gl.enableVertexAttribArray(a_vertexPosAttribute);
-    const textureCoordAttrFront = gl.getAttribLocation(faceShaderProgram, "a_TexCoordFront");
-    gl.enableVertexAttribArray(textureCoordAttrFront);
-    const textureCoordAttrBack = gl.getAttribLocation(faceShaderProgram, "a_TexCoordBack");
-    gl.enableVertexAttribArray(textureCoordAttrBack);
+
+    // Create the shader program
+    const program = gl.createProgram();
+    gl.attachShader(program, vxShader);
+    gl.attachShader(program, fgShader);
+    gl.linkProgram(program);
+
+    // Use it and copy it in an attribute of gl
+    gl.useProgram(program);
+    gl.program  = program;
   },
 
   // Buffers
@@ -109,7 +146,7 @@ View3d.prototype = {
     var ftx   = []; // front texture coords
     var btx   = []; // back texture coords
     var fnr   = []; // front normals coords
-    var bnr   = []; // back normals coords
+    var bnr   = []; // back normals coords Not used for now
     var fin   = []; // front indices
     var bin   = []; // back indices
     var index = 0;
@@ -117,7 +154,7 @@ View3d.prototype = {
     for (var iFace = 0; iFace < this.model.faces.length; iFace++) {
       var f   = this.model.faces[iFace];
       var pts = f.points;
-      // Normal needed for Offset
+      // Normal needed for Offset and used for lightning
       f.computeFaceNormal();
       var n = f.normal;
       // Triangle FAN can be used only because of convex CCW face
@@ -176,25 +213,30 @@ View3d.prototype = {
     var vertices       = new Float32Array(vtx);
     var texCoordsFront = new Float32Array(ftx);
     var texCoordsBack  = new Float32Array(btx);
-    this.initArrayBuffer(gl, gl.faceShaderProgram, vertices, 3, gl.FLOAT, 'a_Position');
-    this.initArrayBuffer(gl, gl.faceShaderProgram, texCoordsFront, 2, gl.FLOAT, 'a_TexCoordFront');
-    this.initArrayBuffer(gl, gl.faceShaderProgram, texCoordsBack, 2, gl.FLOAT, 'a_TexCoordBack');
+    this.initArrayBuffer(gl, vertices, 3, gl.FLOAT, 'aVertexPosition');
+    this.initArrayBuffer(gl, texCoordsFront, 2, gl.FLOAT, 'aTexCoordFront');
+    this.initArrayBuffer(gl, texCoordsBack,  2, gl.FLOAT, 'aTexCoordBack');
+
     // Indices buffer
     var faceVertexIndicesBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, faceVertexIndicesBuffer);
     var faceVertexIndicesArray = new Uint8Array(fin);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faceVertexIndicesArray, gl.STATIC_DRAW);
 
+    // Normals buffer
+    var normals  = new Float32Array(fnr);
+    this.initArrayBuffer(gl, normals, 3, gl.FLOAT, 'aVertexNormal');
+
     // Used in draw()
     this.nbFacesVertice = faceVertexIndicesArray.length;
   },
 
   // Create Buffer Arrays and assign to attribute
-  initArrayBuffer:function (gl, program, data, num, type, attribute) {
+  initArrayBuffer:function (gl, data, num, type, attribute) {
     var buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-    var a_attribute = gl.getAttribLocation(program, attribute);
+    var a_attribute = gl.getAttribLocation(gl.program, attribute);
     gl.vertexAttribPointer(a_attribute, num, type, false, 0, 0);
     gl.enableVertexAttribArray(a_attribute);
   },
@@ -202,39 +244,39 @@ View3d.prototype = {
   // Textures
   initTextures:function () {
     const gl = this.gl;
-    gl.useProgram(gl.faceShaderProgram);
     // Create a texture object Front
     var textureFront = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textureFront);
     // Placeholder One Pixel Color Blue 70ACF3
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0x70, 0xAC, 0xF3, 255]));
-    var u_SamplerFront = gl.getUniformLocation(gl.faceShaderProgram, 'u_SamplerFront');
-    gl.uniform1i(u_SamplerFront, 0);
+    var samplerFront = gl.getUniformLocation(gl.program, 'uSamplerFront');
+    gl.uniform1i(samplerFront, 0);
 
-    // View3d.image_front = new Image();
-    // View3d.image_front.onload = function(){
-    //   gl.useProgram(gl.faceShaderProgram);
-    //   var u_SamplerFront = gl.getUniformLocation(gl.faceShaderProgram, 'u_SamplerFront');
-    //   gl.uniform1i(u_SamplerFront, 0);
-    //   gl.activeTexture(gl.TEXTURE0);
-    //   // Flip the image Y coordinate
-    //   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    //   gl.bindTexture(gl.TEXTURE_2D, textureFront);
-    //   // One of the dimensions is not a power of 2, so set the filtering to render it.
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    //   // TODO fix texImage2D
-    //   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, View3d.image_front);
-    //   // Textures dimensions
-    //   View3d.wTexFront = View3d.image_front.width;
-    //   View3d.hTexFront = View3d.image_front.height;
-    // };
+    View3d.imageFront = new Image();
+    var that = this;
+    View3d.imageFront.onload = function() {
+      gl.activeTexture(gl.TEXTURE0);
+      // Flip the image Y coordinate
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      gl.bindTexture(gl.TEXTURE_2D, textureFront);
+      // One of the dimensions is not a power of 2, so set the filtering to render it.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, View3d.imageFront);
+      // Textures dimensions
+      View3d.wTexFront = View3d.imageFront.width;
+      View3d.hTexFront = View3d.imageFront.height;
+      // Recompute texture coords
+      that.initBuffers();
+    };
     // Require CORS
-    // image_front.src = './textures/front.jpg';
-    // Do not require CORS
-    // View3d.image_front.src = window.document.getElementById("front").src;
+    // View3d.imageFront.src = './textures/front.jpg';
+    // Does not require CORS, use if image is inlined in html
+    if (window.document.getElementById("front")){
+      View3d.imageFront.src = window.document.getElementById("front").src;
+    }
 
     // Create a texture object Back
     var textureBack = gl.createTexture();
@@ -242,31 +284,32 @@ View3d.prototype = {
     gl.bindTexture(gl.TEXTURE_2D, textureBack);
     // Placeholder One Pixel Color Yellow FDEC43
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0xFD, 0xEC, 0x43, 0xFF]));
-    var u_SamplerBack = gl.getUniformLocation(gl.faceShaderProgram, 'u_SamplerBack');
-    gl.uniform1i(u_SamplerBack, 1);
+    var samplerBack = gl.getUniformLocation(gl.program, 'uSamplerBack');
+    gl.uniform1i(samplerBack, 1);
 
-    // View3d.image_back = new Image();
-    // View3d.image_back.onload = function(){
-    //   gl.useProgram(gl.faceShaderProgram);
-    //   var u_SamplerBack = gl.getUniformLocation(gl.faceShaderProgram, 'u_SamplerBack');
-    //   gl.uniform1i(u_SamplerBack, 1);
-    //   gl.activeTexture(gl.TEXTURE1);
-    //   // Flip the image Y coordinate
-    //   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
-    //   gl.bindTexture(gl.TEXTURE_2D, textureBack);
-    //   // One of the dimensions is not a power of 2, so set the filtering to render it.
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    //   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    //   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, View3d.image_back);
-    //   // Textures dimensions
-    //   View3d.wTexBack = View3d.image_back.width;
-    //   View3d.hTexBack = View3d.image_back.height;
-    // };
+    View3d.imageBack = new Image();
+    View3d.imageBack.onload = function(){
+      gl.activeTexture(gl.TEXTURE1);
+      // Flip the image Y coordinate
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      gl.bindTexture(gl.TEXTURE_2D, textureBack);
+      // One of the dimensions is not a power of 2, so set the filtering to render it.
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, View3d.imageBack);
+      // Textures dimensions
+      View3d.wTexBack = View3d.imageBack.width;
+      View3d.hTexBack = View3d.imageBack.height;
+      // Recompute texture coords
+      that.initBuffers();
+    };
     // Require CORS
-    // View3d.image_back.src = './textures/back.jpg';
-    // Do not require CORS
-    // View3d.image_back.src = window.document.getElementById("back").src;
+    // View3d.imageBack.src = './textures/back.jpg';
+    // Does not require CORS if image is inlined
+    if (window.document.getElementById("back")) {
+      View3d.imageBack.src = window.document.getElementById("back").src;
+    }
   },
 
   // Perspective and background
@@ -282,9 +325,10 @@ View3d.prototype = {
     this.resizeCanvasToDisplaySize(this.canvas3d);//, window.devicePixelRatio);
     gl.viewport(0, 0, this.canvas3d.width, this.canvas3d.height);
     gl.viewport(0, 0, this.canvas3d.width, this.canvas3d.height);
-    // Model View Projection
-    var mvp = View3d.g_MvpMatrix;
-    // Choose
+
+    // Model View Projection Matrix
+    var mvp = View3d.projectionMatrix;
+    // Choose portrait or landscape
     var ratio = this.canvas3d.width / this.canvas3d.height;
     var fov = 40;
     var near = 50, far = 1200, top = 30, bottom = -30, left = -30, right = 30;
@@ -307,6 +351,9 @@ View3d.prototype = {
     mvp[ 4] = 0;               mvp[ 5] = 2*near/dy;       mvp[ 6] = 0;                mvp[ 7] = 0;
     mvp[ 8] = (left+right)/dx; mvp[ 9] = (top+bottom)/dy; mvp[10] = -(far+near) / dz; mvp[11] = -1;
     mvp[12] = 0;               mvp[13] = 0;               mvp[14] = -2*near*far / dz; mvp[15] = 0;
+
+    // Step back
+    mvp[15] += 700;
   },
 
   // Resize canvas with client dimensions
@@ -329,9 +376,9 @@ View3d.prototype = {
     this.canvas3d.addEventListener("mousedown", this.mousedown);
     this.canvas3d.addEventListener("mouseup", this.mouseup);
     this.canvas3d.addEventListener("mousemove", this.mousemove);
-    this.canvas3d.addEventListener("touchstart", this.mousedown, {capture: true, passive: true} ); // For tactile screen
-    this.canvas3d.addEventListener("touchend", this.mouseup, {capture: true, passive: true} );
-    this.canvas3d.addEventListener("touchmove", this.mousemove, {capture: true, passive: true} );
+    this.canvas3d.addEventListener("touchstart", this.mousedown, {capture: true, passive: false} ); // For tactile screen
+    this.canvas3d.addEventListener("touchend", this.mouseup, {capture: true, passive: false} );
+    this.canvas3d.addEventListener("touchmove", this.mousemove, {capture: true, passive: false} );
   },
   // Mouse pressed
   mousedown:function (ev) {
@@ -400,44 +447,48 @@ View3d.prototype = {
     this.resizeCanvasToDisplaySize(this.canvas3d);//, window.devicePixelRatio);
 
     // Faces with texture shader
-    gl.useProgram(gl.faceShaderProgram);
+    gl.useProgram(gl.program);
 
-    // Static ModelViewProjection Matrix multiply by X then Y then scale
-    var m = View3d.g_MvpMatrix;
-    var e = new Float32Array(16);
-    // Rotation around X axis
+    // Static Projection for perspective
+    var m = View3d.projectionMatrix;
+    // Set projection matrix
+    var projectionMatrix = gl.getUniformLocation(gl.program, 'uProjectionMatrix');
+    gl.uniformMatrix4fv(projectionMatrix, false, m);
+
+    // Current Model View for object
+    var e = View3d.modelViewMatrix;
+    // Rotation around X axis -> e
     var s = Math.sin(View3d.currentAngle[0]/200);
     var c = Math.cos(View3d.currentAngle[0]/200);
-    e[0] = m[0]; e[4] = c*m[4]+s*m[8];  e[8]  = c*m[8]-s*m[4];  e[12] = m[12];
-    e[1] = m[1]; e[5] = c*m[5]+s*m[9];  e[9]  = c*m[9]-s*m[5];  e[13] = m[13];
-    e[2] = m[2]; e[6] = c*m[6]+s*m[10]; e[10] = c*m[10]-s*m[9]; e[14] = m[14];
-    e[3] = m[3]; e[7] = c*m[7]+s*m[11]; e[11] = c*m[11]-s*m[10];e[15] = m[15];
-    // Rotation around Y axis
-    var f = e.slice(0);
+    e[0] = 1; e[4] = 0;  e[8] = 0;  e[12] = 0;
+    e[1] = 0; e[5] = c;  e[9] = -s; e[13] = 0;
+    e[2] = 0; e[6] = s; e[10] = c;  e[14] = 0;
+    e[3] = 0; e[7] = 0; e[11] = 0;  e[15] = 1;
+    // Rotation around Y axis e -> f
+    var f = e.slice(0); // or new Float32Array(16);
     s = Math.sin(View3d.currentAngle[1]/100);
     c = Math.cos(View3d.currentAngle[1]/100);
     f[0] = c*e[0]-s*e[8];  f[4] = e[4]; f[8]  = c*e[8]+s*e[0];  f[12] = e[12];
     f[1] = c*e[1]-s*e[9];  f[5] = e[5]; f[9]  = c*e[9]+s*e[1];  f[13] = e[13];
     f[2] = c*e[2]-s*e[10]; f[6] = e[6]; f[10] = c*e[10]+s*e[2]; f[14] = e[14];
     f[3] = c*e[3]-s*e[11]; f[7] = e[7]; f[11] = c*e[11]+s*e[3]; f[15] = e[15];
-    // Scale
+    // Scale f -> e and use e
     s = View3d.scale;
     e[0] = s*f[0]; e[4] = s*f[4]; e[8] = s*f[8];   e[12] = s*f[12];
     e[1] = s*f[1]; e[5] = s*f[5]; e[9] = s*f[9];   e[13] = s*f[13];
     e[2] = s*f[2]; e[6] = s*f[6]; e[10] = s*f[10]; e[14] = s*f[14];
     e[3] = s*f[3]; e[7] = s*f[7]; e[11] = s*f[11]; e[15] = s*f[15];
-    // Step back
-    e[15] += 700;
-    // Set matrix
-    var u_MvMatrix = gl.getUniformLocation(gl.faceShaderProgram, 'u_MvMatrix');
-    gl.uniformMatrix4fv(u_MvMatrix, false, e);
+    var umv = gl.getUniformLocation(gl.program, 'uModelViewMatrix')
+    gl.uniformMatrix4fv(umv, false, e);
 
     // Clear and draw triangles
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
     // Front faces
     gl.activeTexture(gl.TEXTURE0);
     gl.cullFace(gl.BACK);
     gl.drawElements(gl.TRIANGLES, this.nbFacesVertice, gl.UNSIGNED_BYTE, 0);
+
     // Back faces
     gl.activeTexture(gl.TEXTURE1);
     gl.cullFace(gl.FRONT);
