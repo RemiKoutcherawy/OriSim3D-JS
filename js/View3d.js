@@ -343,6 +343,7 @@ View3d.prototype = {
       top = right / ratio;
       bottom = left / ratio;
     }
+
     // Basic frustum at a distance of 700
     var dx = right - left;
     var dy = top - bottom;
@@ -384,6 +385,7 @@ View3d.prototype = {
     this.canvas3d.addEventListener("touchend", this.mouseup, {capture: true, passive: false} );
     this.canvas3d.addEventListener("touchmove", this.mousemove, {capture: true, passive: false} );
   },
+
   // Mouse pressed
   mousedown:function (ev) {
     // For tactile devices no "dblclick"
@@ -411,11 +413,13 @@ View3d.prototype = {
       View3d.dragging = true;
     }
   },
+
   // Mouse released
   mouseup:function (ev) {
     ev.preventDefault();
     View3d.dragging = false;
   },
+
   // Mouse move
   mousemove:function (ev) {
     ev.preventDefault();
@@ -456,6 +460,7 @@ View3d.prototype = {
 
     // Current Model View for object
     var e = View3d.modelViewMatrix;
+
     // Rotation around X axis -> e
     var s = Math.sin(View3d.currentAngle[0]/200);
     var c = Math.cos(View3d.currentAngle[0]/200);
@@ -463,6 +468,7 @@ View3d.prototype = {
     e[1] = 0; e[5] = c;  e[9] = -s; e[13] = 0;
     e[2] = 0; e[6] = s; e[10] = c;  e[14] = 0;
     e[3] = 0; e[7] = 0; e[11] = 0;  e[15] = 1;
+
     // Rotation around Y axis e -> f
     var f = e.slice(0); // or new Float32Array(16);
     s = Math.sin(View3d.currentAngle[1]/100);
@@ -471,6 +477,7 @@ View3d.prototype = {
     f[1] = c*e[1]-s*e[9];  f[5] = e[5]; f[9]  = c*e[9]+s*e[1];  f[13] = e[13];
     f[2] = c*e[2]-s*e[10]; f[6] = e[6]; f[10] = c*e[10]+s*e[2]; f[14] = e[14];
     f[3] = c*e[3]-s*e[11]; f[7] = e[7]; f[11] = c*e[11]+s*e[3]; f[15] = e[15];
+
     // Scale f -> e and use e
     var sc = View3d.scale;
     e[0] = sc*f[0]; e[4] = sc*f[4]; e[8] = sc*f[8];   e[12] = f[12];
