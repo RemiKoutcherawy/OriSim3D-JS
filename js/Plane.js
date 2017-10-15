@@ -15,7 +15,7 @@ var Plane = function (r, n) {
     var rp = Point.sub(p, this.r);
     var d  = Point.dot(rp, this.n);
     return (Math.abs(d) < 0.1);
-  };
+  }
 
   // Intersection of This plane with segment defined by two points
   function intersectPoint(a, b) {
@@ -30,7 +30,7 @@ var Plane = function (r, n) {
     if (t >= 0 && t <= 1.0)
       return Point.add(a, ab.scale(t));
     return null;
-  };
+  }
 
   // Intersection of This plane with Segment Return Point or null
   function intersectSeg(s) {
@@ -43,7 +43,7 @@ var Plane = function (r, n) {
     if (t >= 0 && t <= 1.0)
       return Point.add(s.p1, ab.scale(t));
     return null;
-  };
+  }
 
   // Classify point to thick plane 1 in front 0 on -1 behind
   function classifyPointToPlane(p) {
@@ -54,7 +54,7 @@ var Plane = function (r, n) {
     if (dist < -Plane.THICKNESS)
       return -1;
     return 0;
-  };
+  }
 
   // toString
   function toString() {

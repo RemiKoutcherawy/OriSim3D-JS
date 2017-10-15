@@ -484,7 +484,7 @@ View3d.prototype = {
     e[1] = sc*f[1]; e[5] = sc*f[5]; e[9] = sc*f[9];   e[13] = f[13];
     e[2] = sc*f[2]; e[6] = sc*f[6]; e[10] = sc*f[10]; e[14] = f[14];
     e[3] = f[3]; e[7] = f[7]; e[11] = f[11]; e[15] = f[15];
-    var umv = gl.getUniformLocation(gl.program, 'uModelViewMatrix')
+    var umv = gl.getUniformLocation(gl.program, 'uModelViewMatrix');
     gl.uniformMatrix4fv(umv, false, e);
 
     // Clear and draw triangles

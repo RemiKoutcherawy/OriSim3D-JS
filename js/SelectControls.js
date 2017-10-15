@@ -18,8 +18,6 @@ SelectControls = function ( objects, camera, domElement ) {
 	function activate() {
 		domElement.addEventListener( 'mousedown', onDocumentMouseDown, false );
 		domElement.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    console.log("activate:"+domElement);
-
   }
 	function deactivate() {
 		domElement.removeEventListener( 'mousedown', onDocumentMouseDown, false );

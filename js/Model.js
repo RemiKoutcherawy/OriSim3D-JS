@@ -811,6 +811,7 @@ var Model = function () {
   this.selectSegs = selectSegs;
   this.selectPts = selectPts;
   this.get2DBounds = get2DBounds;
+  this.get3DBounds = get3DBounds;
   this.moveOn = moveOn;
   this.zoomFit = zoomFit;
   this.flat = flat;
