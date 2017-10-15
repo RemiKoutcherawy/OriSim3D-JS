@@ -36,9 +36,16 @@ test('length', function () {
   // 3^2 + 4^2 = 9+16 = 25 = 5^2
   ok(p.length() === 5);
 });
+test('scale', function () {
+  let p = new Point(0, 0, 3, 4, 0);
+  // 3^2 + 4^2 = 9+16 = 25 = 5^2
+  p.scale(2);
+  ok(p.length() === 10);
+});
 test('norm', function () {
   let p = new Point(3, 4, 0);
-  ok(p.norm().length() === 1);
+  p.norm();
+  ok(p.length() === 1);
 });
 test('Point.dot', function () {
   let p1 = new Point(0,0, 1,2,3);

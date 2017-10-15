@@ -1,4 +1,4 @@
-// file 'test/testCommand.js
+// file 'test/test.Model.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
 NODE_ENV = true;

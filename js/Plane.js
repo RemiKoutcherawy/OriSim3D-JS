@@ -5,46 +5,20 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Plane is defined by an origin point R and a normal vector N
-// a point P is on plane iff RP.N = 0
-function Plane(r, n) {
+// a point P is on plane if and only if RP.N = 0
+var Plane = function (r, n) {
   this.r = r;
   this.n = n;
-}
 
-// Static values
-Plane.THICKNESS = 1;
-
-// Static methods
-// Define a plane across 2 points
-Plane.across = function (p1, p2) {
-  var middle = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2);
-  var normal = new Point(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
-  return new Plane(middle, normal);
-};
-// Plane by 2 points along Z
-Plane.by     = function (p1, p2) {
-  var r = new Point(p1.x, p1.y, p1.z);
-  // Cross product P2P1 x 0Z
-  var n = new Point(p2.y - p1.y, -(p2.x - p1.x), 0);
-  return new Plane(r, n);
-};
-// Plane orthogonal to Segment and passing by Point
-Plane.ortho  = function (s, p) {
-  var r      = new Point(p.x, p.y, p.z);
-  var normal = new Point(s.p2.x - s.p1.x, s.p2.y - s.p1.y, s.p2.z - s.p1.z);
-  return new Plane(r, normal);
-};
-
-// Class methods
-Plane.prototype = {
-  isOnPlane:function (p) {
+  function isOnPlane(p) {
     // Point P is on plane iff RP.N = 0
     var rp = Point.sub(p, this.r);
     var d  = Point.dot(rp, this.n);
     return (Math.abs(d) < 0.1);
-  },
+  };
+
   // Intersection of This plane with segment defined by two points
-  intersectPoint:function (a, b) {
+  function intersectPoint(a, b) {
     // (A+tAB).N = d <=> t = (d-A.N)/(AB.N) then Q=A+tAB 0<t<1
     var ab  = new Point(b.x - a.x, b.y - a.y, b.z - a.z);
     var abn = Point.dot(ab, this.n);
@@ -56,9 +30,10 @@ Plane.prototype = {
     if (t >= 0 && t <= 1.0)
       return Point.add(a, ab.scale(t));
     return null;
-  },
+  };
+
   // Intersection of This plane with Segment Return Point or null
-  intersectSeg:function (s) {
+  function intersectSeg(s) {
     // (A+tAB).N=d <=> t=(d-A.N)/(AB.N) then Q=A+tAB 0<t<1
     var ab  = new Point(s.p2.x - s.p1.x, s.p2.y - s.p1.y, s.p2.z - s.p1.z);
     var abn = Point.dot(ab, this.n);
@@ -68,9 +43,10 @@ Plane.prototype = {
     if (t >= 0 && t <= 1.0)
       return Point.add(s.p1, ab.scale(t));
     return null;
-  },
+  };
+
   // Classify point to thick plane 1 in front 0 on -1 behind
-  classifyPointToPlane:function (p) {
+  function classifyPointToPlane(p) {
     // (A+tAB).N = d <=> d<e front, d>e behind, else on plane
     var dist = Point.dot(this.r, this.n) - Point.dot(this.n, p);
     if (dist > Plane.THICKNESS)
@@ -78,14 +54,52 @@ Plane.prototype = {
     if (dist < -Plane.THICKNESS)
       return -1;
     return 0;
-  },
+  };
+
   // toString
-  toString:function () {
+  function toString() {
     return "Pl[r:" + this.r + " n:" + this.n + "]";
   }
+
+  // API
+  this.isOnPlane = isOnPlane;
+  this.intersectPoint = intersectPoint;
+  this.intersectSeg = intersectSeg;
+  this.classifyPointToPlane = classifyPointToPlane;
+  this.toString = toString;
+};
+
+// Class methods
+Plane.prototype.constructor = Plane;
+
+// Static values
+Plane.THICKNESS = 1;
+
+// Static methods
+
+// Define a plane across 2 points
+Plane.across = function (p1, p2) {
+  var middle = new Point((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, (p1.z + p2.z) / 2);
+  var normal = new Point(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+  return new Plane(middle, normal);
+};
+
+// Plane by 2 points along Z
+Plane.by     = function (p1, p2) {
+  var r = new Point(p1.x, p1.y, p1.z);
+  // Cross product P2P1 x 0Z
+  var n = new Point(p2.y - p1.y, -(p2.x - p1.x), 0);
+  return new Plane(r, n);
+};
+
+// Plane orthogonal to Segment and passing by Point
+Plane.ortho  = function (s, p) {
+  var r      = new Point(p.x, p.y, p.z);
+  var normal = new Point(s.p2.x - s.p1.x, s.p2.y - s.p1.y, s.p2.z - s.p1.z);
+  return new Plane(r, normal);
 };
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined') {
   module.exports = Plane;
 }

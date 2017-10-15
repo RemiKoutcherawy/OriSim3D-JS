@@ -32,7 +32,7 @@ test('length3d', function () {
   let p1 = new Point(0, 0, 0);
   let p2 = new Point(30, 40, 0);
   let s = new Segment(p1,p2);
-  let lg = s.lg3d;
+  let lg = s.length3d();
   ok(lg === 50,"expect 30 got:"+lg);
   lg = s.length3d();
   ok(lg === 50,"expect 30 got:"+lg);
@@ -41,8 +41,6 @@ test('length2d', function () {
   let p1 = new Point(1, 2);
   let p2 = new Point(4, 6);
   let s = new Segment(p1,p2);
-  let lg = s.lg2d;
-  ok(lg === 5,"expect 5 got:"+lg);
   lg = s.length2d();
   ok(lg === 5,"expect 5 got:"+lg);
 });

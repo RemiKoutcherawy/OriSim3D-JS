@@ -1,25 +1,21 @@
 // File: js/Face.js
 // Dependencies : import them before Face.js in browser
+// Test in NodeJS
+
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   const Point = require('./Point.js');
 }
 
 // Face contains points, segments, normal
-function Face() {
+var Face = function () {
   this.points    = [];
   this.normal    = [0, 0, 1];
   this.select    = 0;
   this.highlight = false;
   this.offset    = 0;
-}
-// Static values
-
-// Class methods
-Face.prototype = {
-  constructor: Face,
 
   // Compute Face normal
-  computeFaceNormal: function () {
+  function computeFaceNormal () {
     if (this.points.length < 3) {
       console.log("Warn Face < 3pts:" + this);
       return null;
@@ -38,20 +34,20 @@ Face.prototype = {
         break;
       }
     }
-    this.normalize(this.normal);
+    normalize(this.normal);
     return this.normal;
-  },
+  }
 
   // Normalize vector v[3] = v[3]/||v[3]||
-  normalize: function (v) {
+  function normalize (v) {
     let d = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     v[0] /= d;
     v[1] /= d;
     v[2] /= d;
-  },
+  }
 
   // String representation
-  toString: function () {
+  function toString () {
     let str = "F" + "(";
     this.points.forEach(function (p, i, a) {
       str = str + "P" + i + p.toString()+ (i === a.length - 1 ? "": " ");
@@ -59,9 +55,18 @@ Face.prototype = {
     str = str + ")";
     return str;
   }
+
+  // API
+  this.computeFaceNormal = computeFaceNormal;
+  this.toString = toString;
 };
 
+// Class methods
+Face.prototype.constructor = Face;
+
+// Static values
+
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (NODE_ENV === true && typeof module !== 'undefined') {
   module.exports = Face;
 }

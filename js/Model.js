@@ -8,19 +8,14 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Model to hold Points, Segments, Faces
-function Model() {
+var Model = function () {
   // Arrays to hold points, faces, segments
   this.points   = [];
   this.segments = [];
   this.faces    = [];
-}
-
-// Class methods
-Model.prototype = {
-  constructor:Model,
 
   // Initializes this orModel with XY points CCW @testOK
-  init:function (list) {
+  function init (list) {
     this.points   = [];
     this.segments = [];
     this.faces    = [];
@@ -38,27 +33,31 @@ Model.prototype = {
     }
     this.addSegment(p1, f.points[0], Segment.EDGE);
     this.addFace(f);
-    return this;
-  },
+    // return this;
+  }
 
   // Adds a point to this Model or return the point at x,y @testOK
-  addPointXYZ: function (xf,yf, x,y,z) {
+  function addPointXYZ (xf,yf, x,y,z) {
     // Create a new Point
     var p = null;
     if (arguments.length === 2) {
       p = new Point(xf, yf);
-    } else if (arguments.length === 3) {
+    }
+    else if (arguments.length === 3) {
       p = new Point(x, y, z);
-    } else if (arguments.length === 5) {
+    }
+    else if (arguments.length === 5) {
       p = new Point(xf, yf, x, y, z);
-    } else {
+    }
+    else {
       console.log("Warn wrong number of Args for addPointXYZ")
     }
     this.points.push(p);
     return p;
-  },
+  }
+
   // Adds a point to this Model or return existing point @testOK
-  addPoint:function (pt) {
+  function addPoint (pt) {
     // Search existing points
     for (var i = 0; i < this.points.length; i++) {
       if (Point.compare3d(this.points[i], pt) < 1) {
@@ -69,9 +68,10 @@ Model.prototype = {
     // Add new Point if not already in model
     this.points.push(pt);
     return pt;
-  },
+  }
+
   // Adds a segment to this model @testOK
-  addSegment:function (p1, p2, type) {
+  function addSegment (p1, p2, type) {
     if (Point.compare3d(p1, p2) === 0) {
       console.log("Warn Add degenerate segment:" + p1);
       return null;
@@ -79,16 +79,17 @@ Model.prototype = {
     var s = new Segment(p1, p2, type);
     this.segments.push(s);
     return s;
-  },
+  }
+
   // Adds a face to this model @testOK
-  addFace:function (f) {
+  function addFace (f) {
     // TODO search existing faces
     this.faces.push(f);
     return f;
-  },
+  }
 
   // Align Point p on segment s in 2D from coordinates in 3D @testOK
-  align2dFrom3d:function (p, s) {
+  function align2dFrom3d (p, s) {
     // Compute the length from p1 to p in 3D
     var lg3d = Math.sqrt((s.p1.x - p.x) * (s.p1.x - p.x)
       + (s.p1.y - p.y) * (s.p1.y - p.y)
@@ -98,9 +99,10 @@ Model.prototype = {
     // Set 2D to have the same ratio
     p.xf     = s.p1.xf + t * (s.p2.xf - s.p1.xf);
     p.yf     = s.p1.yf + t * (s.p2.yf - s.p1.yf);
-  },
+  } //;
+
   // Find face on the right of segment a b @testOK
-  faceRight:function (a, b) {
+  function faceRight (a, b) {
     if (b === undefined) {
       // Guess we have a segment instead of two points
       b = a.p2;
@@ -119,9 +121,10 @@ Model.prototype = {
       }
     });
     return right;
-  },
+  }
+
   // Find face on the left @testOK
-  faceLeft:function (a, b) {
+  function faceLeft (a, b) {
     if (b === undefined) {
       // Guess we have a segment instead of two points
       b = a.p2;
@@ -140,9 +143,10 @@ Model.prototype = {
       }
     });
     return left;
-  },
+  }
+
   // Search face containing a and b but which is not f0 @testOK
-  searchFace:function (s, f0) {
+  function searchFace (s, f0) {
     var a     = s.p1;
     var b     = s.p2;
     var found = null;
@@ -159,10 +163,10 @@ Model.prototype = {
       }
     });
     return found;
-  },
+  }
 
   // Compute angle between face left and right of a segment, angle is positive  @testOK
-  computeAngle:function (s) {
+  function computeAngle (s) {
     var a     = s.p1;
     var b     = s.p2;
     // Find faces left and right
@@ -201,9 +205,10 @@ Model.prototype = {
     // Follow the convention folding in front is positive
     s.angle = -s.angle;
     return s.angle;
-  },
+  }
+
   // Search segment containing Points a and b @testOK
-  searchSegmentTwoPoints:function (a, b) {
+  function searchSegmentTwoPoints (a, b) {
     var list = [];
     this.segments.forEach(function (s) {
       if ((Point.compare3d(s.p1, a) === 0 && Point.compare3d(s.p2, b) === 0)
@@ -217,19 +222,20 @@ Model.prototype = {
     if (list.length === 0)
       return null;
     return list[0];
-  },
+  }
+
   // Search segments containing Point a @testOK
-  searchSegmentsOnePoint:function (a) {
+  function searchSegmentsOnePoint (a) {
     var list = [];
     this.segments.forEach(function (s) {
       if (s.p1 === a || s.p2 === a)
         list.push(s);
     });
     return list;
-  },
+  }
 
   // Splits Segment by a point @testOK
-  splitSegmentByPoint:function (s, p) {
+  function splitSegmentByPoint (s, p) {
     // No new segment if on ending point
     if (Point.compare3d(s.p1, p) === 0 || Point.compare3d(s.p2, p) === 0) {
       return s;
@@ -241,9 +247,10 @@ Model.prototype = {
     s.length2d();
     s.length3d();
     return s1;
-  },
+  }
+
   // Split segment on a point, add point to model, update faces containing segment @testOK
-  splitSegmentOnPoint:function (s1, p) {
+  function splitSegmentOnPoint (s1, p) {
     var pts = null, i = null;
 
     // Align Point p on segment s in 2D from coordinates in 3D
@@ -287,9 +294,10 @@ Model.prototype = {
     // Now we can shorten s to p
     this.splitSegmentByPoint(s1, p);
     return s1;
-  },
+  }
+
   // Splits Segment by a ratio k in  ]0 1[ counting from p1 @testOK
-  splitSegmentByRatio:function (s, k) {
+  function splitSegmentByRatio (s, k) {
     // Create new Point
     var p = new Point();
     p.set3d(
@@ -297,12 +305,12 @@ Model.prototype = {
       s.p1.y + k * (s.p2.y - s.p1.y),
       s.p1.z + k * (s.p2.z - s.p1.z));
     this.splitSegmentOnPoint(s, p);
-  },
+  }
 
   // Origami
-  // Split Face f by plane pl @testOK except on <:> denerate poly
+  // Split Face f by plane pl @testOK except on <:> degenerate poly
   // Complex by design
-  splitFaceByPlane:function (f1, pl) {
+  function splitFaceByPlane (f1, pl) {
     var front     = []; // Front side
     var back      = []; // Back side
     var inFront   = false; // Front face with at least one point
@@ -454,6 +462,7 @@ Model.prototype = {
       a     = b;
       aSide = bSide;
     }
+
     // Modify initial face f1 and add new face if not degenerated
     // this.faces.splice(this.faces.indexOf(f1), 1); change Array
     if (inFront) {
@@ -469,9 +478,10 @@ Model.prototype = {
         this.faces.push(f);
       }
     }
-  },
+  }
+
   // Split all or given Faces by a plane @testOK
-  splitFacesByPlane:function (pl, list) {
+  function splitFacesByPlane (pl, list) {
     // Split list or all faces
     list = (list !== undefined) ? list : this.faces;
     // When a face is split, one face is modified in Array and one added, at the end
@@ -479,24 +489,28 @@ Model.prototype = {
       var f = list[i];
       this.splitFaceByPlane(f, pl);
     }
-  },
+  }
+
   // Split all or given faces Across two points @testOK
-  splitCross:function (p1, p2, list) {
+  function splitCross (p1, p2, list) {
     var pl = Plane.across(p1, p2);
     this.splitFacesByPlane(pl, list);
-  },
+  }
+
   // Split all or given faces By two points @testOK
-  splitBy:function (p1, p2, list) {
+  function splitBy (p1, p2, list) {
     var pl = Plane.by(p1, p2);
     this.splitFacesByPlane(pl, list);
-  },
+  }
+
   // Split faces by a plane Perpendicular to a Segment passing by a Point "p" @testOK
-  splitOrtho:function (s, p, list) {
+  function splitOrtho (s, p, list) {
     var pl = Plane.ortho(s, p);
     this.splitFacesByPlane(pl, list);
-  },
+  }
+
   // Split faces by a plane between two segments given by 3 points p1 center @testOK
-  splitLineToLineByPoints:function (p0, p1, p2, list) {
+  function splitLineToLineByPoints (p0, p1, p2, list) {
     // Project p0 on p1 p2
     var p0p1 = Math.sqrt((p1.x - p0.x) * (p1.x - p0.x)
       + (p1.y - p0.y) * (p1.y - p0.y)
@@ -513,9 +527,10 @@ Model.prototype = {
     // Define Plane
     var pl   = Plane.by(p0, e);
     this.splitFacesByPlane(pl, list);
-  },
+  }
+
   // Split faces by a plane between two segments @testOK
-  splitLineToLine:function (s1, s2, list) {
+  function splitLineToLine (s1, s2, list) {
     var s = Segment.closestLine(s1, s2);
     if (s.length3d() < 1) {
       // Segments cross at c Center
@@ -528,10 +543,10 @@ Model.prototype = {
       var pl = Plane.across(s.p1, s.p2);
       this.splitFacesByPlane(pl, list);
     }
-  },
+  }
 
   // Rotate around axis Segment by angle a list of Points @testOK
-  rotate:function (s, angle, list) {
+  function rotate (s, angle, list) {
     var angleRd = angle * Math.PI / 180.0;
     var ax      = s.p1.x, ay = s.p1.y, az = s.p1.z;
     var nx      = s.p2.x - ax, ny = s.p2.y - ay, nz = s.p2.z - az;
@@ -550,10 +565,10 @@ Model.prototype = {
       p.y    = ay + c21 * ux + c22 * uy + c23 * uz;
       p.z    = az + c31 * ux + c32 * uy + c33 * uz;
     });
-  },
+  }
 
   // Adjust one Point on its (eventually given) segments @testOK
-  adjust:function (p, segments) {
+  function adjust (p, segments) {
     // Take all segments containing point p or given list
     var segs = segments || this.searchSegmentsOnePoint(p);
     var dmax = 100;
@@ -572,7 +587,7 @@ Model.prototype = {
         if (Math.abs(d) > dmax) {
           dmax = Math.abs(d);
         }
-        // Move B Bnew = A + AB * r With r = l2d/l3d
+        // Move B = A + AB * r with r = l2d / l3d
         // AB * r is the extension based on length3d to match length2d
         var r = (lg2d / lg3d);
         if (s.p2 === p) {
@@ -595,9 +610,10 @@ Model.prototype = {
       }
     }
     return dmax;
-  },
+  }
+
   // Adjust list of Points @testOK
-  adjustList:function (list) {
+  function adjustList (list) {
     var dmax = 100;
     for (var i = 0; dmax > 0.001 && i < 100; i++) {
       dmax     = 0;
@@ -611,44 +627,47 @@ Model.prototype = {
       }
     }
     return dmax;
-  },
+  }
+
   // Evaluate and highlight segments with wrong length
-  evaluate:function () {
+  function evaluate () {
     // Iterate over all segments
     for (var i = 0; i < this.segments.length; i++) {
       var s       = this.segments[i];
       var d       = Math.abs(s.length2d() - s.length3d());
       s.highlight = d >= 0.1;
     }
-  },
+  }
 
   // Move list of points by dx,dy,dz
-  move:function (dx, dy, dz, pts) {
+  function move (dx, dy, dz, pts) {
     pts = (pts === null) ? this.points : ((pts.length === 0) ? this.points : pts);
     pts.forEach(function (p) {
       p.x += dx;
       p.y += dy;
       p.z += dz;
     });
-  },
+  }
+
   // Move on a point P0 all following points, k from 0 to 1 for animation
-  moveOn:function (p0, k1, k2, pts) {
+  function moveOn (p0, k1, k2, pts) {
     pts.forEach(function (p) {
       p.x = p0.x * k1 + p.x * k2;
       p.y = p0.y * k1 + p.y * k2;
       p.z = p0.z * k1 + p.z * k2;
     });
-  },
+  }
+
   // Move given or all points to z = 0
-  flat:function (pts) {
+  function flat (pts) {
     var lp = pts.length === 0 ? this.points : pts;
     lp.forEach(function (p) {
       p.z = 0;
     });
-  },
+  }
 
   // Turn model around axis by  angle @testOK
-  turn:function (axe, angle) {
+  function turn (axe, angle) {
     angle *= Math.PI / 180.0;
     var ax = 0, ay = 0, az = 0;
     var nx = 0.0;
@@ -679,30 +698,31 @@ Model.prototype = {
       p.y    = ay + c21 * ux + c22 * uy + c23 * uz;
       p.z    = az + c31 * ux + c32 * uy + c33 * uz;
     });
-  },
+  }
 
   // Select (highlight) points
-  selectPts:function (pts) {
+  function selectPts (pts) {
     pts.forEach(function (p) {
       p.select ^= true; // xor
     });
-  },
+  }
+
   // Select (highlight) segments
-  selectSegs:function (segs) {
+  function selectSegs (segs) {
     segs.forEach(function (s) {
       s.select ^= true; // xor
     });
-  },
+  }
 
   // Offset by dz all following faces according to Z
-  offset:function (dz, lf) {
+  function offset (dz, lf) {
     lf.forEach(function (f) {
       f.offset += dz;
     });
-  },
+  }
 
   // 2D Boundary [xmin, ymin, xmax, ymax]*/
-  get2DBounds:function () {
+  function get2DBounds () {
     var xmax = -100.0;
     var xmin = 100.0;
     var ymax = -100.0;
@@ -720,9 +740,10 @@ Model.prototype = {
     obj.xmax = xmax;
     obj.ymax = ymax;
     return obj;
-  },
+  }
+
   // Fit the model to -200 +200
-  zoomFit:function () {
+  function zoomFit () {
     var b     = this.get3DBounds();
     var w     = 400;
     var scale = w / Math.max(b[2] - b[0], b[3] - b[1]);
@@ -730,17 +751,19 @@ Model.prototype = {
     var cy    = -(b[1] + b[3]) / 2;
     this.move(cx, cy, 0, null);
     this.scaleModel(scale);
-  },
+  }
+
   // Scale model
-  scaleModel:function (scale) {
+  function scaleModel (scale) {
     this.points.forEach(function (p) {
       p.x *= scale;
       p.y *= scale;
       p.z *= scale;
     });
-  },
+  }
+
   // 3D Boundary View [xmin, ymin, xmax, ymax]
-  get3DBounds:function () {
+  function get3DBounds () {
     var xmax = -200.0, xmin = 200.0;
     var ymax = -200.0, ymin = 200.0;
     this.points.forEach(function (p) {
@@ -752,9 +775,51 @@ Model.prototype = {
     });
     return [xmin, ymin, xmax, ymax]
   }
+
+  // API
+  this.init = init;
+  this.addPointXYZ = addPointXYZ;
+  this.addPoint = addPoint;
+  this.addSegment = addSegment;
+  this.addFace = addFace;
+  this.searchSegmentsOnePoint = searchSegmentsOnePoint;
+  this.searchSegmentTwoPoints = searchSegmentTwoPoints;
+  this.align2dFrom3d = align2dFrom3d;
+  this.faceLeft = faceLeft;
+  this.faceRight = faceRight;
+  this.splitFacesByPlane = splitFacesByPlane;
+  this.splitFaceByPlane = splitFaceByPlane;
+  this.searchFace = searchFace;
+  this.splitSegmentByPoint = splitSegmentByPoint;
+  this.splitSegmentOnPoint = splitSegmentOnPoint;
+  this.splitSegmentByRatio = splitSegmentByRatio;
+
+  this.splitCross = splitCross;
+  this.splitBy = splitBy;
+  this.splitOrtho = splitOrtho;
+  this.splitLineToLine = splitLineToLine;
+
+  this.splitLineToLineByPoints = splitLineToLineByPoints;
+  this.computeAngle = computeAngle;
+  this.rotate = rotate;
+  this.turn = turn;
+  this.adjust = adjust;
+  this.adjustList = adjustList;
+  this.evaluate = evaluate;
+  this.offset = offset;
+
+  this.selectSegs = selectSegs;
+  this.selectPts = selectPts;
+  this.get2DBounds = get2DBounds;
+  this.moveOn = moveOn;
+  this.zoomFit = zoomFit;
+  this.flat = flat;
 };
 
-// Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+// Class methods
+Model.prototype.constructor = Model;
+
+// For NodeJS, will be discarded by uglify
+if (NODE_ENV === true && typeof module !== 'undefined') {
   module.exports = Model;
 }
