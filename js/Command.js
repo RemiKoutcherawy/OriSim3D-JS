@@ -1,50 +1,42 @@
 // File: js/Command.js
 // Dependencies : import them before Command.js in browser
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  var Model        = require('./Model.js');
   var Interpolator = require('./Interpolator.js');
 }
 
 // Interprets a list of commands, and apply them on Model
-function Command(model) {
-  this.model        = model;
-  this.toko         = [];
-  this.done         = [];
-  this.iTok         = 0;
+var Command = function Command(model) {
+  var model        = model;
+  var toko         = [];
+  var done         = [];
+  var iTok         = 0;
   // State machine
-  this.state        = State.idle;
+  var state        = State.idle;
   // Time interpolated at instant 'p' preceding and at instant 'n' current
-  this.tni          = 1;
-  this.tpi          = 0;
-  this.interpolator = Interpolator.LinearInterpolator;
+  var tni          = 1;
+  var tpi          = 0;
   // scale, ctx, cy, cz used in ZoomFit
-  this.za           = [0, 0, 0, 0];
+  var za           = [0, 0, 0, 0];
   // Interpolator used in anim() to map tn (time normalized) to tni (time interpolated)
-  this.interpolator = Interpolator.LinearInterpolator;
+  var interpolator = Interpolator.LinearInterpolator;
   // Coefficient to multiply value given in Offset commands
-  this.kOffset = 1; // 0.2 for real rendering, can be 10 to debug
-}
+  var kOffset = 1; // 0.2 for real rendering, can be 10 to debug
 
-// Static values
-const State = {idle:0, run:1, anim:2, pause:3, undo:4};
-// console.log(Object.keys(State)[1]); // run
+  var context = this;
 
-// Class methods
-Command.prototype = {
-  constructor:Command,
-
-  // Tokenize, split the String in this.toko Array of String @testOK
-  tokenize:function (input) {
+  // Tokenize, split the String in toko Array of String @testOK
+  function tokenize(input) {
     var text  = input.replace(/[\);]/g, ' rparent');
     text      = text.replace(/,/g, ' ');
     text      = text.replace(/\/\/.*$/mg, '');
-    this.toko = text.split(/\s+/);
-    this.iTok = 0;
-    return this.toko;
-  },
+    toko = text.split(/\s+/);
+    iTok = 0;
+    context.toko = toko;
+    return toko;
+  }
 
   // Read a File @testOK
-  readfile:function (filename) {
+  function readfile (filename) {
     var text = null;
     // If we are in NodeJS fs is required
     if (NODE_ENV === true && typeof require !== 'undefined') {
@@ -73,283 +65,284 @@ Command.prototype = {
       console.log("Error reading:" + filename);
     }
     return text;
-  },
+  }
 
   // Execute one command token on model
-  execute:function () {
+  function execute () {
     var list = [], a = null, b = null, angle = null, s = null, p = null;
 
     // Commands
     // "d : define" @testOK
-    if (this.toko[this.iTok] === "d" || this.toko[this.iTok] === "define") {
+    if (toko[iTok] === "d" || toko[iTok] === "define") {
       // Define sheet by N points x,y CCW
-      this.iTok++;
-      while (Number.isInteger(Number(this.toko[this.iTok]))) {
-        list.push(this.toko[this.iTok++]);
+      iTok++;
+      while (Number.isInteger(Number(toko[iTok]))) {
+        list.push(toko[iTok++]);
       }
-      this.model.init(list);
+      model.init(list);
     }
     // Origami splits
     // "b : by" @testOK
-    else if (this.toko[this.iTok] === "b" || this.toko[this.iTok] === "by") {
+    else if (toko[iTok] === "b" || toko[iTok] === "by") {
       // Split by two points
-      this.iTok++;
-      a = this.model.points[this.toko[this.iTok++]];
-      b = this.model.points[this.toko[this.iTok++]];
-      this.model.splitBy(a, b);
+      iTok++;
+      a = model.points[toko[iTok++]];
+      b = model.points[toko[iTok++]];
+      model.splitBy(a, b);
     }
     // "c : cross"  @testOK
-    else if (this.toko[this.iTok] === "c" || this.toko[this.iTok] === "cross") {
+    else if (toko[iTok] === "c" || toko[iTok] === "cross") {
       // Split across two points all (or just listed) faces
-      this.iTok++;
-      a = this.model.points[this.toko[this.iTok++]];
-      b = this.model.points[this.toko[this.iTok++]];
-      this.model.splitCross(a, b);
+      iTok++;
+      a = model.points[toko[iTok++]];
+      b = model.points[toko[iTok++]];
+      model.splitCross(a, b);
     }
     // "p : perpendicular"  @testOK
-    else if (this.toko[this.iTok] === "p" || this.toko[this.iTok] === "perpendicular") {
+    else if (toko[iTok] === "p" || toko[iTok] === "perpendicular") {
       // Split perpendicular of line by point
-      this.iTok++;
-      s = this.model.segments[this.toko[this.iTok++]];
-      p = this.model.points[this.toko[this.iTok++]];
-      this.model.splitOrtho(s, p);
+      iTok++;
+      s = model.segments[toko[iTok++]];
+      p = model.points[toko[iTok++]];
+      model.splitOrtho(s, p);
     }
     // "lol : LineOnLine" TODO test
-    else if (this.toko[this.iTok] === "lol" || this.toko[this.iTok] === "lineonline") {
+    else if (toko[iTok] === "lol" || toko[iTok] === "lineonline") {
       // Split by a plane passing between segments
-      this.iTok++;
-      var s0 = this.model.segments[this.toko[this.iTok++]];
-      var s1 = this.model.segments[this.toko[this.iTok++]];
-      this.model.splitLineToLine(s0, s1);
+      iTok++;
+      var s0 = model.segments[toko[iTok++]];
+      var s1 = model.segments[toko[iTok++]];
+      model.splitLineToLine(s0, s1);
     }
     // Segment split TODO test
     // "s : split seg numerator denominator"
-    else if (this.toko[this.iTok] === "s" || this.toko[this.iTok] === "split") {
+    else if (toko[iTok] === "s" || toko[iTok] === "split") {
       // Split set by N/D
-      this.iTok++;
-      s = this.model.segments[this.toko[this.iTok++]];
-      var n = this.toko[this.iTok++];
-      var d = this.toko[this.iTok++];
-      this.model.splitSegmentByRatio(s, n / d);
+      iTok++;
+      s = model.segments[toko[iTok++]];
+      var n = toko[iTok++];
+      var d = toko[iTok++];
+      model.splitSegmentByRatio(s, n / d);
     }
 
     // Animation commands use tni tpi
     // " r : rotate Seg Angle Points"
-    else if (this.toko[this.iTok] === "r" || this.toko[this.iTok] === "rotate") {
+    else if (toko[iTok] === "r" || toko[iTok] === "rotate") {
       // Rotate Seg Angle Points with animation
-      this.iTok++;
-      s     = this.model.segments[this.toko[this.iTok++]];
-      angle = (this.toko[this.iTok++] * (this.tni - this.tpi));
-      list  = this.listPoints();
-      this.model.rotate(s, angle, list);
+      iTok++;
+      s     = model.segments[toko[iTok++]];
+      angle = (toko[iTok++] * (tni - tpi));
+      list  = listPoints();
+      model.rotate(s, angle, list);
     }
     // "f : fold to angle"
-    else if (this.toko[this.iTok] === "f" || this.toko[this.iTok] === "fold") {
-      this.iTok++;
-      s = this.model.segments[this.toko[this.iTok++]];
+    else if (toko[iTok] === "f" || toko[iTok] === "fold") {
+      iTok++;
+      s = model.segments[toko[iTok++]];
       // Cache current angle at start of animation
-      if (this.tpi === 0){
-        this.angleBefore = this.model.computeAngle(s);
+      if (tpi === 0){
+        angleBefore = model.computeAngle(s);
       }
-      angle = ((this.toko[this.iTok++] - this.angleBefore) * (this.tni - this.tpi));
-      list = this.listPoints();
+      angle = ((toko[iTok++] - angleBefore) * (tni - tpi));
+      list = listPoints();
       // Reverse segment to have the first point on left face
-      if (this.tpi === 0 && this.model.faceRight(s.p1, s.p2).points.indexOf(list[0]) !== -1)
+      if (tpi === 0 && model.faceRight(s.p1, s.p2).points.indexOf(list[0]) !== -1)
         s.reverse();
-      this.model.rotate(s, angle, list);
+      model.rotate(s, angle, list);
     }
 
     // Adjust all or listed points
     // "a : adjust"
-    else if (this.toko[this.iTok] === "a" || this.toko[this.iTok] === "adjust") {
+    else if (toko[iTok] === "a" || toko[iTok] === "adjust") {
       // Adjust Points in 3D to fit 3D length
-      this.iTok++;
-      list  = this.listPoints();
-      var liste = list.length === 0 ? this.model.points : list;
-      var dmax = this.model.adjustList(liste);
+      iTok++;
+      list  = listPoints();
+      var liste = list.length === 0 ? model.points : list;
+      var dmax = model.adjustList(liste);
     }
 
     // Offsets
     // "o : offset"
-    else if (this.toko[this.iTok] === "o" || this.toko[this.iTok] === "offset") {
+    else if (toko[iTok] === "o" || toko[iTok] === "offset") {
       // Offset by dz the list of faces : o dz f1 f2...
-      this.iTok++;
-      var dz = this.toko[this.iTok++] * this.kOffset;
-      list  = this.listFaces();
-      this.model.offset(dz, list);
+      iTok++;
+      var dz = toko[iTok++] * kOffset;
+      list  = listFaces();
+      model.offset(dz, list);
     }
 
     // Moves
     // "m : move dx dy dz pts"
-    else if (this.toko[this.iTok] === "m" || this.toko[this.iTok] === "move") {
+    else if (toko[iTok] === "m" || toko[iTok] === "move") {
       // Move 1 point by dx,dy,dz in 3D with Coefficient for animation
-      this.iTok++;
-      this.model.move(this.toko[this.iTok++] * (this.tni - this.tpi)
-        , this.toko[this.iTok++]* (this.tni - this.tpi)
-        , this.toko[this.iTok++] * (this.tni - this.tpi)
-        , this.model.points);
+      iTok++;
+      model.move(toko[iTok++] * (tni - tpi)
+        , toko[iTok++]* (tni - tpi)
+        , toko[iTok++] * (tni - tpi)
+        , model.points);
     }
     // "mo : move on"
-    else if (this.toko[this.iTok] === "mo") {
+    else if (toko[iTok] === "mo") {
       // Move all points on one with animation
-      this.iTok++;
-      var p0 = this.model.points.get(this.toko[this.iTok++]);
-      var k2 = ((1 - this.tni) / (1 - this.tpi));
-      var k1 = (this.tni - this.tpi * k2);
-      this.model.moveOn(p0, k1, k2, this.model.points);
+      iTok++;
+      var p0 = model.points.get(toko[iTok++]);
+      var k2 = ((1 - tni) / (1 - tpi));
+      var k1 = (tni - tpi * k2);
+      model.moveOn(p0, k1, k2, model.points);
     }
 
     // Turns
     // "tx : TurnX angle"
-    else if (this.toko[this.iTok] === "tx") {
-      this.iTok++;
-      this.model.turn(1, Number(this.toko[this.iTok++]) * (this.tni - this.tpi));
+    else if (toko[iTok] === "tx") {
+      iTok++;
+      model.turn(1, Number(toko[iTok++]) * (tni - tpi));
     }
     // "ty : TurnY angle"
-    else if (this.toko[this.iTok] === "ty") {
-      this.iTok++;
-      this.model.turn(2, Number(this.toko[this.iTok++]) * (this.tni - this.tpi));
+    else if (toko[iTok] === "ty") {
+      iTok++;
+      model.turn(2, Number(toko[iTok++]) * (tni - tpi));
     }
     // "tz : TurnZ angle"
-    else if (this.toko[this.iTok] === "tz") {
-      this.iTok++;
-      this.model.turn(3, Number(this.toko[this.iTok++]) * (this.tni - this.tpi));
+    else if (toko[iTok] === "tz") {
+      iTok++;
+      model.turn(3, Number(toko[iTok++]) * (tni - tpi));
     }
 
     // Zooms
     // "z : Zoom scale x y" The zoom is centered on x y z=0
-    else if (this.toko[this.iTok] === "z") {
-      this.iTok++;
-      var scale = this.toko[this.iTok++];
-      var x = this.toko[this.iTok++];
-      var y = this.toko[this.iTok++];
+    else if (toko[iTok] === "z") {
+      iTok++;
+      var scale = toko[iTok++];
+      var x = toko[iTok++];
+      var y = toko[iTok++];
       // for animation
-      var ascale  = ((1 + this.tni * (scale - 1)) / (1 + this.tpi * (scale - 1)));
-      var bfactor = (scale * (this.tni / ascale - this.tpi));
-      this.model.move(x * bfactor, y * bfactor, 0, null);
-      this.model.scaleModel(ascale);
+      var ascale  = ((1 + tni * (scale - 1)) / (1 + tpi * (scale - 1)));
+      var bfactor = (scale * (tni / ascale - tpi));
+      model.move(x * bfactor, y * bfactor, 0, null);
+      model.scaleModel(ascale);
     }
     // "zf : Zoom Fit"
-    else if (this.toko[this.iTok] === "zf") {
-      this.iTok++;
-      if (this.tpi === 0) {
-        b      = this.model.get3DBounds();
+    else if (toko[iTok] === "zf") {
+      iTok++;
+      if (tpi === 0) {
+        b      = model.get3DBounds();
         var w      = 400;
-        this.za[0] = w / Math.max(b[2] - b[0], b[3] - b[1]);
-        this.za[1] = -(b[0] + b[2]) / 2;
-        this.za[2] = -(b[1] + b[3]) / 2;
+        za[0] = w / Math.max(b[2] - b[0], b[3] - b[1]);
+        za[1] = -(b[0] + b[2]) / 2;
+        za[2] = -(b[1] + b[3]) / 2;
       }
-      scale   = ((1 + this.tni * (this.za[0] - 1)) / (1 + this.tpi * (this.za[0] - 1)));
-      bfactor = this.za[0] * (this.tni / scale - this.tpi);
-      this.model.move(this.za[1] * bfactor, this.za[2] * bfactor, 0, null);
-      this.model.scaleModel(scale);
+      scale   = ((1 + tni * (za[0] - 1)) / (1 + tpi * (za[0] - 1)));
+      bfactor = za[0] * (tni / scale - tpi);
+      model.move(za[1] * bfactor, za[2] * bfactor, 0, null);
+      model.scaleModel(scale);
     }
 
     // Interpolators
-    else if (this.toko[this.iTok] === "il") { // "il : Interpolator Linear"
-      this.iTok++;
-      this.interpolator = Interpolator.LinearInterpolator;
+    else if (toko[iTok] === "il") { // "il : Interpolator Linear"
+      iTok++;
+      context.interpolator = Interpolator.LinearInterpolator;
     }
-    else if (this.toko[this.iTok] === "ib") { // "ib : Interpolator Bounce"
-      this.iTok++;
-      this.interpolator = Interpolator.BounceInterpolator;
-    } else if (this.toko[this.iTok] === "io") { // "io : Interpolator OverShoot"
-      this.iTok++;
-      this.interpolator = Interpolator.OvershootInterpolator;
+    else if (toko[iTok] === "ib") { // "ib : Interpolator Bounce"
+      iTok++;
+      context.interpolator = Interpolator.BounceInterpolator;
+    } else if (toko[iTok] === "io") { // "io : Interpolator OverShoot"
+      iTok++;
+      context.interpolator = Interpolator.OvershootInterpolator;
     }
-    else if (this.toko[this.iTok] === "ia") { // "ia : Interpolator Anticipate"
-      this.iTok++;
-      this.interpolator = Interpolator.AnticipateInterpolator;
+    else if (toko[iTok] === "ia") { // "ia : Interpolator Anticipate"
+      iTok++;
+      context.interpolator = Interpolator.AnticipateInterpolator;
     }
-    else if (this.toko[this.iTok] === "iao") { // "iao : Interpolator Anticipate OverShoot"
-      this.iTok++;
-      this.interpolator = Interpolator.AnticipateOvershootInterpolator;
+    else if (toko[iTok] === "iao") { // "iao : Interpolator Anticipate OverShoot"
+      iTok++;
+      context.interpolator = Interpolator.AnticipateOvershootInterpolator;
     }
-    else if (this.toko[this.iTok] === "iad") { // "iad : Interpolator Accelerate Decelerate"
-      this.iTok++;
-      this.interpolator = Interpolator.AccelerateDecelerateInterpolator;
+    else if (toko[iTok] === "iad") { // "iad : Interpolator Accelerate Decelerate"
+      iTok++;
+      context.interpolator = Interpolator.AccelerateDecelerateInterpolator;
     }
-    else if (this.toko[this.iTok] === "iso") { // "iso Interpolator Spring Overshoot"
-      this.iTok++;
-      this.interpolator = Interpolator.SpringOvershootInterpolator;
+    else if (toko[iTok] === "iso") { // "iso Interpolator Spring Overshoot"
+      iTok++;
+      context.interpolator = Interpolator.SpringOvershootInterpolator;
     }
-    else if (this.toko[this.iTok] === "isb") { // "isb Interpolator Spring Bounce"
-      this.iTok++;
-      this.interpolator = Interpolator.SpringBounceInterpolator;
+    else if (toko[iTok] === "isb") { // "isb Interpolator Spring Bounce"
+      iTok++;
+      context.interpolator = Interpolator.SpringBounceInterpolator;
     }
-    else if (this.toko[this.iTok] === "igb") { // "igb : Interpolator Gravity Bounce"
-      this.iTok++;
-      this.interpolator = Interpolator.GravityBounceInterpolator;
+    else if (toko[iTok] === "igb") { // "igb : Interpolator Gravity Bounce"
+      iTok++;
+      context.interpolator = Interpolator.GravityBounceInterpolator;
     }
 
     // Mark points and segments
     // "select points"
-    else if (this.toko[this.iTok] === "pt") {
-      this.iTok++;
-      this.model.selectPts(this.model.points);
+    else if (toko[iTok] === "pt") {
+      iTok++;
+      model.selectPts(model.points);
     }
     // "select segments"
-    else if (this.toko[this.iTok] === "seg") {
-      this.iTok++;
-      this.model.selectSegs(this.model.segments);
+    else if (toko[iTok] === "seg") {
+      iTok++;
+      model.selectSegs(model.segments);
     }
 
     // End skip remaining tokens
     // "end" give Control back to CommandLoop
-    else if (this.toko[this.iTok] === "end") {
-      this.iTok = this.toko.length;
+    else if (toko[iTok] === "end") {
+      iTok = toko.length;
     }
 
     // Default should not get these
-    else if (this.toko[this.iTok] === "t"
-      || this.toko[this.iTok] === "rparent"
-      || this.toko[this.iTok] === "u"
-      || this.toko[this.iTok] === "co") {
-      console.log("Warn unnecessary token :" + this.toko[this.iTok] + "\n");
-      this.iTok++;
+    else if (toko[iTok] === "t"
+      || toko[iTok] === "rparent"
+      || toko[iTok] === "u"
+      || toko[iTok] === "co") {
+      console.log("Warn unnecessary token :" + toko[iTok] + "\n");
+      iTok++;
       return -1;
     } else {
       // Real default : ignore
-      this.iTok++;
+      iTok++;
     }
-    return this.iTok;
-  },
+    return iTok;
+  }
 
   // Make a list from following points numbers @testOK
-  listPoints:function () {
+  function listPoints () {
     var list = [];
-    while (Number.isInteger(Number(this.toko[this.iTok]))) {
-      list.push(this.model.points[this.toko[this.iTok++]]);
+    while (Number.isInteger(Number(toko[iTok]))) {
+      list.push(model.points[toko[iTok++]]);
     }
     return list;
-  },
+  }
 
   // Make a list from following segments numbers @testOK
-  listSegments:function () {
+  function listSegments () {
     var list = [];
-    while (Number.isInteger(Number(this.toko[this.iTok]))) {
-      list.push(this.model.segments[this.toko[this.iTok++]]);
+    while (Number.isInteger(Number(toko[iTok]))) {
+      list.push(model.segments[toko[iTok++]]);
     }
     return list;
-  },
+  }
+
   // Make a list from following faces numbers @testOK
-  listFaces:function () {
+  function listFaces () {
     var list = [];
-    while (Number.isInteger(Number(this.toko[this.iTok]))) {
-      list.push(this.model.faces[this.toko[this.iTok++]]);
+    while (Number.isInteger(Number(toko[iTok]))) {
+      list.push(model.faces[toko[iTok++]]);
     }
     return list;
-  },
+  }
 
   // Main entry Point
   // Execute list of commands
   // TODO : simplify
-  command:function (cde) {
+  function command (cde) {
 // -- State Idle tokenize list of command
-    if (this.state === State.idle) {
+    if (state === State.idle) {
       if (cde === "u") {
-        this.toko = this.done.slice().reverse();
-        this.undo(); // We are exploring this.toko[]
+        toko = done.slice().reverse();
+        undo(); // We are exploring toko[]
         return;
       }
       else if (cde.startsWith("read")) {
@@ -361,13 +354,13 @@ Command.prototype = {
           cde    = document.getElementById(id).text;
         } else {
           // Attention replace argument cde by the content of the file
-          cde = this.readfile(filename.trim());
+          cde = readfile(filename.trim());
         }
         if (cde === null)
           return;
-        // On success clear this.toko and use read cde
-        this.done = [];
-        this.undo = [];
+        // On success clear toko and use read cde
+        done = [];
+        undo = [];
         // Continue to Execute
       }
       else if (cde === "co" || cde === "pa") {
@@ -376,196 +369,214 @@ Command.prototype = {
       }
       else if (cde.startsWith("d")) {
         // Starts a new folding
-        this.done = [];
-        this.undo = [];
+        done = [];
+        undo = [];
       }
       // Execute
-      this.toko  = this.tokenize(cde);
-      this.state = State.run;
-      this.iTok  = 0;
-      this.commandLoop();
+      toko  = tokenize(cde);
+      state = State.run;
+      iTok  = 0;
+      commandLoop();
       return;
     }
 // -- State Run execute list of command
-    if (this.state === State.run) {
-      this.commandLoop();
+    if (state === State.run) {
+      commandLoop();
       return;
     }
 // -- State Animation execute up to ')' or pause
-    if (this.state === State.anim) {
+    if (state === State.anim) {
       // "Pause"
       if (cde === "pa") {
-        this.state = State.pause;
+        state = State.pause;
       }
       return;
     }
 // -- State Paused in animation
-    if (this.state === State.pause) {
+    if (state === State.pause) {
       // "Continue"
       if (cde === "co") {
         // performance.now() vs new Date().getTime();
-        this.pauseDuration = new Date().getTime() - this.pauseStart;
+        pauseDuration = new Date().getTime() - pauseStart;
         // Continue animation
         //mainPane.view3d.animate(this);
-        this.state = State.anim;
+        state = State.anim;
       }
       else if (cde === "u") {
         // Undo one step
-        this.state = State.undo;
-        this.undo();
+        state = State.undo;
+        undo();
       }
       return;
     }
 // -- State undo
-    if (this.state === State.undo) {
-      if (this.undoInProgress === false) {
+    if (state === State.undo) {
+      if (undoInProgress === false) {
         if (cde === "u") {
           // Ok continue to undo
-          this.undo();
+          undo();
         }
         else if (cde === "co") {
           // Switch back to run
-          this.state = State.run;
-          this.commandLoop();
+          state = State.run;
+          commandLoop();
         }
         else if (cde === "pa") {
           // Forbidden ignore pause
         } else {
           // A new Command can only come from Debug
           // Removes 't' or 'd'
-          this.iTok--;
+          iTok--;
           // Execute
-          this.toko  = this.tokenize(cde);
-          this.state = State.run;
-          this.iTok  = 0;
-          this.commandLoop();
+          toko  = tokenize(cde);
+          state = State.run;
+          iTok  = 0;
+          commandLoop();
         }
       }
     }
-  },
+  }
 
   // Loop to execute commands
-  commandLoop:function () {
-    while (this.iTok < this.toko.length) {
+  function commandLoop () {
+    while (iTok < toko.length) {
       // Breaks loop to launch animation on 't'
-      if (this.toko[this.iTok] === "t") {
+      if (toko[iTok] === "t") {
         // Time t duration ... )
-        this.done.push(this.toko[this.iTok++]);
-        // this.iTok will be incremented by duration = this.toko[this.iTok++]
-        this.done.push(this.toko[this.iTok]);
-        this.duration      = this.toko[this.iTok++];
-        this.pauseDuration = 0;
-        this.state         = State.anim;
-        this.animStart();
+        done.push(toko[iTok++]);
+        // iTok will be incremented by duration = toko[iTok++]
+        done.push(toko[iTok]);
+        duration      = toko[iTok++];
+        pauseDuration = 0;
+        state         = State.anim;
+        animStart();
         // Return breaks the loop, giving control to anim
         return;
       }
-      else if (this.toko[this.iTok] === "rparent") {
+      else if (toko[iTok] === "rparent") {
         // Finish pushing command
-        this.done.push(this.toko[this.iTok++]);
+        done.push(toko[iTok++]);
         continue;
       }
 
-      var iBefore = this.iTok;
+      var iBefore = iTok;
 
       // Execute one command
-      var iReached = this.execute();
+      var iReached = execute();
 
       // Push modified model
-      this.pushUndo();
+      pushUndo();
       // Add done commands to done list
       while (iBefore < iReached) {
-        this.done.push(this.toko[iBefore++]);
+        done.push(toko[iBefore++]);
       }
       // Post an event to repaint
       // The repaint will not occur till next animation, or end Cde
-      this.model.change = true;
+      model.change = true;
     }
     // End of command line switch to idle
-    if (this.state === State.run) {
-      this.state = State.idle;
+    if (state === State.run) {
+      state = State.idle;
     }
-  },
+  }
 
-  // Sets a flag in model which is tested in Animation loop in Orisim3d.js
-  animStart:function () {
-    this.model.change = true;
-    this.tstart       = new Date().getTime();
-    this.tpi          = 0.0;
-  },
+  // Sets a flag in model which is tested in Animation loop
+  function animStart () {
+    model.change = true;
+    tstart       = new Date().getTime();
+    tpi          = 0.0;
+  }
 
   // Called from Orisim3d.js in Animation loop
   // return true if anim should continue false if anim should end
-  anim:function () {
-    if (this.state === State.undo) {
-      var index = this.popUndo();
-      var ret   = (index > this.iTok);
+  function anim () {
+    if (state === State.undo) {
+      var index = popUndo();
+      var ret   = (index > iTok);
       // Stop undo if undo mark reached and switch to repaint
       if (ret === false) {
-        this.undoInProgress = false;
+        undoInProgress = false;
         //mainPane.repaint();
       }
       return ret;
     }
-    else if (this.state === State.pause) {
-      this.pauseStart = new Date().getTime();
+    else if (state === State.pause) {
+      pauseStart = new Date().getTime();
       return false;
     }
-    else if (this.state !== State.anim) {
+    else if (state !== State.anim) {
       return false;
     }
     // We are in state anim
     var t  = new Date().getTime();
     // Compute tn varying from 0 to 1
-    var tn = (t - this.tstart - this.pauseDuration) / this.duration; // tn from 0 to 1
+    var tn = (t - tstart - pauseDuration) / duration; // tn from 0 to 1
     if (tn > 1.0)
       tn = 1.0;
-    this.tni = this.interpolator(tn);
+    tni = context.interpolator(tn);
 
     // Execute commands just after t xxx up to including ')'
-    this.iBeginAnim = this.iTok;
-    while (this.toko[this.iTok] !== "rparent") {
-      this.execute();
-      if (this.iTok === this.toko.length) {
+    iBeginAnim = iTok;
+    while (toko[iTok] !== "rparent") {
+      execute();
+      if (iTok === toko.length) {
         console.log("Warning missing parent !");
         break;
       }
     }
     // For undoing animation
-    this.pushUndo();
+    pushUndo();
 
     // Keep t (tpi) preceding t now (tni)
-    this.tpi = this.tni; // t preceding
+    tpi = tni; // t preceding
 
     // If Animation is finished, set end values
     if (tn >= 1.0) {
-      this.tni = 1.0;
-      this.tpi = 0.0;
+      tni = 1.0;
+      tpi = 0.0;
       // Push done
-      while (this.iBeginAnim < this.iTok) {
+      while (iBeginAnim < iTok) {
         // Time t duration ... )
-        this.done.push(this.toko[this.iBeginAnim++]);
+        done.push(toko[iBeginAnim++]);
       }
       // Switch back to run and launch next cde
-      this.state = State.run;
-      this.commandLoop();
+      state = State.run;
+      commandLoop();
       // If commandLoop has launched another animation we continue
-      if (this.state === State.anim)
+      if (state === State.anim)
         return true;
       // OK we stop anim
       return false;
     }
     // Rewind to continue animation
-    this.iTok = this.iBeginAnim;
+    iTok = iBeginAnim;
     return true;
-  },
+  }
 
   // TODO : implement
-  pushUndo:function () {
-  },
-  popUndo:function () {
-  }
+  function pushUndo () { }
+  function popUndo () { }
+
+  // API
+  this.tokenize = tokenize;
+  this.readfile = readfile;
+  this.execute = execute;
+
+  this.interpolator = interpolator;
+  this.toko = toko;
+  this.listPoints = listPoints;
+
+  this.command = command;
+  this.commandLoop = commandLoop;
+  this.anim = anim;
 };
+
+// Static values
+const State = {idle:0, run:1, anim:2, pause:3, undo:4};
+// console.log(Object.keys(State)[1]); // run
+
+// Class methods
+Command.prototype.constructor = Command;
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
