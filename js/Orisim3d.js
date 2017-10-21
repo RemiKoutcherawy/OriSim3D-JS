@@ -9,26 +9,22 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Main Module
-function Orisim3d(model, view2d, view3d, command) {
+var Orisim3d = function Orisim3d(model, view2d, view3d, command) {
   // Instance variables
   this.model  = model;
   this.view2d = view2d;
   this.view3d = view3d;
   this.command = command;
 }
-
-// Class methods
-Orisim3d.prototype = {
-  constructor:Orisim3d
-};
+Orisim3d.prototype.constructor = Orisim3d;
 
 // Global
-var orisim3d = null;
 
 // Main startup
 if (typeof window !== 'undefined') {
   window.addEventListener("load", completed );
 }
+
 function completed () {
   window.removeEventListener( "load", completed );
 

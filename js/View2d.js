@@ -7,7 +7,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // View2d Constructor
-function View2d(model, canvas2d) {
+var View2d  = function View2d(model, canvas2d) {
   // Instance variables
   this.model           = model;
   this.canvas2d        = canvas2d;
@@ -25,18 +25,14 @@ function View2d(model, canvas2d) {
   this.yOffset = 0;
 
   // Resize canvas to fit model
-  this.fit();
+  var scope = this;
+  fit(scope);
 
   // Mouse hit
   this.canvas2d.addEventListener('mousedown', this.mouseDown);
-}
-
-// Class methods
-View2d.prototype = {
-  constructor:View2d,
 
   // Point under mousedown
-  mouseDown:function (ev) {
+  function mouseDown (ev) {
     // Event clic
     var rect = ev.target.getBoundingClientRect();
     var x    = ev.clientX - rect.left;
@@ -51,10 +47,10 @@ View2d.prototype = {
     // Model clic
     var xf = (x - xOffset) / scale;
     var yf = -(y - yOffset) / scale;
-  },
+  }
 
   // Draw all points in blue
-  drawPoint:function () {
+  function drawPoint () {
     var ctx     = this.ctx;
     var scale   = this.scale;
     var xOffset = this.xOffset;
@@ -80,9 +76,10 @@ View2d.prototype = {
         ctx.fillText(String(i), xf - 8, yf + 5);
       }
     });
-  },
+  }
+
   // Draw all segments in green
-  drawSegment:function () {
+  function drawSegment () {
     var ctx     = this.ctx;
     var scale   = this.scale;
     var xOffset = this.xOffset;
@@ -124,9 +121,10 @@ View2d.prototype = {
         ctx.fillText(String(i), xc - 8, yc + 5);
       }
     });
-  },
+  }
+
   // Draw all faces
-  drawFaces:function () {
+  function drawFaces () {
     var ctx     = this.ctx;
     var scale   = this.scale;
     var xOffset = this.xOffset;
@@ -170,10 +168,10 @@ View2d.prototype = {
         ctx.fillText(String(i), cx - 8, cy + 5);
       }
     });
-  },
+  }
 
   // Draw the Model
-  draw:function draw() {
+  function draw() {
     if (this.canvas2d === null) {
       return;
     }
@@ -181,33 +179,42 @@ View2d.prototype = {
     this.drawFaces();
     this.drawSegment();
     this.drawPoint();
-  },
+  }
 
   // Fit to show all the model in the view, ie compute scale
-  fit:function fit() {
+  function fit(scope) {
     // Model
-    var bounds      = this.model.get2DBounds();
+    var bounds      = scope.model.get2DBounds();
     var modelWidth  = bounds.xmax - bounds.xmin;
     var modelHeight = bounds.ymax - bounds.ymin;
 
     // <div> containing Canvas
-    var viewWidth  = this.canvas2d.clientWidth;
-    var viewHeight = this.canvas2d.clientHeight;
+    var viewWidth  = scope.canvas2d.clientWidth;
+    var viewHeight = scope.canvas2d.clientHeight;
 
     // Resize canvas to fit <div>, should not be necessary but is
-    this.canvas2d.width  = viewWidth;
-    this.canvas2d.height = viewHeight;
+    scope.canvas2d.width  = viewWidth;
+    scope.canvas2d.height = viewHeight;
 
     // Compute Scale to fit
     const scaleX = viewWidth / modelWidth;
     const scaleY = viewHeight / modelHeight;
-    this.scale   = Math.min(scaleX, scaleY) / 1.1;
+    scope.scale   = Math.min(scaleX, scaleY) / 1.1;
 
     // Compute Offset to center drawing
-    this.xOffset = viewWidth / 2;
-    this.yOffset = viewHeight / 2;
+    scope.xOffset = viewWidth / 2;
+    scope.yOffset = viewHeight / 2;
   }
+
+  // API
+  this.drawPoint = drawPoint;
+  this.drawSegment = drawSegment;
+  this.drawFaces = drawFaces;
+  this.draw = draw;
 };
+
+// Class methods
+View2d.prototype.constructor = View2d;
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {

@@ -3,7 +3,7 @@
  * Hover change cursor to indicate selecting is possible
  */
 
-SelectControls = function ( objects, camera, domElement ) {
+var SelectControls = function ( objects, camera, domElement ) {
 
 	var _plane = new THREE.Plane();
 	var _raycaster = new THREE.Raycaster();

@@ -1,12 +1,9 @@
 // File: js/Menu.js
 // Menu Constructor
-function Menu(element) {
-  element.addEventListener('click', this.click);
-}
-// Class methods
-Menu.prototype = {
-  constructor:Menu,
-  click:function (ev) {
+var Menu = function Menu(element) {
+  element.addEventListener('click', click);
+
+  function click (ev) {
     var menu  = window.document.getElementsByClassName('menu')[0];
     var items = menu.children;
     // Menu open if click on first
@@ -51,7 +48,13 @@ Menu.prototype = {
       }
     }
   }
+
+  // API
+  // this.click = click;
 };
+
+// Class methods
+Menu.prototype.constructor= Menu;
 
 // New Menu on load
 if (typeof window !== 'undefined') {
