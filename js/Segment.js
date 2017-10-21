@@ -13,7 +13,7 @@ var Segment = function (p1, p2, type) {
   this.p2        = p2;
   this.type      = Segment.PLAIN | type;
   this.angle     = 0;
-  this.highlight = false;
+  this.select    = false;
 
   // Reverse order of the 2 points of this segment
   function reverse() {
@@ -113,55 +113,59 @@ Segment.closestSeg = function closestSeg(s1, s2) {
   var e = Point.dot(v2,v2); // squared length of s2
   var f = Point.dot(v2,r);  //
   // Check degeneration of segments into points
+  var closest;
   if (a <= Segment.EPSILON && e <= Segment.EPSILON) {
     // Both degenerate into points
     t1 = t2 = 0.0;
-    return new Segment(s1.p1, s2.p1, Segment.TEMPORARY);
-  }
-  if (a <= Segment.EPSILON) {
-    // This segment degenerate into point
-    t1 = 0.0;
-    t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
-    t2 = t2 < 0 ? 0 : t2 > 1 ? 1 : t2;
+    closest = new Segment(s1.p1, s2.p1, Segment.TEMPORARY);
   } else {
-    var c = Point.dot(v1, r);
-    if (e <= Segment.EPSILON) {
-      // Second segment degenerate into point
-      t2 = 0.0;
-      t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
-      t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
-    } else {
-      // General case
-      var b = Point.dot(v1, v2); // Delayed computation of b
-      var denom = a * e - b * b; // Denominator of Cramer system
-      // Segments not parallel, compute closest and clamp
-      if (denom !== 0.0) {
-        t1 = (b * f - c * e) / denom;
+    if (a <= Segment.EPSILON) {
+      // This segment degenerate into point
+      t1 = 0.0;
+      t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
+      t2 = t2 < 0 ? 0 : t2 > 1 ? 1 : t2;
+    }
+    else {
+      var c = Point.dot(v1, r);
+      if (e <= Segment.EPSILON) {
+        // Second segment degenerate into point
+        t2 = 0.0;
+        t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
         t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
-      }
-      else {
-        // Arbitrary point, here 0 => p1
-        t1 = 0;
-      }
-      // Compute closest on L2 using
-      t2 = (b * t1 + f) / e;
-      // if t2 in [0,1] done, else clamp t2 and recompute t1
-      if (t2 < 0.0) {
-        t2 = 0;
-        t1 = -c / a;
-        t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
-      }
-      else if (t2 > 1.0) {
-        t2 = 1.0
-        ;
-        t1 = (b - c) / a;
-        t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
+      } else {
+        // General case
+        var b = Point.dot(v1, v2); // Delayed computation of b
+        var denom = a * e - b * b; // Denominator of Cramer system
+        // Segments not parallel, compute closest and clamp
+        if (denom !== 0.0) {
+          t1 = (b * f - c * e) / denom;
+          t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
+        }
+        else {
+          // Arbitrary point, here 0 => p1
+          t1 = 0;
+        }
+        // Compute closest on L2 using
+        t2 = (b * t1 + f) / e;
+        // if t2 in [0,1] done, else clamp t2 and recompute t1
+        if (t2 < 0.0) {
+          t2 = 0;
+          t1 = -c / a;
+          t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
+        }
+        else if (t2 > 1.0) {
+          t2 = 1.0
+          ;
+          t1 = (b - c) / a;
+          t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
+        }
       }
     }
+    var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
+    var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
+    closest = new Segment(c1, c2);
   }
-  var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
-  var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
-  return new Segment(c1, c2);
+  return closest;
 };
 
 // Closest points from s1(line) to s2(line) returned as a new segment
@@ -182,40 +186,43 @@ Segment.closestLine = function closestLine(s1, s2) {
   var e = Point.dot(v2, v2); // squared length of s
   var f = Point.dot(v2, r);  //
   // Check degeneration of segments into points
+  var closest;
   if (a <= Segment.EPSILON && e <= Segment.EPSILON) {
     // Both degenerate into points
     t1 = t2 = 0.0;
-    return new Segment(s1.p1, s2.p1, Segment.TEMPORARY, -1);
-  }
-  if (a <= Segment.EPSILON) {
-    // This segment degenerate into point
-    t1 = 0.0;
-    t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
+    closest = new Segment(s1.p1, s2.p1, Segment.TEMPORARY, -1);
   } else {
-    var c = Point.dot(v1, r);
-    if (e <= Segment.EPSILON) {
-      // Second segment degenerate into point
-      t2 = 0.0;
-      t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
+    if (a <= Segment.EPSILON) {
+      // This segment degenerate into point
+      t1 = 0.0;
+      t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
     } else {
-      // General case
-      var b = Point.dot(v1, v2); // Delayed computation of b
-      var denom = a * e - b * b; // Denominator of cramer system
-      // Segments not parallel, compute closest
-      if (denom !== 0.0) {
-        t1 = (b * f - c * e) / denom;
+      var c = Point.dot(v1, r);
+      if (e <= Segment.EPSILON) {
+        // Second segment degenerate into point
+        t2 = 0.0;
+        t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
+      } else {
+        // General case
+        var b     = Point.dot(v1, v2); // Delayed computation of b
+        var denom = a * e - b * b; // Denominator of cramer system
+        // Segments not parallel, compute closest
+        if (denom !== 0.0) {
+          t1 = (b * f - c * e) / denom;
+        }
+        else {
+          // Arbitrary point, here 0 => p1
+          t1 = 0;
+        }
+        // Compute closest on L2 using
+        t2 = (b * t1 + f) / e;
       }
-      else {
-        // Arbitrary point, here 0 => p1
-        t1 = 0;
-      }
-      // Compute closest on L2 using
-      t2 = (b * t1 + f) / e;
     }
+    var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
+    var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
+    closest = new Segment(c1, c2);
   }
-  var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
-  var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
-  return new Segment(c1, c2);
+  return closest;
 };
 
 // For NodeJS, will be discarded by uglify

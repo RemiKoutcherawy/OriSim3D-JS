@@ -39,6 +39,8 @@ var Point = function Point(xf, yf, x, y, z) {
     this.z  = 0 | z;
   }
 
+  this.select = false;
+
   // Set x y Flat and  x y z 3D
   function set5d(xf, yf, x, y, z) {
     // x y Flat, in unfolded state
