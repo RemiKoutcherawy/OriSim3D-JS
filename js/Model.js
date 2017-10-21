@@ -8,7 +8,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Model to hold Points, Segments, Faces
-var Model = function () {
+var Model = function Model () {
   // Arrays to hold points, faces, segments
   this.points   = [];
   this.segments = [];
@@ -21,7 +21,7 @@ var Model = function () {
     this.faces    = [];
     this.change   = true; // should trigger a redraw
     var f         = new Face();
-    // Add XY XYZ points, make EDGE segments
+    // Add XY as XYZ points, make EDGE segments
     var p1        = null;
     for (var i = 0; i < list.length; i += 2) {
       var p2 = this.addPointXYZ(list[i], list[i + 1], list[i], list[i + 1], 0);
@@ -629,7 +629,7 @@ var Model = function () {
     return dmax;
   }
 
-  // Evaluate and highlight segments with wrong length
+  // Evaluate and highlight segments with wrong length @testOK
   function evaluate () {
     // Iterate over all segments
     for (var i = 0; i < this.segments.length; i++) {
@@ -639,9 +639,9 @@ var Model = function () {
     }
   }
 
-  // Move list of points by dx,dy,dz
+  // Move list of points by dx,dy,dz @testOK
   function move (dx, dy, dz, pts) {
-    pts = (pts === null) ? this.points : ((pts.length === 0) ? this.points : pts);
+    pts = (pts === null) ? this.points : (pts === undefined) ? this.points : pts;
     pts.forEach(function (p) {
       p.x += dx;
       p.y += dy;
@@ -649,7 +649,7 @@ var Model = function () {
     });
   }
 
-  // Move on a point P0 all following points, k from 0 to 1 for animation
+  // Move on a point P0 all following points, k from 0 to 1 for animation @testOK
   function moveOn (p0, k1, k2, pts) {
     pts.forEach(function (p) {
       p.x = p0.x * k1 + p.x * k2;
@@ -660,7 +660,7 @@ var Model = function () {
 
   // Move given or all points to z = 0
   function flat (pts) {
-    var lp = pts.length === 0 ? this.points : pts;
+    var lp = pts === undefined ? this.points : pts;
     lp.forEach(function (p) {
       p.z = 0;
     });
@@ -700,28 +700,28 @@ var Model = function () {
     });
   }
 
-  // Select (highlight) points
+  // Select (highlight) points @testOK
   function selectPts (pts) {
     pts.forEach(function (p) {
-      p.select ^= true; // xor
+      p.select = !p.select;
     });
   }
 
-  // Select (highlight) segments
+  // Select (highlight) segments @testOK
   function selectSegs (segs) {
     segs.forEach(function (s) {
-      s.select ^= true; // xor
+      s.select = !s.select;
     });
   }
 
-  // Offset by dz all following faces according to Z
+  // Offset by dz all following faces according to Z @testOK
   function offset (dz, lf) {
     lf.forEach(function (f) {
       f.offset += dz;
     });
   }
 
-  // 2D Boundary [xmin, ymin, xmax, ymax]*/
+  // 2D Boundary [xmin, ymin, xmax, ymax] @testOK
   function get2DBounds () {
     var xmax = -100.0;
     var xmin = 100.0;
@@ -736,24 +736,24 @@ var Model = function () {
     });
     var obj = {};
     obj.xmin = xmin;
-    obj.ymin =ymin;
+    obj.ymin = ymin;
     obj.xmax = xmax;
     obj.ymax = ymax;
     return obj;
   }
 
-  // Fit the model to -200 +200
+  // Fit the model to -200 +200 @testOK
   function zoomFit () {
     var b     = this.get3DBounds();
     var w     = 400;
-    var scale = w / Math.max(b[2] - b[0], b[3] - b[1]);
-    var cx    = -(b[0] + b[2]) / 2;
-    var cy    = -(b[1] + b[3]) / 2;
+    var scale = w / Math.max(b.xmax - b.xmin, b.ymax - b.ymin);
+    var cx    = -(b.xmin + b.xmax) / 2;
+    var cy    = -(b.ymin + b.ymax) / 2;
     this.move(cx, cy, 0, null);
     this.scaleModel(scale);
   }
 
-  // Scale model
+  // Scale model @testOK
   function scaleModel (scale) {
     this.points.forEach(function (p) {
       p.x *= scale;
@@ -773,7 +773,12 @@ var Model = function () {
       if (y > ymax) ymax = y;
       if (y < ymin) ymin = y;
     });
-    return [xmin, ymin, xmax, ymax]
+    var obj = {};
+    obj.xmin = xmin;
+    obj.ymin = ymin;
+    obj.xmax = xmax;
+    obj.ymax = ymax;
+    return obj;
   }
 
   // API
@@ -806,15 +811,18 @@ var Model = function () {
   this.adjust = adjust;
   this.adjustList = adjustList;
   this.evaluate = evaluate;
+  this.move = move;
+  this.moveOn = moveOn;
+  this.flat = flat;
   this.offset = offset;
 
   this.selectSegs = selectSegs;
   this.selectPts = selectPts;
   this.get2DBounds = get2DBounds;
   this.get3DBounds = get3DBounds;
-  this.moveOn = moveOn;
+
   this.zoomFit = zoomFit;
-  this.flat = flat;
+  this.scaleModel = scaleModel;
 };
 
 // Class methods
