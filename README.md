@@ -1,25 +1,21 @@
 OriSim3D 
 ===
-OriSim3D origami folding simulation with WebGL.
-
-
-Fork and Push requests welcomed
+OriSim3D origami folding simulation with three.js
 ===
-OriSim3D origami folding simulation with WebGL.
+OriSim3D origami folding simulation with WebGL and three.js.
 
-Demo : [one file no libs](https://remikoutcherawy.github.io/cocotte.html) 
+Demo : [Cocotte](https://remikoutcherawy.github.io/cocotte.html) 
+Demo : [Vue3dLocal](https://remikoutcherawy.github.io/vue3dLocal.html) 
 
-This application is a work in progress from 
-https://github.com/RemiKoutcherawy/OriSim3D-Android
+This application is a work in progress, don't expect more.
 
 ## Usage
 
 Download and open : [conception.html](https://remikoutcherawy.github.io/conception.html)
-You can use it to make up a model, tweak it, and make pull request.
+On the left the crease pattern, on the right the 3D view.  
 
 To bundle all files in `app.js`, lauch `node build.js`  
-This require `npm update --save-dev` to download mocha and uglify-es.
-
+This requires `npm update --save-dev` to download mocha and uglify-es.
 
 
 ## Comment est organisé le code ?
