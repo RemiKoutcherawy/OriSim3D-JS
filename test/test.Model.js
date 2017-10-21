@@ -647,6 +647,80 @@ test('Evaluate Segments', function () {
   ok(model.segments[3].highlight === true,  "Got:" + model.segments[3].highlight);
 });
 
+// Move
+test('Move List', function () {
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  let p1 = model.points[1];
+  // Move 2 points by 1,2,3
+  model.move(1, 2, 3, [p0, p1]);
+  ok(Math.round(p0.x) === -199,"Got:"+p0.x);
+  ok(Math.round(p0.y) === -198,"Got:"+p0.y);
+  ok(Math.round(p0.z) === 3,"Got:"+p0.z);
+  // Move all points by 1,2,3
+  model.move(1, 2, 3);
+  ok(Math.round(p0.x) === -198,"Got:"+p0.x);
+  ok(Math.round(p0.y) === -196,"Got:"+p0.y);
+  ok(Math.round(p0.z) === 6,"Got:"+p0.z);
+});
+// Move On
+test('Move on List', function () {
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  let p1 = model.points[1];
+  // Move on p0 points p1
+  model.moveOn(p0, 0, 1, [p1]);
+  ok(Math.round(p1.x) === 200,"Got:"+p1.x);
+  ok(Math.round(p1.y) === -200,"Got:"+p1.y);
+  ok(Math.round(p1.z) === 0,"Got:"+p1.z);
+  model.moveOn(p0, 1, 0, [p1]);
+  ok(Math.round(p1.x) === -200,"Got:"+p1.x);
+  ok(Math.round(p1.y) === -200,"Got:"+p1.y);
+  ok(Math.round(p1.z) === 0,"Got:"+p1.z);
+});
+// Flat
+test('Flat', function () {
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  let p1 = model.points[1];
+  model.move(0, 0, 3, [p0, p1]);
+
+  // Move flat points p0 p1
+  model.flat([p1]);
+  ok(Math.round(p1.x) === 200,"Got:"+p1.x);
+  ok(Math.round(p1.y) === -200,"Got:"+p1.y);
+  ok(Math.round(p1.z) === 0,"Got:"+p1.z);
+  model.move(0, 0, 3, [p0, p1]);
+  model.flat();
+  ok(Math.round(p1.x) === 200,"Got:"+p1.x);
+  ok(Math.round(p1.y) === -200,"Got:"+p1.y);
+  ok(Math.round(p1.z) === 0,"Got:"+p1.z);
+});
+
+// Select Points
+test('selectPts', function () {
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  let p1 = model.points[1];
+  model.selectPts([p1]);
+  ok(p0.select === false,"Got"+p0.select);
+  ok(p1.select === true, "Got"+p1.select);
+});
+// Select Segments
+test('selectSegs', function () {
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let s0 = model.segments[0];
+  let s1 = model.segments[1];
+  model.selectPts([s1]);
+  ok(s0.select === false,"Got"+s0.select);
+  ok(s1.select === true, "Got"+s1.select);
+});
+
 // Offset
 test('Offset', function(){
   let model = new Model();
@@ -656,4 +730,47 @@ test('Offset', function(){
   model.offset(42, [model.faces[0]] );
   ok(model.faces[0].offset === 42,"Got:"+model.faces[0].offset);
   ok(model.faces[1].offset === 0,"Got:"+model.faces[1].offset);
+});
+
+// get2DBounds
+test('get2DBounds', function(){
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let bounds = model.get2DBounds();
+  ok(bounds.xmin === -200,"Got:"+bounds.xmin);
+  ok(bounds.xmax === 200,"Got:"+bounds.xmax);
+  ok(bounds.ymin === -200,"Got:"+bounds.ymin);
+  ok(bounds.ymax === 200,"Got:"+bounds.ymax);
+});
+// get3DBounds
+test('get3DBounds', function(){
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let bounds = model.get3DBounds();
+  ok(bounds.xmin === -200,"Got:"+bounds.xmin);
+  ok(bounds.xmax === 200,"Got:"+bounds.xmax);
+  ok(bounds.ymin === -200,"Got:"+bounds.ymin);
+  ok(bounds.ymax === 200,"Got:"+bounds.ymax);
+});
+
+// ScaleModel
+test('scaleModel', function(){
+  let model = new Model();
+  model.init([-200,-200, 200,-200, 200,200, -200,200]);
+  let p0 = model.points[0];
+  model.scaleModel(4);
+  ok(p0.x === -800,"Got:"+p0.x);
+  ok(p0.y === -800,"Got:"+p0.y);
+  ok(p0.z === 0,"Got:"+p0.z);
+});
+
+// ZoomFit
+test('zoomFit', function(){
+  let model = new Model();
+  model.init([-400,-400, 200,-200, 400,400, -200,300]);
+  let p0 = model.points[0];
+  model.zoomFit();
+  ok(p0.x === -200,"Got:"+p0.x);
+  ok(p0.y === -200,"Got:"+p0.y);
+  ok(p0.z === 0,"Got:"+p0.z);
 });
