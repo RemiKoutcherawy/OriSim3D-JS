@@ -25,8 +25,9 @@ var View2d  = function View2d(model, canvas2d) {
   this.yOffset = 0;
 
   // Resize canvas to fit model
-  var scope = this;
-  fit(scope);
+  // .bind(this) used to call fit() with this view2d context
+  var boundFit = fit.bind(this);
+  boundFit();
 
   // Mouse hit
   this.canvas2d.addEventListener('mousedown', this.mouseDown);
@@ -182,28 +183,28 @@ var View2d  = function View2d(model, canvas2d) {
   }
 
   // Fit to show all the model in the view, ie compute scale
-  function fit(scope) {
+  function fit() {
     // Model
-    var bounds      = scope.model.get2DBounds();
+    var bounds      = this.model.get2DBounds();
     var modelWidth  = bounds.xmax - bounds.xmin;
     var modelHeight = bounds.ymax - bounds.ymin;
 
     // <div> containing Canvas
-    var viewWidth  = scope.canvas2d.clientWidth;
-    var viewHeight = scope.canvas2d.clientHeight;
+    var viewWidth  = this.canvas2d.clientWidth;
+    var viewHeight = this.canvas2d.clientHeight;
 
     // Resize canvas to fit <div>, should not be necessary but is
-    scope.canvas2d.width  = viewWidth;
-    scope.canvas2d.height = viewHeight;
+    this.canvas2d.width  = viewWidth;
+    this.canvas2d.height = viewHeight;
 
     // Compute Scale to fit
     const scaleX = viewWidth / modelWidth;
     const scaleY = viewHeight / modelHeight;
-    scope.scale   = Math.min(scaleX, scaleY) / 1.1;
+    this.scale   = Math.min(scaleX, scaleY) / 1.2;
 
     // Compute Offset to center drawing
-    scope.xOffset = viewWidth / 2;
-    scope.yOffset = viewHeight / 2;
+    this.xOffset = viewWidth / 2;
+    this.yOffset = viewHeight / 2;
   }
 
   // API

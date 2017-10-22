@@ -3,7 +3,7 @@
 // Test in NodeJS
 
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  const Point = require('./Point.js');
+  var Point = require('./Point.js');
 }
 
 // Face contains points, segments, normal

@@ -16,6 +16,7 @@ var Orisim3d = function Orisim3d(model, view2d, View3dThree, command) {
   this.view3d = View3dThree;
   this.command = command;
 };
+
 // Class methods
 Orisim3d.prototype.constructor = Orisim3d;
 
@@ -37,7 +38,7 @@ function completed () {
   var view3d = canvas3d ? new View3dThree() : null;
   if (view3d !== null){
     view3d.init();
-    view3d.buildObjects();
+    view3d.buildObjects(model);
   }
   var commandarea  = window.document.getElementById('commandarea');
   commandarea ? new CommandArea(command, commandarea) : null;
@@ -51,16 +52,18 @@ function completed () {
 
 // Animation loop
 function loop() {
+  // If model has changed
   if (orisim3d.model.change) {
     if (orisim3d.view2d !== null) {
       orisim3d.view2d.draw();
     }
     if (orisim3d.view3d !== null) {
-      orisim3d.view3d.buildObjects();
+      orisim3d.view3d.buildObjects(orisim3d.model);
     }
+    // command.anim() returns true while animation in progress, and false at the end
     orisim3d.model.change = !!orisim3d.command.anim()
   }
-  orisim3d.view3d.draw();
+  orisim3d.view3d.render();
   requestAnimationFrame(loop);
 }
 

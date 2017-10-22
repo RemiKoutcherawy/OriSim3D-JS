@@ -140,7 +140,8 @@ var Command = function Command(model) {
       iTok++;
       s = model.segments[toko[iTok++]];
       // Cache current angle at start of animation
-      if (tpi === 0){
+      var angleBefore = 0;
+      if (tpi === 0) {
         angleBefore = model.computeAngle(s);
       }
       angle = ((toko[iTok++] - angleBefore) * (tni - tpi));
@@ -511,8 +512,9 @@ var Command = function Command(model) {
     var t  = new Date().getTime();
     // Compute tn varying from 0 to 1
     var tn = (t - tstart - pauseDuration) / duration; // tn from 0 to 1
-    if (tn > 1.0)
+    if (tn > 1.0){
       tn = 1.0;
+    }
     tni = context.interpolator(tn);
 
     // Execute commands just after t xxx up to including ')'
@@ -542,12 +544,16 @@ var Command = function Command(model) {
       // Switch back to run and launch next cde
       state = State.run;
       commandLoop();
+
       // If commandLoop has launched another animation we continue
-      if (state === State.anim)
+      if (state === State.anim) {
         return true;
+      }
+
       // OK we stop anim
       return false;
     }
+
     // Rewind to continue animation
     iTok = iBeginAnim;
     return true;

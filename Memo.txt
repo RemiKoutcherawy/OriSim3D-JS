@@ -2,10 +2,10 @@ Error: WebGL warning: drawElements: Drawing to a destination rect smaller than t
 
 TODO
 x double click sur WebGL
-- chargement texture
+x chargement texture
 x enlever matrix4D
-- Menu
-/ Icones
+x Menu
+- Icones
 - clic sur cocotte à l'image de conception
 - zoom sans scale
 - menu pour 2D 3D Cde Model upload, download

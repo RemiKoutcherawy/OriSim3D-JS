@@ -9,7 +9,7 @@ function View3d(model, canvas3d) {
   // Instance variables
   var model        = model;
   var canvas3d     = canvas3d;
-  var nbFacesVertice = nbFacesVertice;
+  var nbFacesVertice = 0;
   var gl           = canvas3d.getContext('webgl') || canvas3d.getContext('experimental-webgl');
   var scope = this;
 
