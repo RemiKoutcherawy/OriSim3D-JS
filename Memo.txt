@@ -11,3 +11,4 @@ x Menu
 - menu pour 2D 3D Cde Model upload, download
 - bateau.txt
 - select 2D 3D
+- 1080 x 617

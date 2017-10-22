@@ -15,7 +15,7 @@ var Orisim3d = function Orisim3d(model, view2d, view3d, command) {
   this.view2d = view2d;
   this.view3d = view3d;
   this.command = command;
-}
+};
 Orisim3d.prototype.constructor = Orisim3d;
 
 // Global

@@ -5,10 +5,10 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // View3d Constructor
-function View3d(model, canvas3d) {
+function View3d(modele, canvas3dElt) {
   // Instance variables
-  var model        = model;
-  var canvas3d     = canvas3d;
+  var model        = modele;
+  var canvas3d     = canvas3dElt;
   var nbFacesVertice = 0;
   var gl           = canvas3d.getContext('webgl') || canvas3d.getContext('experimental-webgl');
   var scope = this;
@@ -215,7 +215,7 @@ function View3d(model, canvas3d) {
       View3d.hTexBack = View3d.imageBack.height;
       // Recompute texture coords
       initBuffers();
-    }
+    };
     // Require CORS
     // View3d.imageBack.src = './textures/back.jpg';
     // Does not require CORS if image is inlined

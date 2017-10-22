@@ -5,8 +5,8 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Interprets a list of commands, and apply them on Model
-var Command = function Command(model) {
-  var model        = model;
+var Command = function Command(modele) {
+  var model        = modele;
   var toko         = [];
   var done         = [];
   var iTok         = 0;
@@ -21,6 +21,8 @@ var Command = function Command(model) {
   var interpolator = Interpolator.LinearInterpolator;
   // Coefficient to multiply value given in Offset commands
   var kOffset = 1; // 0.2 for real rendering, can be 10 to debug
+  //
+  var undo, pauseStart, pauseDuration, duration, tstart, undoInProgress;
 
   var context = this;
 
@@ -159,7 +161,7 @@ var Command = function Command(model) {
       iTok++;
       list  = listPoints();
       var liste = list.length === 0 ? model.points : list;
-      var dmax = model.adjustList(liste);
+      model.adjustList(liste);
     }
 
     // Offsets
@@ -317,7 +319,7 @@ var Command = function Command(model) {
     return list;
   }
 
-  // Make a list from following segments numbers @testOK
+  // Make a list from following segments numbers
   function listSegments () {
     var list = [];
     while (Number.isInteger(Number(toko[iTok]))) {
@@ -343,7 +345,7 @@ var Command = function Command(model) {
     if (state === State.idle) {
       if (cde === "u") {
         toko = done.slice().reverse();
-        undo(); // We are exploring toko[]
+        // undo(); // We are exploring toko[]
         return;
       }
       else if (cde.startsWith("read")) {
@@ -406,7 +408,7 @@ var Command = function Command(model) {
       else if (cde === "u") {
         // Undo one step
         state = State.undo;
-        undo();
+        // undo();
       }
       return;
     }
@@ -415,7 +417,7 @@ var Command = function Command(model) {
       if (undoInProgress === false) {
         if (cde === "u") {
           // Ok continue to undo
-          undo();
+          // undo();
         }
         else if (cde === "co") {
           // Switch back to run
@@ -518,7 +520,7 @@ var Command = function Command(model) {
     tni = context.interpolator(tn);
 
     // Execute commands just after t xxx up to including ')'
-    iBeginAnim = iTok;
+    var iBeginAnim = iTok;
     while (toko[iTok] !== "rparent") {
       execute();
       if (iTok === toko.length) {
@@ -571,6 +573,7 @@ var Command = function Command(model) {
   this.interpolator = interpolator;
   this.toko = toko;
   this.listPoints = listPoints;
+  this.listSegments = listSegments;
 
   this.command = command;
   this.commandLoop = commandLoop;
