@@ -8,7 +8,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Model to hold Points, Segments, Faces
-var Model = function Model () {
+var Model = function Model (list) {
   // Arrays to hold points, faces, segments
   this.points   = [];
   this.segments = [];
@@ -823,6 +823,10 @@ var Model = function Model () {
 
   this.zoomFit = zoomFit;
   this.scaleModel = scaleModel;
+
+  // Initialize if a list is provided
+  var boundinit = init.bind(this);
+  list ? boundinit(list): null;
 };
 
 // Class methods
