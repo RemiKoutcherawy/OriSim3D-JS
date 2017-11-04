@@ -6,119 +6,182 @@ if (NODE_ENV === true && typeof module !== 'undefined') {
   var Orisim3d = require('./Orisim3dThree.js');
 }
 
-var View3dThree = function () {
-  // Create model, Command, then lookup view2d, view3d, textarea
-  var model = new Model();
-  model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
-
+var View3dThree = function (model) {
   var canvas3d, camera, controls, scene, renderer;
   var materialFront, materialBack;
   var materialPoint, materialPointSelected;
-  var materialLine, materialLineSelected;
+  var materialLine,  materialLineSelected;
   var anim = false;
   var objects = [];
+  // Three objects
+  var points;
+  var lines;
+  var faces;
 
-  function buildObjects (model) {
-    // Remove all Objects
-    var i;
-    for (i = scene.children.length; i > 0; i--) {
-      var obj = scene.children[i];
-      scene.remove(obj);
+  // Set Points positions
+  var setPointsPositions = function (model, geometryPoint) {
+    var positionsPoint = geometryPoint.attributes.position.array;
+    for (var i = 0; i < model.points.length; i++) {
+      var pt                    = model.points[i];
+      positionsPoint[3 * i]     = pt.x;
+      positionsPoint[3 * i + 1] = pt.y;
+      positionsPoint[3 * i + 2] = pt.z;
+      // Keep a reference to THREE.Points in this pt
+      pt.point                  = this.points;
     }
-    objects.length = 0;
+    geometryPoint.setDrawRange(0, model.points.length);
+  };
 
-    // Put Points
-    for (i = 0; i < model.points.length; i++) {
-      var pt = model.points[i];
-      var ptVector = new THREE.Vector3(pt.x, pt.y, pt.z);
-      var geometryPoint = new THREE.Geometry();
-      geometryPoint.vertices.push(ptVector);
-      var point         = new THREE.Points(geometryPoint, materialPoint);
-      scene.add(point);
-      objects.push(point);
-    }
-
-    // Puts Segments
-    for (i = 0; i < model.segments.length; i++) {
+  // Set Segments positions
+  var setSegmentsPositions = function (model, geometryline) {
+    var positionsLine = geometryline.attributes.position.array;
+    for (var i = 0; i < model.segments.length; i++) {
       var s = model.segments[i];
-      var pt1Vector = new THREE.Vector3(s.p1.x, s.p1.y, s.p1.z);
-      var pt2Vector = new THREE.Vector3(s.p2.x, s.p2.y, s.p2.z);
-      var geometryline = new THREE.Geometry();
-      geometryline.vertices.push(pt1Vector);
-      geometryline.vertices.push(pt2Vector);
-      var line         = new THREE.LineSegments(geometryline, materialLine);
-      scene.add(line);
-      objects.push( line );
+      positionsLine[6 * i]     = s.p1.x;
+      positionsLine[6 * i + 1] = s.p1.y;
+      positionsLine[6 * i + 2] = s.p1.z;
+      positionsLine[6 * i + 3] = s.p2.x;
+      positionsLine[6 * i + 4] = s.p2.y;
+      positionsLine[6 * i + 5] = s.p2.z;
+
+      // Keep a reference to THREE.Line in segment
+      s.lines                  = this.lines;
+    }
+    geometryline.setDrawRange(0, model.segments.length * 2);
+  };
+
+  // Set Faces vertices positions
+  var setFacesPositions = function (model, geometryFace) {
+    var pos = geometryFace.attributes.position.array;
+    var uv = geometryFace.attributes.uv.array;
+    var indices = geometryFace.getIndex();
+
+    // Put all points with UV coords in 'pos'
+    var allPoints = model.points;
+    for (var ip = 0; ip < allPoints.length; ip++) {
+      var pt               = model.points[ip];
+      pos[ 3 * ip]     = pt.x;
+      pos[ 3 * ip + 1] = pt.y;
+      pos[ 3 * ip + 2] = pt.z;
+      // UV are just flat coordinates on crease pattern
+      uv[ 2 * ip]      = (200.0 + pt.xf) / 400.0;
+      uv[ 2 * ip + 1 ] = (200.0 + pt.yf) / 400.0;
+// console.log("pos xyz: "+pos[ 3 * ip]+" "+pos[ 3 * ip +1]+" "+pos[ 3 * ip +2]);
+// console.log("uv:"+uv[ 2 * ip]+" "+uv[ 2 * ip+1]);
     }
 
-    // Put Faces
-    var xmin = -200, xmax = 200, ymin = -200, ymax = 200;
-    for (i = 0 ; i < model.faces.length ; i++) {
-      var f = model.faces[i];
+    var index = 0;
+    for (var i = 0; i < model.faces.length; i++) {
+      var f   = model.faces[i];
       var pts = f.points;
 
-      // Triangle FAN can be used only because of convex CCW face
+      // Triangle FAN can be used only because of convex face
       // Triangle are made of 3 points : origin, first, second
       var origin = pts[0]; // center of the FAN
-      var originVector = new THREE.Vector3(origin.x, origin.y, origin.z);
-
-      var first = pts[1]; // first
-      var second; // second point, third and last point of triangle
-      for (var j = 2; j < pts.length; j++) { // pts.length
-        second = pts[j]; // second starts à 2
-
-        var firstVector = new THREE.Vector3(first.x, first.y, first.z);
-        var secondVector = new THREE.Vector3(second.x, second.y, second.z);
-
+      var first  = pts[1]; // first point
+      var second;          // second point, third and last point of triangle
+// console.log("face:"+i+" sur:"+model.faces.length);
+      // Each point adds a new triangle
+      for (var j = 2; j < pts.length; j++) {
+        second = pts[j];  // second starts à 2
+// console.log("point:"+j+" sur points:"+pts.length);
         // Front Fan triangle : center, first, second
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(originVector);
-        geometry.vertices.push(firstVector);
-        geometry.vertices.push(secondVector);
+        indices[index++] = allPoints.indexOf(origin);
+        indices[index++] = allPoints.indexOf(first);
+        indices[index++] = allPoints.indexOf(second);
+// console.log("indices:"+indices[index-3]+" "+indices[index-2]+" "+indices[index-1]);
 
-        geometry.faceVertexUvs[0] = [];
-        geometry.faceVertexUvs[0].push([
-          new THREE.Vector2((origin.x - xmin) / (xmax - xmin), (origin.y - ymin) / (ymax - ymin)),
-          new THREE.Vector2((first.x - xmin) / (xmax - xmin), (first.y - ymin) / (ymax - ymin)),
-          new THREE.Vector2((second.x - xmin) / (xmax - xmin), (second.y - ymin) / (ymax - ymin))
-        ]);
-
-        // Front Face pushed in geometry.faces
-        var face = new THREE.Face3(0, 1, 2);
-        geometry.faces.push(face);
-
-        // Object mesh with geometry for this triangle
-        var mesh = new THREE.Mesh(geometry, materialFront);
-        scene.add(mesh);
-
-        // Back Fan triangle : center, second, first
-        var geometryBack = new THREE.Geometry();
-        geometryBack.vertices.push(originVector);
-        geometryBack.vertices.push(secondVector);
-        geometryBack.vertices.push(firstVector);
-
-        geometryBack.faceVertexUvs[0] = [];
-        geometryBack.faceVertexUvs[0].push([
-          new THREE.Vector2((origin.x - xmin) / (xmax - xmin), (origin.y - ymin) / (ymax - ymin)),
-          new THREE.Vector2((second.x - xmin) / (xmax - xmin), (second.y - ymin) / (ymax - ymin)),
-          new THREE.Vector2((first.x - xmin) / (xmax - xmin), (first.y - ymin) / (ymax - ymin))
-        ]);
-
-        // Back Face pushed in geometry.faces
-        var faceBack = new THREE.Face3(0, 1, 2);
-        geometryBack.faces.push(faceBack);
-
-        // Object mesh with geometry for this triangle, and materialBack
-        var meshBack = new THREE.Mesh(geometryBack, materialBack);
-        scene.add(meshBack);
-
-        // Next triangle second becomes the first for the next triangle.
+        // Next triangle, second becomes the first for the next triangle.
         first = second;
       }
+      // Keep a reference to THREE.Mesh in model face
+      f.mesh = this.faces;
     }
-  }
+    // geometryFace.setDrawRange(0, index);
 
-  function init() {
+  };
+
+  // Build all objects
+  var buildObjects = function  (model) {
+    var MAX_POINTS = 500;
+
+    // Build Points
+    var geometryPoint = new THREE.BufferGeometry();
+    var positionsArrayPoint = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+    geometryPoint.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayPoint, 3 ) );
+    // Mesh
+    this.points         = new THREE.Points(geometryPoint, materialPoint);
+    setPointsPositions.call(this, model, geometryPoint);
+    scene.add(this.points);
+
+    // Build Segments
+    var geometryline = new THREE.BufferGeometry();
+    var positionsArrayLine = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+    geometryline.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayLine, 3 ) );
+    // Mesh
+    this.lines = new THREE.LineSegments( geometryline,  materialLine );
+    setSegmentsPositions.call(this, model, geometryline);
+    scene.add( this.lines );
+
+    // Build Faces
+    var geometryFace = new THREE.BufferGeometry();
+    var positionsArrayFace = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+    geometryFace.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayFace, 3 ) );
+    var uvFaces = new Float32Array( MAX_POINTS * 2 ); // 2 UV per point
+    geometryFace.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ) );
+    var indices = new Uint32Array( MAX_POINTS * 3); // Number of indices is the sum of point of faces
+    geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+    // Mesh
+    this.faces = new THREE.Mesh( geometryFace,  materialFront );
+    setFacesPositions.call(this, model, geometryFace);
+    // scene.add( this.faces );
+
+    // TEST
+    var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
+    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+    var quad_indices = [0,2,1, 0,3,2];
+    var geometry = new THREE.BufferGeometry();
+    // itemSize = 3 because there are 3 values (components) per vertex
+    // var vertices = new Float32Array( quad_vertices );
+    // geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+
+    var postest = new Float32Array( 12 ); // 3 vertices per point
+    geometry.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ) );
+    var pos = geometry.attributes.position.array;
+    for (var k = 0; k < quad_vertices.length; k++ ){
+      pos[k] = quad_vertices[k];
+    }
+
+
+    // Each vertex has one uv coordinate for texture mapping
+    var uvs = new Float32Array( quad_uvs);
+    geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+    // Use the four vertices to draw the two triangles that make up the square.
+    var indicestest = new Uint32Array( quad_indices );
+    geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
+    var mesh = new THREE.Mesh( geometry, materialFront );
+    mesh.position.z = -100;
+
+    scene.add(mesh);
+  };
+
+  // Update all objects positions
+  var update  = function  (model) {
+    // Updates Points
+    setPointsPositions.call(this, model, this.points.geometry );
+    this.points.geometry.attributes.position.needsUpdate = true;
+
+    // Update Segments
+    setSegmentsPositions.call(this, model, this.lines.geometry );
+    this.lines.geometry.attributes.position.needsUpdate = true;
+
+    // Update Faces
+    setFacesPositions.call(this, model, this.faces.geometry );
+    this.faces.geometry.attributes.position.needsUpdate = true;
+  };
+
+  // Initialize Scene, Lights, Textures, Materials
+  var init = function () {
     canvas3d = window.document.getElementById('canvas3d');
     setStyles();
 
@@ -141,25 +204,29 @@ var View3dThree = function () {
 
 // Textures
     var textureFront = new THREE.TextureLoader().load('textures/cocotte256x256.jpg');
-    // textureFront.repeat.set(1, 1);
+    textureFront.repeat.set(1, 1);
     materialFront = new THREE.MeshPhongMaterial({
       map:textureFront,
       side:THREE.FrontSide,
       flatShading:THREE.SmoothShading
     });
-    var textureBack = new THREE.TextureLoader().load('textures/back256x256.jpg');
-    // textureBack.repeat.set(1, 1);
-    materialBack = new THREE.MeshPhongMaterial({
-      map:textureBack,
-      side:THREE.FrontSide,
-      flatShading:THREE.SmoothShading
-    });
+    // var materialFront = new THREE.MeshPhongMaterial( {
+    //   color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
+    //   side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+    // } );
 
-// Points
+    // var textureBack = new THREE.TextureLoader().load('textures/back256x256.jpg');
+    // materialBack = new THREE.MeshPhongMaterial({
+    //   map:textureBack,
+    //   side:THREE.FrontSide,
+    //   flatShading:THREE.SmoothShading
+    // });
+
+// Points Materials
     materialPoint = new THREE.PointsMaterial({size:20, color:0x0000ff});
     materialPointSelected = new THREE.PointsMaterial({size:40, color:0xff0000});
 
-// Lines
+// Lines Materials
     materialLine = new THREE.LineBasicMaterial({color:0x0000ff, linewidth:3});
     materialLineSelected = new THREE.LineBasicMaterial({color:0xff0000, linewidth:6});
 
@@ -177,48 +244,48 @@ var View3dThree = function () {
     renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
 
 // Select
-    var selectPoints = [];
-    var selectLines = [];
-    var selectControls = new SelectControls( objects, camera, renderer.domElement );
-    selectControls.addEventListener( 'selectPt', function ( event, object ) {
-        var pt = event.object;
-        if (selectPoints.length === 0){
-          // Select
-          selectPoints[0] = pt;
-          selectPoints[0].material.size = 40;
-          selectPoints[0].material.color.r = 1.0;
-        }
-        else if (selectPoints[0] === pt) {
-          // Deselect
-          selectPoints[0].material.color.r = 0.0;
-          selectPoints.splice( 0, 1 );
-        }
-        else {
-          // Got two
-          selectPoints[1] = pt;
-          selectPoints[1].material.size = 40;
-          selectPoints[1].material.color.r = 1.0;
-          console.log("AddLine");
-          // Do
-          var addline = new THREE.Geometry();
-          addline.vertices.push(new THREE.Vector3(
-            selectPoints[0].geometry.vertices[0].x,
-            selectPoints[0].geometry.vertices[0].y,
-            selectPoints[0].geometry.vertices[0].z));
-          addline.vertices.push(new THREE.Vector3(
-            selectPoints[1].geometry.vertices[0].x,
-            selectPoints[1].geometry.vertices[0].y,
-            selectPoints[1].geometry.vertices[0].z));
-          var addMaterialLine = new THREE.LineBasicMaterial( { color: 0xff00ff,linewidth: 6} );
-          var line = new THREE.LineSegments( addline, addMaterialLine );
-          scene.add( line );
-          selectPoints.splice( 0, 1 );
-          selectPoints.splice( 0, 1 );
-        }
-        console.dir(pt);
-      }
-    );
-    selectControls.activate();
+//     var selectPoints = [];
+//     var selectLines = [];
+//     var selectControls = new SelectControls( objects, camera, renderer.domElement );
+//     selectControls.addEventListener( 'selectPt', function ( event, object ) {
+//         var pt = event.object;
+//         if (selectPoints.length === 0){
+//           // Select
+//           selectPoints[0] = pt;
+//           selectPoints[0].material.size = 40;
+//           selectPoints[0].material.color.r = 1.0;
+//         }
+//         else if (selectPoints[0] === pt) {
+//           // Deselect
+//           selectPoints[0].material.color.r = 0.0;
+//           selectPoints.splice( 0, 1 );
+//         }
+//         else {
+//           // Got two
+//           selectPoints[1] = pt;
+//           selectPoints[1].material.size = 40;
+//           selectPoints[1].material.color.r = 1.0;
+//           console.log("AddLine");
+//           // Do
+//           var addline = new THREE.Geometry();
+//           addline.vertices.push(new THREE.Vector3(
+//             selectPoints[0].geometry.vertices[0].x,
+//             selectPoints[0].geometry.vertices[0].y,
+//             selectPoints[0].geometry.vertices[0].z));
+//           addline.vertices.push(new THREE.Vector3(
+//             selectPoints[1].geometry.vertices[0].x,
+//             selectPoints[1].geometry.vertices[0].y,
+//             selectPoints[1].geometry.vertices[0].z));
+//           var addMaterialLine = new THREE.LineBasicMaterial( { color: 0xff00ff,linewidth: 6} );
+//           var line = new THREE.LineSegments( addline, addMaterialLine );
+//           scene.add( line );
+//           selectPoints.splice( 0, 1 );
+//           selectPoints.splice( 0, 1 );
+//         }
+//         console.dir(pt);
+//       }
+//     );
+//     selectControls.activate();
 
 // dat.GUI
    var gui = new dat.GUI();
@@ -244,17 +311,17 @@ var View3dThree = function () {
 
 // Resize
     window.addEventListener( 'resize', onWindowResize, false );
-  }
+  };
 
-  function onWindowResize() {
+  var onWindowResize = function () {
     setStyles();
     camera.aspect = canvas3d.clientWidth / canvas3d.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
     renderer.render( scene, camera );
-  }
+  };
 
-  function setStyles() {
+  var setStyles = function () {
     var height80 = window.document.getElementById('height80').style;
     height80.position = 'relative';
     height80.width = Number(window.innerWidth * 1.0)+'px';
@@ -263,16 +330,22 @@ var View3dThree = function () {
     var height20 = window.document.getElementById('height20').style;
     height20.width = Number(window.innerWidth)+'px';
     height20.height = Number(window.innerHeight * 0.2)+'px';
-  }
+  };
 
-  function render() {
+  var render = function () {
     controls.update();
     renderer.render( scene, camera );
-  }
+  };
+
+  // Initialize renderer
+  init.call(this);
+  // Build objects if a model is provided
+  model ? buildObjects.call(this, model) : null;
 
   // API
   this.init = init;
   this.buildObjects = buildObjects;
+  this.update = update;
   this.render = render;
 };
 
