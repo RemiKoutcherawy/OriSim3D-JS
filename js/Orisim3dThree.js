@@ -29,17 +29,12 @@ function completed () {
   window.removeEventListener( "load", completed );
 
   // Create model, Command, then lookup view2d, view3d, textarea
-  var model = new Model();
-  model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
+  var model = new Model([-200, -200, 200, -200, 200, 200, -200, 200]);
   var command      = new Command(model);
   var canvas2d     = window.document.getElementById('canvas2d');
   var view2d       = canvas2d ? new View2d(model, canvas2d) : null;
   var canvas3d     = window.document.getElementById('canvas3d');
-  var view3d = canvas3d ? new View3dThree() : null;
-  if (view3d !== null){
-    view3d.init();
-    view3d.buildObjects(model);
-  }
+  var view3d       = canvas3d ? new View3dThree(model) : null;
   var commandarea  = window.document.getElementById('commandarea');
   commandarea ? new CommandArea(command, commandarea) : null;
 
@@ -58,7 +53,7 @@ function loop() {
       orisim3d.view2d.draw();
     }
     if (orisim3d.view3d !== null) {
-      orisim3d.view3d.buildObjects(orisim3d.model);
+      orisim3d.view3d.update(orisim3d.model);
     }
     // command.anim() returns true while animation in progress, and false at the end
     orisim3d.model.change = !!orisim3d.command.anim()
