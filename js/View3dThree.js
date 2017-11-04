@@ -54,25 +54,37 @@ var View3dThree = function (model) {
   var setFacesPositions = function (model, geometryFace) {
     var pos = geometryFace.attributes.position.array;
     var uv = geometryFace.attributes.uv.array;
-    var indices = geometryFace.getIndex();
+    // var indices = geometryFace.getIndex();
 
     // Put all points with UV coords in 'pos'
     var allPoints = model.points;
-    for (var ip = 0; ip < allPoints.length; ip++) {
-      var pt               = model.points[ip];
-      pos[ 3 * ip]     = pt.x;
-      pos[ 3 * ip + 1] = pt.y;
-      pos[ 3 * ip + 2] = pt.z;
+    for (var i = 0; i < allPoints.length; i++) {
+      var pt          = model.points[i];
+      pos[ 3 * i]     = pt.x;
+      pos[ 3 * i + 1] = pt.y;
+      pos[ 3 * i + 2] = pt.z;
       // UV are just flat coordinates on crease pattern
-      uv[ 2 * ip]      = (200.0 + pt.xf) / 400.0;
-      uv[ 2 * ip + 1 ] = (200.0 + pt.yf) / 400.0;
-// console.log("pos xyz: "+pos[ 3 * ip]+" "+pos[ 3 * ip +1]+" "+pos[ 3 * ip +2]);
-// console.log("uv:"+uv[ 2 * ip]+" "+uv[ 2 * ip+1]);
+      uv[ 2 * i]      = (200.0 + pt.xf) / 400.0;
+      uv[ 2 * i + 1 ] = (200.0 + pt.yf) / 400.0;
     }
 
+    // Count points
+    var count = 0;
+    for (var iface = 0; iface < model.faces.length; iface++) {
+      var f   = model.faces[iface];
+      var pts = f.points;
+      // Each point adds a new triangle
+      for (var ipoint = 2; ipoint < pts.length; ipoint++) {
+        count += 3;
+        // Next triangle, second becomes the first for the next triangle.
+        first = second;
+      }
+    };
+    var indices = new Uint32Array( count );
+
     var index = 0;
-    for (var i = 0; i < model.faces.length; i++) {
-      var f   = model.faces[i];
+    for (var iface = 0; iface < model.faces.length; iface++) {
+      var f   = model.faces[iface];
       var pts = f.points;
 
       // Triangle FAN can be used only because of convex face
@@ -80,25 +92,22 @@ var View3dThree = function (model) {
       var origin = pts[0]; // center of the FAN
       var first  = pts[1]; // first point
       var second;          // second point, third and last point of triangle
-// console.log("face:"+i+" sur:"+model.faces.length);
+
       // Each point adds a new triangle
-      for (var j = 2; j < pts.length; j++) {
-        second = pts[j];  // second starts à 2
-// console.log("point:"+j+" sur points:"+pts.length);
+      for (var ipoint = 2; ipoint < pts.length; ipoint++) {
+        second = pts[ipoint];  // second starts à 2
         // Front Fan triangle : center, first, second
         indices[index++] = allPoints.indexOf(origin);
         indices[index++] = allPoints.indexOf(first);
         indices[index++] = allPoints.indexOf(second);
-// console.log("indices:"+indices[index-3]+" "+indices[index-2]+" "+indices[index-1]);
-
         // Next triangle, second becomes the first for the next triangle.
         first = second;
       }
       // Keep a reference to THREE.Mesh in model face
       f.mesh = this.faces;
     }
-    // geometryFace.setDrawRange(0, index);
-
+    // Set index
+    geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
   };
 
   // Build all objects
@@ -129,40 +138,56 @@ var View3dThree = function (model) {
     geometryFace.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayFace, 3 ) );
     var uvFaces = new Float32Array( MAX_POINTS * 2 ); // 2 UV per point
     geometryFace.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ) );
-    var indices = new Uint32Array( MAX_POINTS * 3); // Number of indices is the sum of point of faces
-    geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+    // var indices = new Uint32Array( MAX_POINTS * 3); // Number of indices is the sum of point of faces
+    // geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
     // Mesh
     this.faces = new THREE.Mesh( geometryFace,  materialFront );
     setFacesPositions.call(this, model, geometryFace);
-    // scene.add( this.faces );
+    scene.add( this.faces );
 
-    // TEST
-    var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
-    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
-    var quad_indices = [0,2,1, 0,3,2];
-    var geometry = new THREE.BufferGeometry();
-    // itemSize = 3 because there are 3 values (components) per vertex
-    // var vertices = new Float32Array( quad_vertices );
-    // geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-
-    var postest = new Float32Array( 12 ); // 3 vertices per point
-    geometry.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ) );
-    var pos = geometry.attributes.position.array;
-    for (var k = 0; k < quad_vertices.length; k++ ){
-      pos[k] = quad_vertices[k];
-    }
-
-
-    // Each vertex has one uv coordinate for texture mapping
-    var uvs = new Float32Array( quad_uvs);
-    geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
-    // Use the four vertices to draw the two triangles that make up the square.
-    var indicestest = new Uint32Array( quad_indices );
-    geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
-    var mesh = new THREE.Mesh( geometry, materialFront );
-    mesh.position.z = -100;
-
-    scene.add(mesh);
+    // // TEST
+    // var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
+    // var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+    // var quad_indices = [0,2,1, 0,3,2];
+    // var geometry = new THREE.BufferGeometry();
+    // // itemSize = 3 because there are 3 values (components) per vertex
+    // // var vertices = new Float32Array( quad_vertices );
+    // // geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+    // var postest = new Float32Array( 12 ); // 3 vertices per point
+    // geometry.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
+    // var pos = geometry.attributes.position.array;
+    // for (var k = 0; k < quad_vertices.length; k++ ){
+    //   pos[k] = quad_vertices[k];
+    // };
+    //
+    // // Each vertex has one uv coordinate for texture mapping
+    // // var uvs = new Float32Array( quad_uvs);
+    // // geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+    // var uvs = new Float32Array( 8 ); // 2 UV per point
+    // geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).setDynamic(true) );
+    // var uv = geometry.attributes.uv.array;
+    // for (var l = 0; l < uvs.length; l++ ) {
+    //   uv[l]      = quad_uvs[l];
+    // };
+    //
+    // // Use the four vertices to draw the two triangles that make up the square.
+    // // var indicestest = new Uint32Array( quad_indices );
+    // // geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
+    // var indicestest = new Uint32Array( 6 );
+    // geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
+    // var indices = geometry.getIndex();
+    // var indices = new Uint32Array( 6 );
+    // console.log("indicestest:"+indicestest+" indices:"+indices);
+    // for (var m = 0; m < quad_indices.length; m++ ) {
+    //   // indicestest[m]      = quad_indices[m];
+    //   indices[m]      = quad_indices[m];
+    // };
+    // geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+    //
+    // var mesh = new THREE.Mesh( geometry, materialFront );
+    // mesh.position.z = -100;
+    //
+    // scene.add(mesh);
   };
 
   // Update all objects positions
