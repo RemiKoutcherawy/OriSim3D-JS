@@ -23,7 +23,7 @@ var View3dThree = function () {
     // console.log("setPointsPositions:"+ this.constructor.name);
 
     var pos = geometry.attributes.position.array;
-    var uv  = geometry.attributes.uv;
+    var uv  = geometry.attributes.uv.array;
 
     for (var i = 0; i < model.points.length; i++) {
       var pt         = model.points[i];
@@ -98,14 +98,14 @@ var View3dThree = function () {
   // Build all objects
   function buildObjects (model) {
     console.log("buildObjects:"+ this.constructor.name+" needRebuild:"+ ((model.needRebuild === true) ? "vrai" : "faux"));
-    if (points3d){
+    if (points3d) {
       scene.remove(points3d);
       scene.remove(faces3d);
       scene.remove(lines3d);
       scene.remove(mesh);
     }
 
-    var MAX_POINTS = 16;
+    var MAX_POINTS = 512;
 
     // Build Points Mesh
     var geometry = new THREE.BufferGeometry();
@@ -122,7 +122,6 @@ var View3dThree = function () {
     var indicesArray = new Uint32Array( MAX_POINTS * 3 );
     var indicesFacesBuffer = new THREE.BufferAttribute( indicesArray, 1 ).setDynamic(true);
     geometry.setIndex( indicesFacesBuffer );
-    // setFacesIndices( model, geometry );
     // Create object, same geometry, and add it to scene
     faces3d = new THREE.Mesh( geometry,  materialFront );
     scene.add( faces3d );
@@ -131,46 +130,47 @@ var View3dThree = function () {
     var geometryline = new THREE.BufferGeometry();
     var positionsArrayLine = new Float32Array( MAX_POINTS * 3 );
     geometryline.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayLine, 3 ).setDynamic(true) );
-    // setSegmentPointsPositions( model, geometryline );
     // Indices
     var indicesSegmentArray = new Uint32Array( MAX_POINTS * 2 );
     var indicesSegmentBuffer = new THREE.BufferAttribute( indicesSegmentArray, 1 ).setDynamic(true);
     geometryline.setIndex( indicesSegmentBuffer );
-    // setSegmentsIndices( model, geometryline );
     // Create object, and add it to scene
     lines3d = new THREE.LineSegments( geometryline,  materialLine );
     scene.add( lines3d );
 
     // TEST
-    var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
-    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
-    var quad_indices = [0,2,1, 0,3,2];
-    var geometryTest = new THREE.BufferGeometry();
-    var postest = new Float32Array( 12 ); // 3 vertices per point
-    geometryTest.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
-    var pos = geometryTest.attributes.position.array;
-    for (var k = 0; k < quad_vertices.length; k++ ){
-      pos[k] = quad_vertices[k];
+    {
+      var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
+      var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+      var quad_indices = [0,2,1, 0,3,2];
+      var geometryTest = new THREE.BufferGeometry();
+      var postest = new Float32Array( 12 ); // 3 vertices per point
+      geometryTest.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
+      // var pos = geometryTest.attributes.position.array;
+      // for (var k = 0; k < quad_vertices.length; k++ ){
+      //   pos[k] = quad_vertices[k];
+      // }
+      // Each vertex has one uv coordinate for texture mapping
+      var uvs = new Float32Array( 8 ); // 2 UV per point
+      var uvsBufffer = new THREE.BufferAttribute( uvs, 2 ).setDynamic(true);
+      geometryTest.addAttribute( 'uv', uvsBufffer );
+      // var uv = geometryTest.attributes.uv.array;
+      // for (var l = 0; l < quad_uvs.length - 3; l++ ) {
+      //   uv[l]      = quad_uvs[l];
+      // }
+      // Use the four vertices to draw the two triangles that make up the square.
+      var indices = new Uint32Array( 6 );
+      var indicesTestBuffer = new THREE.BufferAttribute( indices, 1 ).setDynamic(true);
+      geometryTest.setIndex( indicesTestBuffer );
+      // indices = geometryTest.getIndex().array;
+      // for (var m = 0; m < quad_indices.length - 3; m++ ) {
+      //   indices[m]      = quad_indices[m];
+      // }
+      mesh = new THREE.Mesh( geometryTest, materialFront );
+      mesh.position.z = -100;
+      scene.add(mesh);
     }
-    // Each vertex has one uv coordinate for texture mapping
-    var uvs = new Float32Array( 8 ); // 2 UV per point
-    var uvsBufffer = new THREE.BufferAttribute( uvs, 2 ).setDynamic(true);
-    geometryTest.addAttribute( 'uv', uvsBufffer );
-    var uv = geometryTest.attributes.uv.array;
-    for (var l = 0; l < quad_uvs.length - 3; l++ ) {
-      uv[l]      = quad_uvs[l];
-    }
-    // Use the four vertices to draw the two triangles that make up the square.
-    var indices = new Uint32Array( 6 );
-    for (var m = 0; m < quad_indices.length - 3; m++ ) {
-      indices[m]      = quad_indices[m];
-    }
-    var indicesTestBuffer = new THREE.BufferAttribute( indices, 1 ).setDynamic(true);
-    geometryTest.setIndex( indicesTestBuffer );
-    indices = geometryTest.getIndex().array;
-    mesh = new THREE.Mesh( geometryTest, materialFront );
-    mesh.position.z = -100;
-    scene.add(mesh);
+
 
     model.needRebuild = false;
   }
@@ -185,15 +185,22 @@ var View3dThree = function () {
     }
 
     // TEST
-    var uv = mesh.geometry.attributes.uv.array;
-    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
-    for (var l = 0; l < quad_uvs.length; l++ ) {
-      uv[l]      = quad_uvs[l];
-    }
-    var quad_indices = [0,2,1, 0,3,2];
-    var indices = mesh.geometry.getIndex().array;
-    for (var n = 0; n < quad_indices.length; n++ ) {
-      indices[n]      = quad_indices[n];
+    {
+      var pos = mesh.geometry.attributes.position.array;
+      var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
+      for (var k = 0; k < quad_vertices.length; k++ ){
+        pos[k] = quad_vertices[k];
+      }
+      var uv = mesh.geometry.attributes.uv.array;
+      var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+      for (var l = 0; l < quad_uvs.length; l++ ) {
+        uv[l]      = quad_uvs[l];
+      }
+      var quad_indices = [0,2,1, 0,3,2];
+      var indices = mesh.geometry.getIndex().array;
+      for (var n = 0; n < quad_indices.length; n++ ) {
+        indices[n]      = quad_indices[n];
+      }
     }
 
     // Updates Points
@@ -202,7 +209,6 @@ var View3dThree = function () {
 
     // Update Segments
     setSegmentPointsPositions( model, lines3d.geometry );
-    // console.log("SegmentsPoints:"+lines3d.geometry.attributes.position.array);
     setSegmentsIndices(model, lines3d.geometry);
 // console.log("SegmentsIndices:"+lines3d.geometry.getIndex().array);
     lines3d.geometry.attributes.position.needsUpdate = true;
