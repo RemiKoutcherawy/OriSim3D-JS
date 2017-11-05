@@ -3,6 +3,7 @@
 <link>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#317EFB"/>
   <title>OriSim3D en JavaScript</title>
   <style>
     body { display:block; margin:0;}
@@ -57,11 +58,11 @@ read models/cocotte.txt
   c 6 0 c 6 1 c 6 2 c 6 3
   // Retourne iad interpolateur accelerate decelerate
   iad
-  t 500 ty 180)
+  //t 500 ty 180)
   // Replie le coin et retourne
   t 1000 r 48 180 21 0 10)
   o 1 24 0 7 25
-  t 500 ty 180)
+  //t 500 ty 180)
   // Bord haut
   t 1000 r 35 179 8 17 3) // Pas mal
   t 500 r 55 90 17 3 a 3 19)
@@ -83,12 +84,14 @@ read models/cocotte.txt
   t 500 r 16 -90 10 8 20 17 16 14 3 19 r 40 -90 0)
   t 500 r 16 -80 10 8 20 17 16 14 3 19 a 0)
   // Ajuste à peu près
-  r 24 10 4 r 37 -10 8
-  r 29 -5 5 8 r 23 -5 7 4
-  r 15 10 21  r 15 -10 10
+  //r 24 10 4 r 37 -10 8
+  //r 29 -5 5 8 r 23 -5 7 4
+  //r 15 10 21  r 15 -10 10
   // Montre
-  iao t 1000 zf) t 1000 tz -45) t 1000 zf)
-  iso t 4000 ty 360)
+  //iao t 1000 zf)
+  t 1000 tz -45)
+  //t 1000 zf)
+  //iso t 4000 ty 360)
   </script>
 </body>
 </html>
