@@ -51,11 +51,9 @@ var View3dThree = function () {
 
   // Set Segments indices
   function setSegmentsIndices(model, geometry) {
-    // console.log("setSegmentsIndices:"+ this.constructor.name);
-
     var indices   = geometry.getIndex().array;
     var allPoints = model.points;
-    for (var i = 0; i < allPoints.length; i++) {
+    for (var i = 0; i < model.segments.length; i++) {
       var s              = model.segments[i];
       indices[2 * i]     = allPoints.indexOf(s.p1);
       indices[2 * i + 1] = allPoints.indexOf(s.p2);
@@ -64,8 +62,6 @@ var View3dThree = function () {
 
   // Set Faces indices
   function setFacesIndices (model, geometry) {
-    // console.log("setFacesIndices:"+ this.constructor.name);
-
     var indices = geometry.getIndex().array;
     var allPoints = model.points;
     var index = 0;
