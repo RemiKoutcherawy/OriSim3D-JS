@@ -13,13 +13,14 @@ var Model = function Model (list) {
   this.points   = [];
   this.segments = [];
   this.faces    = [];
+  this.needRebuild = true;
+  this.change   = true; // should trigger a redraw
 
   // Initializes this orModel with XY points CCW @testOK
   function init (list) {
     this.points   = [];
     this.segments = [];
     this.faces    = [];
-    this.change   = true; // should trigger a redraw
     var f         = new Face();
     // Add XY as XYZ points, make EDGE segments
     var p1        = null;
@@ -33,7 +34,7 @@ var Model = function Model (list) {
     }
     this.addSegment(p1, f.points[0], Segment.EDGE);
     this.addFace(f);
-    // return this;
+    this.needRebuild = true;
   }
 
   // Adds a point to this Model or return the point at x,y @testOK
