@@ -113,7 +113,6 @@ var View3dThree = function () {
     geometry.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayPoint, 3 ).setDynamic(true) );
     var uvFaces = new Float32Array( MAX_POINTS * 2 ); // 2 UV per point
     geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ).setDynamic(true) );
-    // setPointsPositions(model, geometry);
     // Create object, and add it to scene
     points3d = new THREE.Points( geometry, materialPoint );
     scene.add( points3d );
@@ -146,26 +145,14 @@ var View3dThree = function () {
       var geometryTest = new THREE.BufferGeometry();
       var postest = new Float32Array( 12 ); // 3 vertices per point
       geometryTest.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
-      // var pos = geometryTest.attributes.position.array;
-      // for (var k = 0; k < quad_vertices.length; k++ ){
-      //   pos[k] = quad_vertices[k];
-      // }
       // Each vertex has one uv coordinate for texture mapping
       var uvs = new Float32Array( 8 ); // 2 UV per point
       var uvsBufffer = new THREE.BufferAttribute( uvs, 2 ).setDynamic(true);
       geometryTest.addAttribute( 'uv', uvsBufffer );
-      // var uv = geometryTest.attributes.uv.array;
-      // for (var l = 0; l < quad_uvs.length - 3; l++ ) {
-      //   uv[l]      = quad_uvs[l];
-      // }
       // Use the four vertices to draw the two triangles that make up the square.
       var indices = new Uint32Array( 6 );
       var indicesTestBuffer = new THREE.BufferAttribute( indices, 1 ).setDynamic(true);
       geometryTest.setIndex( indicesTestBuffer );
-      // indices = geometryTest.getIndex().array;
-      // for (var m = 0; m < quad_indices.length - 3; m++ ) {
-      //   indices[m]      = quad_indices[m];
-      // }
       mesh = new THREE.Mesh( geometryTest, materialFront );
       mesh.position.z = -100;
       scene.add(mesh);
@@ -210,13 +197,11 @@ var View3dThree = function () {
     // Update Segments
     setSegmentPointsPositions( model, lines3d.geometry );
     setSegmentsIndices(model, lines3d.geometry);
-// console.log("SegmentsIndices:"+lines3d.geometry.getIndex().array);
     lines3d.geometry.attributes.position.needsUpdate = true;
     lines3d.geometry.index.needsUpdate = true;
 
     // Update Faces
     setFacesIndices( model, faces3d.geometry );
-// console.log("FacesIndices:"+faces3d.geometry.getIndex().array);
     faces3d.geometry.attributes.position.needsUpdate = true;
     faces3d.geometry.index.needsUpdate = true;
   }
