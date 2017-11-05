@@ -3,89 +3,75 @@
 if (NODE_ENV === true && typeof module !== 'undefined') {
   var THREE = require('three');
   var Model = require('./Model.js');
-  var Orisim3d = require('./Orisim3dThree.js');
+  var OriSim3dThree = require('./OriSim3dThree.js');
 }
 
-var View3dThree = function (model) {
+var View3dThree = function () {
   var canvas3d, camera, controls, scene, renderer;
   var materialFront, materialBack;
   var materialPoint, materialPointSelected;
   var materialLine,  materialLineSelected;
-  var anim = false;
-  var objects = [];
+
   // Three objects
-  var points;
-  var lines;
-  var faces;
+  var points3d;
+  var lines3d;
+  var faces3d;
+  var mesh;
 
-  // Set Points positions
-  var setPointsPositions = function (model, geometryPoint) {
-    var positionsPoint = geometryPoint.attributes.position.array;
+  // Set Points positions for points3d and faces3d
+  function setPointsPositions(model, geometry) {
+    // console.log("setPointsPositions:"+ this.constructor.name);
+
+    var pos = geometry.attributes.position.array;
+    var uv  = geometry.attributes.uv;
+
     for (var i = 0; i < model.points.length; i++) {
-      var pt                    = model.points[i];
-      positionsPoint[3 * i]     = pt.x;
-      positionsPoint[3 * i + 1] = pt.y;
-      positionsPoint[3 * i + 2] = pt.z;
-      // Keep a reference to THREE.Points in this pt
-      pt.point                  = this.points;
+      var pt         = model.points[i];
+      pos[3 * i]     = pt.x;
+      pos[3 * i + 1] = pt.y;
+      pos[3 * i + 2] = pt.z;
+      // UV are just flat coordinates on crease pattern
+      uv[2 * i] = (200.0 + pt.xf) / 400.0;
+      uv[2 * i + 1] = (200.0 + pt.yf) / 400.0;
     }
-    geometryPoint.setDrawRange(0, model.points.length);
-  };
+  }
 
-  // Set Segments positions
-  var setSegmentsPositions = function (model, geometryline) {
-    var positionsLine = geometryline.attributes.position.array;
-    for (var i = 0; i < model.segments.length; i++) {
-      var s = model.segments[i];
-      positionsLine[6 * i]     = s.p1.x;
-      positionsLine[6 * i + 1] = s.p1.y;
-      positionsLine[6 * i + 2] = s.p1.z;
-      positionsLine[6 * i + 3] = s.p2.x;
-      positionsLine[6 * i + 4] = s.p2.y;
-      positionsLine[6 * i + 5] = s.p2.z;
+  // Set Points positions for segments
+  function setSegmentPointsPositions(model, geometry) {
+    // console.log("setSegmentPointsPositions:"+ this.constructor.name);
 
-      // Keep a reference to THREE.Line in segment
-      s.lines                  = this.lines;
+    var pos = geometry.attributes.position.array;
+    for (var i = 0; i < model.points.length; i++) {
+      var pt         = model.points[i];
+      pos[3 * i]     = pt.x;
+      pos[3 * i + 1] = pt.y;
+      pos[3 * i + 2] = pt.z;
     }
-    geometryline.setDrawRange(0, model.segments.length * 2);
-  };
+  }
 
-  // Set Faces vertices positions
-  var setFacesPositions = function (model, geometryFace) {
-    var pos = geometryFace.attributes.position.array;
-    var uv = geometryFace.attributes.uv.array;
-    // var indices = geometryFace.getIndex();
+  // Set Segments indices
+  function setSegmentsIndices(model, geometry) {
+    // console.log("setSegmentsIndices:"+ this.constructor.name);
 
-    // Put all points with UV coords in 'pos'
+    var indices   = geometry.getIndex().array;
     var allPoints = model.points;
     for (var i = 0; i < allPoints.length; i++) {
-      var pt          = model.points[i];
-      pos[ 3 * i]     = pt.x;
-      pos[ 3 * i + 1] = pt.y;
-      pos[ 3 * i + 2] = pt.z;
-      // UV are just flat coordinates on crease pattern
-      uv[ 2 * i]      = (200.0 + pt.xf) / 400.0;
-      uv[ 2 * i + 1 ] = (200.0 + pt.yf) / 400.0;
+      var s              = model.segments[i];
+      indices[2 * i]     = allPoints.indexOf(s.p1);
+      indices[2 * i + 1] = allPoints.indexOf(s.p2);
     }
+  }
 
-    // Count points
-    var count = 0;
-    for (var iface = 0; iface < model.faces.length; iface++) {
-      var f   = model.faces[iface];
-      var pts = f.points;
-      // Each point adds a new triangle
-      for (var ipoint = 2; ipoint < pts.length; ipoint++) {
-        count += 3;
-        // Next triangle, second becomes the first for the next triangle.
-        first = second;
-      }
-    };
-    var indices = new Uint32Array( count );
+  // Set Faces indices
+  function setFacesIndices (model, geometry) {
+    // console.log("setFacesIndices:"+ this.constructor.name);
 
+    var indices = geometry.getIndex().array;
+    var allPoints = model.points;
     var index = 0;
-    for (var iface = 0; iface < model.faces.length; iface++) {
-      var f   = model.faces[iface];
-      var pts = f.points;
+    for (var i = 0; i < model.faces.length; i++) {
+      // Face points
+      var pts = model.faces[i].points;
 
       // Triangle FAN can be used only because of convex face
       // Triangle are made of 3 points : origin, first, second
@@ -94,119 +80,143 @@ var View3dThree = function (model) {
       var second;          // second point, third and last point of triangle
 
       // Each point adds a new triangle
-      for (var ipoint = 2; ipoint < pts.length; ipoint++) {
-        second = pts[ipoint];  // second starts à 2
+      for (var j = 2; j < pts.length; j++) {
+        // second starts à 2
+        second = pts[j];
+
         // Front Fan triangle : center, first, second
         indices[index++] = allPoints.indexOf(origin);
         indices[index++] = allPoints.indexOf(first);
         indices[index++] = allPoints.indexOf(second);
+
         // Next triangle, second becomes the first for the next triangle.
         first = second;
       }
-      // Keep a reference to THREE.Mesh in model face
-      f.mesh = this.faces;
     }
-    // Set index
-    geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-  };
+  }
 
   // Build all objects
-  var buildObjects = function  (model) {
-    var MAX_POINTS = 500;
+  function buildObjects (model) {
+    console.log("buildObjects:"+ this.constructor.name+" needRebuild:"+ ((model.needRebuild === true) ? "vrai" : "faux"));
+    if (points3d){
+      scene.remove(points3d);
+      scene.remove(faces3d);
+      scene.remove(lines3d);
+      scene.remove(mesh);
+    }
 
-    // Build Points
-    var geometryPoint = new THREE.BufferGeometry();
-    var positionsArrayPoint = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-    geometryPoint.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayPoint, 3 ) );
-    // Mesh
-    this.points         = new THREE.Points(geometryPoint, materialPoint);
-    setPointsPositions.call(this, model, geometryPoint);
-    scene.add(this.points);
+    var MAX_POINTS = 16;
 
-    // Build Segments
-    var geometryline = new THREE.BufferGeometry();
-    var positionsArrayLine = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-    geometryline.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayLine, 3 ) );
-    // Mesh
-    this.lines = new THREE.LineSegments( geometryline,  materialLine );
-    setSegmentsPositions.call(this, model, geometryline);
-    scene.add( this.lines );
-
-    // Build Faces
-    var geometryFace = new THREE.BufferGeometry();
-    var positionsArrayFace = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
-    geometryFace.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayFace, 3 ) );
+    // Build Points Mesh
+    var geometry = new THREE.BufferGeometry();
+    var positionsArrayPoint = new Float32Array( MAX_POINTS * 3 );
+    geometry.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayPoint, 3 ).setDynamic(true) );
     var uvFaces = new Float32Array( MAX_POINTS * 2 ); // 2 UV per point
-    geometryFace.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ) );
-    // var indices = new Uint32Array( MAX_POINTS * 3); // Number of indices is the sum of point of faces
-    // geometryFace.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-    // Mesh
-    this.faces = new THREE.Mesh( geometryFace,  materialFront );
-    setFacesPositions.call(this, model, geometryFace);
-    scene.add( this.faces );
+    geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ).setDynamic(true) );
+    // setPointsPositions(model, geometry);
+    // Create object, and add it to scene
+    points3d = new THREE.Points( geometry, materialPoint );
+    scene.add( points3d );
 
-    // // TEST
-    // var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
-    // var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
-    // var quad_indices = [0,2,1, 0,3,2];
-    // var geometry = new THREE.BufferGeometry();
-    // // itemSize = 3 because there are 3 values (components) per vertex
-    // // var vertices = new Float32Array( quad_vertices );
-    // // geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-    // var postest = new Float32Array( 12 ); // 3 vertices per point
-    // geometry.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
-    // var pos = geometry.attributes.position.array;
-    // for (var k = 0; k < quad_vertices.length; k++ ){
-    //   pos[k] = quad_vertices[k];
-    // };
-    //
-    // // Each vertex has one uv coordinate for texture mapping
-    // // var uvs = new Float32Array( quad_uvs);
-    // // geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
-    // var uvs = new Float32Array( 8 ); // 2 UV per point
-    // geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ).setDynamic(true) );
-    // var uv = geometry.attributes.uv.array;
-    // for (var l = 0; l < uvs.length; l++ ) {
-    //   uv[l]      = quad_uvs[l];
-    // };
-    //
-    // // Use the four vertices to draw the two triangles that make up the square.
-    // // var indicestest = new Uint32Array( quad_indices );
-    // // geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
-    // var indicestest = new Uint32Array( 6 );
-    // geometry.setIndex( new THREE.BufferAttribute( indicestest, 1 ) );
-    // var indices = geometry.getIndex();
-    // var indices = new Uint32Array( 6 );
-    // console.log("indicestest:"+indicestest+" indices:"+indices);
-    // for (var m = 0; m < quad_indices.length; m++ ) {
-    //   // indicestest[m]      = quad_indices[m];
-    //   indices[m]      = quad_indices[m];
-    // };
-    // geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-    //
-    // var mesh = new THREE.Mesh( geometry, materialFront );
-    // mesh.position.z = -100;
-    //
-    // scene.add(mesh);
-  };
+    // Build Faces Mesh : Indices only, faces share the same geometry
+    var indicesArray = new Uint32Array( MAX_POINTS * 3 );
+    var indicesFacesBuffer = new THREE.BufferAttribute( indicesArray, 1 ).setDynamic(true);
+    geometry.setIndex( indicesFacesBuffer );
+    // setFacesIndices( model, geometry );
+    // Create object, same geometry, and add it to scene
+    faces3d = new THREE.Mesh( geometry,  materialFront );
+    scene.add( faces3d );
+
+    // Build Segments Mesh : Points and indices
+    var geometryline = new THREE.BufferGeometry();
+    var positionsArrayLine = new Float32Array( MAX_POINTS * 3 );
+    geometryline.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayLine, 3 ).setDynamic(true) );
+    // setSegmentPointsPositions( model, geometryline );
+    // Indices
+    var indicesSegmentArray = new Uint32Array( MAX_POINTS * 2 );
+    var indicesSegmentBuffer = new THREE.BufferAttribute( indicesSegmentArray, 1 ).setDynamic(true);
+    geometryline.setIndex( indicesSegmentBuffer );
+    // setSegmentsIndices( model, geometryline );
+    // Create object, and add it to scene
+    lines3d = new THREE.LineSegments( geometryline,  materialLine );
+    scene.add( lines3d );
+
+    // TEST
+    var quad_vertices = [-200.0,200.0,0.0, 200.0,200.0,0.0, 200.0,-200.0,0.0, -200.0,-200.0,0.0];
+    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+    var quad_indices = [0,2,1, 0,3,2];
+    var geometryTest = new THREE.BufferGeometry();
+    var postest = new Float32Array( 12 ); // 3 vertices per point
+    geometryTest.addAttribute( 'position', new THREE.BufferAttribute( postest, 3 ).setDynamic(true) );
+    var pos = geometryTest.attributes.position.array;
+    for (var k = 0; k < quad_vertices.length; k++ ){
+      pos[k] = quad_vertices[k];
+    }
+    // Each vertex has one uv coordinate for texture mapping
+    var uvs = new Float32Array( 8 ); // 2 UV per point
+    var uvsBufffer = new THREE.BufferAttribute( uvs, 2 ).setDynamic(true);
+    geometryTest.addAttribute( 'uv', uvsBufffer );
+    var uv = geometryTest.attributes.uv.array;
+    for (var l = 0; l < quad_uvs.length - 3; l++ ) {
+      uv[l]      = quad_uvs[l];
+    }
+    // Use the four vertices to draw the two triangles that make up the square.
+    var indices = new Uint32Array( 6 );
+    for (var m = 0; m < quad_indices.length - 3; m++ ) {
+      indices[m]      = quad_indices[m];
+    }
+    var indicesTestBuffer = new THREE.BufferAttribute( indices, 1 ).setDynamic(true);
+    geometryTest.setIndex( indicesTestBuffer );
+    indices = geometryTest.getIndex().array;
+    mesh = new THREE.Mesh( geometryTest, materialFront );
+    mesh.position.z = -100;
+    scene.add(mesh);
+
+    model.needRebuild = false;
+  }
 
   // Update all objects positions
-  var update  = function  (model) {
+  function update ( model ) {
+    console.log("update:"+ this.constructor.name + " needRebuild:"+ ((model.needRebuild == true) ? "vrai" : "faux"));
+
+    // Rebuild if needed
+    if( model.needRebuild ){
+      buildObjects(model)
+    }
+
+    // TEST
+    var uv = mesh.geometry.attributes.uv.array;
+    var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+    for (var l = 0; l < quad_uvs.length; l++ ) {
+      uv[l]      = quad_uvs[l];
+    }
+    var quad_indices = [0,2,1, 0,3,2];
+    var indices = mesh.geometry.getIndex().array;
+    for (var n = 0; n < quad_indices.length; n++ ) {
+      indices[n]      = quad_indices[n];
+    }
+
     // Updates Points
-    setPointsPositions.call(this, model, this.points.geometry );
-    this.points.geometry.attributes.position.needsUpdate = true;
+    setPointsPositions( model, points3d.geometry );
+    points3d.geometry.attributes.position.needsUpdate = true;
 
     // Update Segments
-    setSegmentsPositions.call(this, model, this.lines.geometry );
-    this.lines.geometry.attributes.position.needsUpdate = true;
+    setSegmentPointsPositions( model, lines3d.geometry );
+    // console.log("SegmentsPoints:"+lines3d.geometry.attributes.position.array);
+    setSegmentsIndices(model, lines3d.geometry);
+// console.log("SegmentsIndices:"+lines3d.geometry.getIndex().array);
+    lines3d.geometry.attributes.position.needsUpdate = true;
+    lines3d.geometry.index.needsUpdate = true;
 
     // Update Faces
-    setFacesPositions.call(this, model, this.faces.geometry );
-    this.faces.geometry.attributes.position.needsUpdate = true;
-  };
+    setFacesIndices( model, faces3d.geometry );
+// console.log("FacesIndices:"+faces3d.geometry.getIndex().array);
+    faces3d.geometry.attributes.position.needsUpdate = true;
+    faces3d.geometry.index.needsUpdate = true;
+  }
 
   // Initialize Scene, Lights, Textures, Materials
-  var init = function () {
+  function init() {
     canvas3d = window.document.getElementById('canvas3d');
     setStyles();
 
@@ -223,16 +233,19 @@ var View3dThree = function (model) {
     scene.background = new THREE.Color( 0xf0f0f0 );
 
 // Lights
-    var light = new THREE.DirectionalLight( 0xffffff, 0.8 );
-    light.position.set( 0, 0, 2000 );
-    light.castShadow = true;
+    var lightDir = new THREE.DirectionalLight( 0xffffff, 0.2 );
+    lightDir.position.set( 0, 0, 2000 );
+    // lightDir.castShadow = true;
+    scene.add(lightDir);
+    var lightAmbiant = new THREE.AmbientLight( 0xffffff, 0.8 );
+    scene.add(lightAmbiant);
 
 // Textures
     var textureFront = new THREE.TextureLoader().load('textures/cocotte256x256.jpg');
     textureFront.repeat.set(1, 1);
     materialFront = new THREE.MeshPhongMaterial({
       map:textureFront,
-      side:THREE.FrontSide,
+      side:THREE.DoubleSide,
       flatShading:THREE.SmoothShading
     });
     // var materialFront = new THREE.MeshPhongMaterial( {
@@ -240,12 +253,12 @@ var View3dThree = function (model) {
     //   side: THREE.DoubleSide, vertexColors: THREE.VertexColors
     // } );
 
-    // var textureBack = new THREE.TextureLoader().load('textures/back256x256.jpg');
-    // materialBack = new THREE.MeshPhongMaterial({
-    //   map:textureBack,
-    //   side:THREE.FrontSide,
-    //   flatShading:THREE.SmoothShading
-    // });
+    var textureBack = new THREE.TextureLoader().load('textures/back256x256.jpg');
+    materialBack = new THREE.MeshPhongMaterial({
+      map:textureBack,
+      side:THREE.FrontSide,
+      flatShading:THREE.SmoothShading
+    });
 
 // Points Materials
     materialPoint = new THREE.PointsMaterial({size:20, color:0x0000ff});
@@ -256,11 +269,11 @@ var View3dThree = function (model) {
     materialLineSelected = new THREE.LineBasicMaterial({color:0xff0000, linewidth:6});
 
 // Shadows
-    light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
-    light.shadow.bias = - 0.0022;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.mapSize.height = 2048;
-    scene.add( light );
+//     light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
+//     light.shadow.bias = - 0.0022;
+//     light.shadow.mapSize.width = 2048;
+//     light.shadow.mapSize.height = 2048;
+//     scene.add( light );
 
 // Renderer
     renderer = new THREE.WebGLRenderer( { canvas: canvas3d, antialias: true } );
@@ -313,40 +326,64 @@ var View3dThree = function (model) {
 //     selectControls.activate();
 
 // dat.GUI
-   var gui = new dat.GUI();
-   var params = {
-     reset: function () {
-       controls.reset();
-       scene.rotation.y = 0;
-     },
-     play: function () {
-       // Expect a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
-       var tag = document.getElementById("cocotte.txt");
-       if (tag){
-         var model = tag.textContent;
-         // Global var : orisim3d
-         if (typeof orisim3d !== "undefined"){
-           orisim3d.command.command(model);
-         }
-       }
-     }
-   };
-   gui.add( params, 'reset' );
-   gui.add( params, 'play' );
+    var gui = new dat.GUI();
+    var params = {
+      reset:function () {
+        controls.reset();
+        scene.rotation.y = 0;
+      },
+      play:function () {
+        // Expect a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
+        var tag = document.getElementById("cocotte.txt");
+        if (tag) {
+          var model = tag.textContent;
+          // Global var : orisim3d
+          if (typeof orisim3d !== "undefined") {
+            orisim3d.command.command(model);
+          }
+        }
+      },
+      pause:function () {
+        // Global var : orisim3d
+        if (typeof orisim3d !== "undefined") {
+          orisim3d.command.command("pa");
+        }
+      },
+      cont:function () {
+        // Global var : orisim3d
+        if (typeof orisim3d !== "undefined") {
+          orisim3d.command.command("co");
+        }
+      },
+      fold:function () {
+        // Global var : orisim3d
+        if (typeof orisim3d !== "undefined") {
+          orisim3d.command.command("by 0 2 by 1 3");
+          orisim3d.command.command("c 0 3 c 0 1");
+          orisim3d.view3d.update(orisim3d.model);
+        }
+      }
+
+    };
+    gui.add(params, 'reset');
+    gui.add(params, 'play');
+    gui.add(params, 'pause');
+    gui.add(params, 'cont');
+    gui.add(params, 'fold');
 
 // Resize
     window.addEventListener( 'resize', onWindowResize, false );
-  };
+  }
 
-  var onWindowResize = function () {
+  function onWindowResize () {
     setStyles();
     camera.aspect = canvas3d.clientWidth / canvas3d.clientHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(canvas3d.clientWidth, canvas3d.clientHeight);
     renderer.render( scene, camera );
-  };
+  }
 
-  var setStyles = function () {
+  function setStyles () {
     var height80 = window.document.getElementById('height80').style;
     height80.position = 'relative';
     height80.width = Number(window.innerWidth * 1.0)+'px';
@@ -355,23 +392,21 @@ var View3dThree = function (model) {
     var height20 = window.document.getElementById('height20').style;
     height20.width = Number(window.innerWidth)+'px';
     height20.height = Number(window.innerHeight * 0.2)+'px';
-  };
+  }
 
-  var render = function () {
+  function render () {
     controls.update();
     renderer.render( scene, camera );
-  };
-
-  // Initialize renderer
-  init.call(this);
-  // Build objects if a model is provided
-  model ? buildObjects.call(this, model) : null;
+  }
 
   // API
   this.init = init;
-  this.buildObjects = buildObjects;
+  // this.buildObjects = buildObjects;
   this.update = update;
   this.render = render;
+
+  // Initialize renderer
+  this.init();
 };
 
 // Class methods
