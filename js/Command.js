@@ -15,7 +15,7 @@ var Command = function Command(modele) {
   // Time interpolated at instant 'p' preceding and at instant 'n' current
   var tni          = 1;
   var tpi          = 0;
-  // scale, ctx, cy, cz used in ZoomFit
+  // scale, cx, cy, cz used in ZoomFit
   var za           = [0, 0, 0, 0];
   // Interpolator used in anim() to map tn (time normalized) to tni (time interpolated)
   var interpolator = Interpolator.LinearInterpolator;
@@ -230,14 +230,15 @@ var Command = function Command(modele) {
       if (tpi === 0) {
         b      = model.get3DBounds();
         var w      = 400;
-        za[0] = w / Math.max(b[2] - b[0], b[3] - b[1]);
-        za[1] = -(b[0] + b[2]) / 2;
-        za[2] = -(b[1] + b[3]) / 2;
+        za[0] = w / Math.max(b.xmax - b.xmin, b.ymax - b.ymin);
+        za[1] = -(b.xmin + b.xmax) / 2;
+        za[2] = -(b.ymin + b.ymax) / 2;
       }
       scale   = ((1 + tni * (za[0] - 1)) / (1 + tpi * (za[0] - 1)));
       bfactor = za[0] * (tni / scale - tpi);
       model.move(za[1] * bfactor, za[2] * bfactor, 0, null);
       model.scaleModel(scale);
+      console.log("scale:"+scale);
     }
 
     // Interpolators
