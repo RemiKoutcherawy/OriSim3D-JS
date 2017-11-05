@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View3dBufferedGeometry</title>
+  <script src="three.js" type="application/javascript"></script>
+</head>
+<body>
+<script>
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  document.body.appendChild( renderer.domElement );
+
+  var quad_vertices = [-30.0,30.0,0.0, 30.0,30.0,0.0, 30.0,-30.0,0.0, -30.0, -30.0, 0.0];
+  var quad_uvs = [0.0,0.0, 1.0,0.0, 1.0,1.0, 0.0,1.0];
+  var quad_indices = [0,2,1, 0,3,2]; // Not used
+
+  var geometry = new THREE.BufferGeometry();
+  var vertices = new Float32Array( quad_vertices );
+  var uvs = new Float32Array( quad_uvs);
+
+  // Use the four vertices to draw the two triangles that make up the square.
+  var indices = new Uint32Array( 6 ); // place for 2 triangles
+  indices[0]=0;
+  indices[1]=2;
+  indices[2]=1;
+
+  geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+  geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+  geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
+
+  // Load the texture asynchronously
+  var textureLoader = new THREE.TextureLoader();
+  textureLoader.load('../textures/cocotte256x256.jpg', function (texture){
+    var material = new THREE.MeshBasicMaterial( {map: texture });
+    var mesh = new THREE.Mesh( geometry, material );
+    mesh.position.z = -100;
+
+    scene.add(mesh);
+
+    // Render a first time
+    renderer.render(scene, camera);
+
+    // Add a triangle,
+    indices[3]=0;
+    indices[4]=3;
+    indices[5]=2;
+    console.log("geometry:"+geometry.getIndex().array);
+    geometry.index.needsUpdate = true;
+    geometry.attributes.position.needsUpdate = true;
+
+    // Render a second time
+    renderer.render(scene, camera);
+
+  }, undefined, function (err) {
+    console.error('texture not loaded', err)
+  });
+</script>
+</body>
+</html>
