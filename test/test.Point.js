@@ -80,3 +80,12 @@ test('Point.compare2d', function () {
   ok(p2.xf === 0 && p2.yf === 3,"expect P[3d:1,2,3 flat:0,3] got:"+p2.toString());
   ok(Point.compare2d(p1, p2) === 3, "expect 3 got:"+Point.compare2d(p1, p2));
 });
+test('Performance Point', function () {
+  var time = Date.now(); //performance.now();
+  for (var i = 0; i < 10000; i++){
+    let p = new Point();
+    p.set5d(1, 2, 10, 20, 30);
+    p.length();
+  }
+  console.log("Performance:"+(Date.now() -time));
+});
