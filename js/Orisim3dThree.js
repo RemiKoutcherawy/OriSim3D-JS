@@ -34,12 +34,16 @@ function completed () {
   var canvas2d     = window.document.getElementById('canvas2d');
   var view2d       = canvas2d ? new View2d(model, canvas2d) : null;
   var canvas3d     = window.document.getElementById('canvas3d');
-  var view3d       = canvas3d ? new View3dThree(model) : null;
+  var view3d       = canvas3d ? new View3dThree() : null;
   var commandarea  = window.document.getElementById('commandarea');
   commandarea ? new CommandArea(command, commandarea) : null;
 
   // Bind all in OriSim3d
   orisim3d = new Orisim3d(model, view2d, view3d, command);
+  orisim3d.command.command("by 0 2 by 1 3");
+  // orisim3d.command.command("c 0 3 c 0 1 c 3 7");
+  // var tag = document.getElementById("cocotte.txt");
+  // orisim3d.command.command(tag.textContent);
 
   // Launch animation
   requestAnimationFrame(loop);
