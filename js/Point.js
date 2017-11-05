@@ -42,7 +42,7 @@ var Point = function Point(xf, yf, x, y, z) {
   this.select = false;
 
   // Set x y Flat and  x y z 3D
-  var set5d = function (xf, yf, x, y, z) {
+  function set5d (xf, yf, x, y, z) {
     // x y Flat, in unfolded state
     this.xf = 0 | xf;
     this.yf = 0 | yf;
@@ -54,7 +54,7 @@ var Point = function Point(xf, yf, x, y, z) {
   }
 
   // Set x y z 3D
-  var set3d = function (x, y, z) {
+  function set3d (x, y, z) {
     this.x = 0 | x;
     this.y = 0 | y;
     this.z = 0 | z;
@@ -62,19 +62,19 @@ var Point = function Point(xf, yf, x, y, z) {
   }
 
   // Set x y z 2D
-  var set2d = function (xf, yf) {
+  function set2d (xf, yf) {
     this.xf = 0 | xf;
     this.yf = 0 | yf;
     return this;
   }
 
   // Sqrt(this.this)
-  var length = function () {
+  function length () {
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
 
   // Scale
-  var scale = function (t) {
+  function scale (t) {
     this.x *= t;
     this.y *= t;
     this.z *= t;
@@ -82,24 +82,26 @@ var Point = function Point(xf, yf, x, y, z) {
   }
 
   // Normalize as a vector
-  var norm = function () {
+  function norm() {
+    console.log("norm:"+ this.constructor.name);
+
     var lg = this.length();
     return this.scale(1.0 / lg);
   }
 
   // String representation [x,y,z xf,yf]
-  var toString = function () {
+  function toString () {
     return "[" + Math.round(this.x) + "," + Math.round(this.y) + "," + Math.round(this.z)
       + "  " + Math.round(this.xf) + "," + Math.round(this.yf) + "]";
   }
 
   // Short String representation [x,y,z]
-  var toXYZString = function () {
+  function toXYZString () {
     return "[" + Math.round(this.x) + "," + Math.round(this.y) + "," + Math.round(this.z) + "]";
   }
 
   // Short String representation [xf,yf]
-  var toXYString = function () {
+  function toXYString () {
     return "[" + Math.round(this.xf) + "," + Math.round(this.yf) + "]";
   }
 
