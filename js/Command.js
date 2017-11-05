@@ -402,7 +402,7 @@ var Command = function Command(modele) {
         // performance.now() vs new Date().getTime();
         pauseDuration = new Date().getTime() - pauseStart;
         // Continue animation
-        //mainPane.view3d.animate(this);
+        commandLoop();
         state = State.anim;
       }
       else if (cde === "u") {
