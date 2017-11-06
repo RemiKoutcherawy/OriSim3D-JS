@@ -230,9 +230,9 @@ var Command = function Command(modele) {
       if (tpi === 0) {
         b      = model.get3DBounds();
         var w      = 400;
-        za[0] = w / Math.max(b[2] - b[0], b[3] - b[1]);
-        za[1] = -(b[0] + b[2]) / 2;
-        za[2] = -(b[1] + b[3]) / 2;
+        za[0] = w / Math.max(b.xmax - b.xmin, b.ymax - b.ymin);
+        za[1] = -(b.xmin + b.xmax) / 2;
+        za[2] = -(b.ymin + b.ymax) / 2;
       }
       scale   = ((1 + tni * (za[0] - 1)) / (1 + tpi * (za[0] - 1)));
       bfactor = za[0] * (tni / scale - tpi);
