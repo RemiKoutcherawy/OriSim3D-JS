@@ -60,7 +60,8 @@ var View2d  = function View2d(model, canvas2d) {
     var points      = this.model.points;
     ctx.font        = '18px serif';
     ctx.strokeStyle = 'blue';
-    points.forEach((p, i) => {
+    for (var i = 0; i < points.length; i++) {
+      var p = points[i];
       var xf        = p.xf * scale + xOffset;
       var yf        = -p.yf * scale + yOffset;
       // Circle
@@ -76,7 +77,7 @@ var View2d  = function View2d(model, canvas2d) {
       } else {
         ctx.fillText(String(i), xf - 8, yf + 5);
       }
-    });
+    }
   }
 
   // Draw all segments in green
@@ -89,7 +90,8 @@ var View2d  = function View2d(model, canvas2d) {
     var segments    = this.model.segments;
     ctx.font        = '18px serif';
     ctx.strokeStyle = 'green';
-    segments.forEach((s, i) => {
+    for (var i = 0; i < segments.length; i++){
+      var s = segments[i];
       var xf1 = s.p1.xf * scale + xOffset;
       var yf1 = -s.p1.yf * scale + yOffset;
       var xf2 = s.p2.xf * scale + xOffset;
@@ -121,7 +123,7 @@ var View2d  = function View2d(model, canvas2d) {
       } else {
         ctx.fillText(String(i), xc - 8, yc + 5);
       }
-    });
+    }
   }
 
   // Draw all faces
@@ -134,7 +136,8 @@ var View2d  = function View2d(model, canvas2d) {
     var faces       = this.model.faces;
     ctx.font        = '18px serif';
     ctx.strokeStyle = 'black';
-    faces.forEach((f, i) => {
+    for (var i = 0; i < faces.length; i++){
+      var f = faces[i];
       var pts = f.points;
       var cx  = 0;
       var cy  = 0;
@@ -168,7 +171,7 @@ var View2d  = function View2d(model, canvas2d) {
       } else {
         ctx.fillText(String(i), cx - 8, cy + 5);
       }
-    });
+    }
   }
 
   // Draw the Model
