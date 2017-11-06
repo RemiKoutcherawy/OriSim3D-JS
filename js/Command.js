@@ -238,7 +238,6 @@ var Command = function Command(modele) {
       bfactor = za[0] * (tni / scale - tpi);
       model.move(za[1] * bfactor, za[2] * bfactor, 0, null);
       model.scaleModel(scale);
-      console.log("scale:"+scale);
     }
 
     // Interpolators
