@@ -7,7 +7,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Face contains points, segments, normal
-var Face = function () {
+var Face = function Face () {
   this.points    = [];
   this.normal    = [0, 0, 1];
   this.select    = 0;
@@ -20,13 +20,13 @@ var Face = function () {
       console.log("Warn Face < 3pts:" + this);
       return null;
     }
-    for (let i = 0; i < this.points.length - 2; i++) {
+    for (var i = 0; i < this.points.length - 2; i++) {
       // Take triangles until p2p1 x p1p3 > 0.1
-      let p1         = this.points[i];
-      let p2         = this.points[i + 1];
-      let p3         = this.points[i + 2];
-      let u          = [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z];
-      let v          = [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z];
+      var p1         = this.points[i];
+      var p2         = this.points[i + 1];
+      var p3         = this.points[i + 2];
+      var u          = [p2.x - p1.x, p2.y - p1.y, p2.z - p1.z];
+      var v          = [p3.x - p1.x, p3.y - p1.y, p3.z - p1.z];
       this.normal[0] = u[1] * v[2] - u[2] * v[1];
       this.normal[1] = u[2] * v[0] - u[0] * v[2];
       this.normal[2] = u[0] * v[1] - u[1] * v[0];
@@ -40,7 +40,7 @@ var Face = function () {
 
   // Normalize vector v[3] = v[3]/||v[3]||
   function normalize (v) {
-    let d = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    var d = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
     v[0] /= d;
     v[1] /= d;
     v[2] /= d;
@@ -48,7 +48,7 @@ var Face = function () {
 
   // String representation
   function toString () {
-    let str = "F" + "(";
+    var str = "F" + "(";
     this.points.forEach(function (p, i, a) {
       str = str + "P" + i + p.toString()+ (i === a.length - 1 ? "": " ");
     });
