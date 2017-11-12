@@ -41,7 +41,7 @@ test('length2d', function () {
   let p1 = new Point(1, 2);
   let p2 = new Point(4, 6);
   let s = new Segment(p1,p2);
-  lg = s.length2d();
+  let lg = s.length2d();
   ok(lg === 5,"expect 5 got:"+lg);
 });
 test('toString', function () {
