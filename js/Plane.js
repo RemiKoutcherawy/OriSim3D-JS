@@ -6,7 +6,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 
 // Plane is defined by an origin point R and a normal vector N
 // a point P is on plane if and only if RP.N = 0
-var Plane = function (r, n) {
+function Plane (r, n) {
   this.r = r;
   this.n = n;
 
@@ -68,9 +68,6 @@ var Plane = function (r, n) {
   this.classifyPointToPlane = classifyPointToPlane;
   this.toString = toString;
 };
-
-// Class methods
-Plane.prototype.constructor = Plane;
 
 // Static values
 Plane.THICKNESS = 1;

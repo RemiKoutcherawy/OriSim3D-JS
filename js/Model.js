@@ -8,7 +8,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Model to hold Points, Segments, Faces
-var Model = function Model (list) {
+function Model (list) {
   // Arrays to hold points, faces, segments
   this.points   = [];
   this.segments = [];
@@ -829,9 +829,6 @@ var Model = function Model (list) {
   var boundinit = init.bind(this);
   list ? boundinit(list): null;
 };
-
-// Class methods
-Model.prototype.constructor = Model;
 
 // For NodeJS, will be discarded by uglify
 if (NODE_ENV === true && typeof module !== 'undefined') {

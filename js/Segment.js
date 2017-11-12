@@ -7,7 +7,7 @@ if (NODE_ENV === true && typeof require === 'function') {
 }
 
 // Segment to hold Segments : Two points p1 p2
-var Segment = function (p1, p2, type) {
+function Segment (p1, p2, type) {
   // API
   this.p1        = p1;
   this.p2        = p2;
@@ -50,9 +50,6 @@ var Segment = function (p1, p2, type) {
   this.length2d = length2d;
   this.toString = toString;
 };
-
-// Class method
-Segment.prototype.constructor = Segment;
 
 // Static values
 Segment.PLAIN     = 0;

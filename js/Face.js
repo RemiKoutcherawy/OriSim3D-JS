@@ -7,7 +7,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Face contains points, segments, normal
-var Face = function Face () {
+function Face () {
   this.points    = [];
   this.normal    = [0, 0, 1];
   this.select    = 0;
@@ -60,9 +60,6 @@ var Face = function Face () {
   this.computeFaceNormal = computeFaceNormal;
   this.toString = toString;
 };
-
-// Class methods
-Face.prototype.constructor = Face;
 
 // Static values
 

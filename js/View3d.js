@@ -5,7 +5,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // View3d Constructor
-function View3d(modele, canvas3dElt) {
+function View3d (modele, canvas3dElt) {
   // Instance variables
   var model        = modele;
   var canvas3d     = canvas3dElt;
@@ -316,6 +316,7 @@ function View3d(modele, canvas3dElt) {
     var touches = ev.changedTouches ? ev.changedTouches[0] : ev;
     const x     = touches.clientX;
     const y     = touches.clientY;
+
     // Start dragging
     const rect  = ev.target.getBoundingClientRect();
     if (rect.left <= x && x < rect.right && rect.top <= y && y < rect.bottom) {
@@ -493,9 +494,6 @@ View3d.wTexFront = 1;
 View3d.hTexFront = 1;
 View3d.wTexBack  = 1;
 View3d.hTexBack  = 1;
-
-// Class methods
-View3d.prototype.constructor = View3d;
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {

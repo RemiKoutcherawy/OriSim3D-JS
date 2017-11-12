@@ -4,7 +4,7 @@
 // 3D : x y z
 // Crease pattern flat : xf, yf
 
-var Point = function Point(xf, yf, x, y, z) {
+function Point (xf, yf, x, y, z) {
 
   // Create new Point(x,y,z)
   if (arguments.length === 3) {
@@ -116,9 +116,6 @@ var Point = function Point(xf, yf, x, y, z) {
   this.toXYZString = toXYZString;
   this.toXYString = toXYString;
 };
-
-// Class methods
-Point.prototype.constructor = Point;
 
 // Static methods
 
