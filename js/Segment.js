@@ -17,7 +17,7 @@ function Segment (p1, p2, type) {
 
   // Reverse order of the 2 points of this segment
   function reverse() {
-    const p   = this.p1;
+    var p = this.p1;
     this.p1 = this.p2;
     this.p2 = p;
   }
@@ -49,7 +49,7 @@ function Segment (p1, p2, type) {
   this.length3d = length3d;
   this.length2d = length2d;
   this.toString = toString;
-};
+}
 
 // Static values
 Segment.PLAIN     = 0;

@@ -83,8 +83,6 @@ function Point (xf, yf, x, y, z) {
 
   // Normalize as a vector
   function norm() {
-    console.log("norm:"+ this.constructor.name);
-
     var lg = this.length();
     return this.scale(1.0 / lg);
   }

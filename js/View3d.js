@@ -4,7 +4,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   var Model = require('./Model.js');
 }
 
-// View3d Constructor
+// View3d
 function View3d (modele, canvas3dElt) {
   // Instance variables
   var model        = modele;

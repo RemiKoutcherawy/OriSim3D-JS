@@ -6,7 +6,7 @@ if (NODE_ENV === true && typeof module !== 'undefined') {
   var OriSim3dThree = require('./OriSim3dThree.js');
 }
 
-var View3dThree = function () {
+function View3dThree () {
   var canvas3d, camera, controls, scene, renderer;
   var materialFront, materialBack;
   var materialPoint, materialPointSelected;
@@ -89,7 +89,6 @@ var View3dThree = function () {
 
   // Build all objects
   function buildObjects (model) {
-    // console.log("buildObjects:"+ this.constructor.name+" needRebuild:"+ ((model.needRebuild === true) ? "vrai" : "faux"));
     if (points3d) {
       scene.remove(points3d);
       scene.remove(faces3dFront);

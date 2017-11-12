@@ -7,7 +7,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // View2d Constructor
-var View2d  = function View2d(model, canvas2d) {
+function View2d (model, canvas2d) {
   // Instance variables
   this.model           = model;
   this.canvas2d        = canvas2d;
@@ -216,9 +216,6 @@ var View2d  = function View2d(model, canvas2d) {
   this.drawFaces = drawFaces;
   this.draw = draw;
 };
-
-// Class methods
-View2d.prototype.constructor = View2d;
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
