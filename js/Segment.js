@@ -3,19 +3,20 @@
 // Dependencies : import them before Segment.js in browser
 // Test in NodeJS
 if (NODE_ENV === true && typeof require === 'function') {
-  var Point = require('./Point.js');
+  var OR = OR || {};
+  OR.Point = require('./Point.js');
 }
 
 // Segment to hold Segments : Two points p1 p2
-function Segment (p1, p2, type) {
+OR.Segment = function (p1, p2, type) {
   // API
   this.p1        = p1;
   this.p2        = p2;
-  this.type      = Segment.PLAIN | type;
+  this.type      = OR.Segment.PLAIN | type;
   this.angle     = 0;
   this.select    = false;
 
-  // Reverse order of the 2 points of this segment
+  // Reverse order of the 2 points of this OR.Segment
   function reverse() {
     var p = this.p1;
     this.p1 = this.p2;
@@ -52,23 +53,23 @@ function Segment (p1, p2, type) {
 }
 
 // Static values
-Segment.PLAIN     = 0;
-Segment.EDGE      = 1;
-Segment.MOUNTAIN  = 2;
-Segment.VALLEY    = 3;
-Segment.TEMPORARY = -1;
-Segment.EPSILON   = 0.01;
+OR.Segment.PLAIN     = 0;
+OR.Segment.EDGE      = 1;
+OR.Segment.MOUNTAIN  = 2;
+OR.Segment.VALLEY    = 3;
+OR.Segment.TEMPORARY = -1;
+OR.Segment.EPSILON   = 0.01;
 
 // Static methods
 
 // Compares segments s1 with s2
-Segment.compare = function (s1, s2) {
-  var d = Point.compare3d(s1.p1, s2.p1) + Point.compare3d(s2.p2, s2.p2);
+OR.Segment.compare = function (s1, s2) {
+  var d = OR.Point.compare3d(s1.p1, s2.p1) + OR.Point.compare3d(s2.p2, s2.p2);
   return d > 1 ? d : 0;
 };
 
 // 2D Distance between Segment and Point @testOK
-Segment.distanceToSegment = function (seg, pt) {
+OR.Segment.distanceToSegment = function (seg, pt) {
   var x1 = seg.p1.x;
   var y1 = seg.p1.y;
   var x2 = seg.p2.x;
@@ -90,7 +91,7 @@ Segment.distanceToSegment = function (seg, pt) {
 };
 
 // Closest points from s1 to s2 returned as a new segment
-Segment.closestSeg = function closestSeg(s1, s2) {
+OR.Segment.closestSeg = function closestSeg(s1, s2) {
   // On this segment we have : S1(t1)=p1+t1*(p2-p1)       = p1+t1*v1   = p
   // On v argument we have   : S2(t2)=v.p1+t2*(v.p2-v.p1) = s2.p2+t2*v2 = q
   // Vector pq perpendicular to both lines : pq(t1,t2).v1=0  pq(t1,t2).v2=0
@@ -101,37 +102,37 @@ Segment.closestSeg = function closestSeg(s1, s2) {
   var t1;
   var t2;
   // s1 direction
-  var v1 = new Point(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, s1.p2.z - s1.p1.z);
+  var v1 = new OR.Point(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, s1.p2.z - s1.p1.z);
   // s2 direction
-  var v2 = new Point(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, s2.p2.z - s2.p1.z);
+  var v2 = new OR.Point(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, s2.p2.z - s2.p1.z);
   // s2.p1 to s1.p1
-  var r = new Point(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, s1.p1.z - s2.p1.z);
-  var a = Point.dot(v1,v1); // squared length of s1
-  var e = Point.dot(v2,v2); // squared length of s2
-  var f = Point.dot(v2,r);  //
+  var r = new OR.Point(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, s1.p1.z - s2.p1.z);
+  var a = OR.Point.dot(v1,v1); // squared length of s1
+  var e = OR.Point.dot(v2,v2); // squared length of s2
+  var f = OR.Point.dot(v2,r);  //
   // Check degeneration of segments into points
   var closest;
-  if (a <= Segment.EPSILON && e <= Segment.EPSILON) {
+  if (a <= OR.Segment.EPSILON && e <= OR.Segment.EPSILON) {
     // Both degenerate into points
     t1 = t2 = 0.0;
-    closest = new Segment(s1.p1, s2.p1, Segment.TEMPORARY);
+    closest = new OR.Segment(s1.p1, s2.p1, OR.Segment.TEMPORARY);
   } else {
-    if (a <= Segment.EPSILON) {
+    if (a <= OR.Segment.EPSILON) {
       // This segment degenerate into point
       t1 = 0.0;
       t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
       t2 = t2 < 0 ? 0 : t2 > 1 ? 1 : t2;
     }
     else {
-      var c = Point.dot(v1, r);
-      if (e <= Segment.EPSILON) {
+      var c = OR.Point.dot(v1, r);
+      if (e <= OR.Segment.EPSILON) {
         // Second segment degenerate into point
         t2 = 0.0;
         t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
         t1 = t1 < 0 ? 0 : t1 > 1 ? 1 : t1;
       } else {
         // General case
-        var b = Point.dot(v1, v2); // Delayed computation of b
+        var b = OR.Point.dot(v1, v2); // Delayed computation of b
         var denom = a * e - b * b; // Denominator of Cramer system
         // Segments not parallel, compute closest and clamp
         if (denom !== 0.0) {
@@ -158,15 +159,15 @@ Segment.closestSeg = function closestSeg(s1, s2) {
         }
       }
     }
-    var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
-    var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
-    closest = new Segment(c1, c2);
+    var c1 = OR.Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
+    var c2 = OR.Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
+    closest = new OR.Segment(c1, c2);
   }
   return closest;
 };
 
 // Closest points from s1(line) to s2(line) returned as a new segment
-Segment.closestLine = function closestLine(s1, s2) {
+OR.Segment.closestLine = function closestLine(s1, s2) {
   // On s1 segment we have : S1(t1)=p1+t1*(p2-p1)       = p1+t1*v1   = p
   // On s2 segment we have : S2(t2)=v.p1+t2*(v.p2-v.p1) = s2.p2+t2*v2 = q
   // Vector pq perpendicular to both lines : pq(t1,t2).v1=0  pq(t1,t2).v2=0
@@ -176,32 +177,32 @@ Segment.closestLine = function closestLine(s1, s2) {
   // Solved to t1=(bf-ce)/(ae-bb) t2=(af-bc)/(ae-bb)
   var t1;
   var t2;
-  var v1 = new Point(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, s1.p2.z - s1.p1.z); // s1 direction
-  var v2 = new Point(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, s2.p2.z - s2.p1.z); // s direction
-  var r = new Point(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, s1.p1.z - s2.p1.z); // s2.p1 to s1.p1
-  var a = Point.dot(v1, v1); // squared length of s1
-  var e = Point.dot(v2, v2); // squared length of s
-  var f = Point.dot(v2, r);  //
+  var v1 = new OR.Point(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, s1.p2.z - s1.p1.z); // s1 direction
+  var v2 = new OR.Point(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, s2.p2.z - s2.p1.z); // s direction
+  var r = new OR.Point(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, s1.p1.z - s2.p1.z); // s2.p1 to s1.p1
+  var a = OR.Point.dot(v1, v1); // squared length of s1
+  var e = OR.Point.dot(v2, v2); // squared length of s
+  var f = OR.Point.dot(v2, r);  //
   // Check degeneration of segments into points
   var closest;
-  if (a <= Segment.EPSILON && e <= Segment.EPSILON) {
+  if (a <= OR.Segment.EPSILON && e <= OR.Segment.EPSILON) {
     // Both degenerate into points
     t1 = t2 = 0.0;
-    closest = new Segment(s1.p1, s2.p1, Segment.TEMPORARY, -1);
+    closest = new OR.Segment(s1.p1, s2.p1, OR.Segment.TEMPORARY, -1);
   } else {
-    if (a <= Segment.EPSILON) {
+    if (a <= OR.Segment.EPSILON) {
       // This segment degenerate into point
       t1 = 0.0;
       t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
     } else {
-      var c = Point.dot(v1, r);
-      if (e <= Segment.EPSILON) {
+      var c = OR.Point.dot(v1, r);
+      if (e <= OR.Segment.EPSILON) {
         // Second segment degenerate into point
         t2 = 0.0;
         t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
       } else {
         // General case
-        var b     = Point.dot(v1, v2); // Delayed computation of b
+        var b     = OR.Point.dot(v1, v2); // Delayed computation of b
         var denom = a * e - b * b; // Denominator of cramer system
         // Segments not parallel, compute closest
         if (denom !== 0.0) {
@@ -215,14 +216,14 @@ Segment.closestLine = function closestLine(s1, s2) {
         t2 = (b * t1 + f) / e;
       }
     }
-    var c1 = Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
-    var c2 = Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
-    closest = new Segment(c1, c2);
+    var c1 = OR.Point.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
+    var c2 = OR.Point.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
+    closest = new OR.Segment(c1, c2);
   }
   return closest;
 };
 
 // For NodeJS, will be discarded by uglify
 if (NODE_ENV === true && typeof module !== 'undefined') {
-  module.exports = Segment;
+  module.exports = OR.Segment;
 }

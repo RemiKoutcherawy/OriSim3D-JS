@@ -2,6 +2,7 @@
 // Dependencies : import them before Command in browser
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   // No dependencies
+    var OR = OR || {};
 }
 
 // Maps time to time
@@ -9,7 +10,7 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 // t and tn should start at 0.0 and end at 1.0
 // between 0 and 1, t can be < 0 (anticipate) and >1 (overshoot)
 // Use Padé approximations to speed up complex calculations
-var Interpolator = {
+OR.Interpolator = {
   // Linear "il"
   LinearInterpolator:function (t) {
     return t;
@@ -106,5 +107,5 @@ var Interpolator = {
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  module.exports = Interpolator;
+  module.exports = OR.Interpolator;
 }

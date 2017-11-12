@@ -1,14 +1,15 @@
 // File: js/Model.js
 // Dependencies : import them before Model.js in browser
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  var Point   = require('./Point.js');
-  var Segment = require('./Segment.js');
-  var Face    = require('./Face.js');
-  var Plane   = require('./Plane.js');
+  var OR = OR || {};
+  OR.Point   = require('./Point.js');
+  OR.Segment = require('./Segment.js');
+  OR.Face    = require('./Face.js');
+  OR.Plane   = require('./Plane.js');
 }
 
 // Model to hold Points, Segments, Faces
-function Model (list) {
+OR.Model = function (list) {
   // Arrays to hold points, faces, segments
   this.points   = [];
   this.segments = [];
@@ -21,18 +22,18 @@ function Model (list) {
     this.points   = [];
     this.segments = [];
     this.faces    = [];
-    var f         = new Face();
+    var f         = new OR.Face();
     // Add XY as XYZ points, make EDGE segments
     var p1        = null;
     for (var i = 0; i < list.length; i += 2) {
       var p2 = this.addPointXYZ(list[i], list[i + 1], list[i], list[i + 1], 0);
       f.points.push(p2);
       if (p1 !== null) {
-        this.addSegment(p1, p2, Segment.EDGE);
+        this.addSegment(p1, p2, OR.Segment.EDGE);
       }
       p1 = p2;
     }
-    this.addSegment(p1, f.points[0], Segment.EDGE);
+    this.addSegment(p1, f.points[0], OR.Segment.EDGE);
     this.addFace(f);
     this.needRebuild = true;
   }
@@ -42,13 +43,13 @@ function Model (list) {
     // Create a new Point
     var p = null;
     if (arguments.length === 2) {
-      p = new Point(xf, yf);
+      p = new OR.Point(xf, yf);
     }
     else if (arguments.length === 3) {
-      p = new Point(x, y, z);
+      p = new OR.Point(x, y, z);
     }
     else if (arguments.length === 5) {
-      p = new Point(xf, yf, x, y, z);
+      p = new OR.Point(xf, yf, x, y, z);
     }
     else {
       console.log("Warn wrong number of Args for addPointXYZ")
@@ -61,7 +62,7 @@ function Model (list) {
   function addPoint (pt) {
     // Search existing points
     for (var i = 0; i < this.points.length; i++) {
-      if (Point.compare3d(this.points[i], pt) < 1) {
+      if (OR.Point.compare3d(this.points[i], pt) < 1) {
         // Return existing point instead of pt parameter
         return this.points[i];
       }
@@ -73,11 +74,11 @@ function Model (list) {
 
   // Adds a segment to this model @testOK
   function addSegment (p1, p2, type) {
-    if (Point.compare3d(p1, p2) === 0) {
+    if (OR.Point.compare3d(p1, p2) === 0) {
       console.log("Warn Add degenerate segment:" + p1);
       return null;
     }
-    var s = new Segment(p1, p2, type);
+    var s = new OR.Segment(p1, p2, type);
     this.segments.push(s);
     return s;
   }
@@ -174,7 +175,7 @@ function Model (list) {
     var left  = this.faceLeft(a, b);
     var right = this.faceRight(a, b);
     // Compute angle in Degrees at this segment
-    if (s.type === Segment.EDGE) {
+    if (s.type === OR.Segment.EDGE) {
       console.log("Warn Angle on Edge:" + s);
       return 0;
     }
@@ -212,8 +213,8 @@ function Model (list) {
   function searchSegmentTwoPoints (a, b) {
     var list = [];
     this.segments.forEach(function (s) {
-      if ((Point.compare3d(s.p1, a) === 0 && Point.compare3d(s.p2, b) === 0)
-        ||(Point.compare3d(s.p2, a) === 0 && Point.compare3d(s.p1, b) === 0) )
+      if ((OR.Point.compare3d(s.p1, a) === 0 && OR.Point.compare3d(s.p2, b) === 0)
+        ||(OR.Point.compare3d(s.p2, a) === 0 && OR.Point.compare3d(s.p1, b) === 0) )
         list.push(s);
     });
     if (list.length > 1) {
@@ -238,7 +239,7 @@ function Model (list) {
   // Splits Segment by a point @testOK
   function splitSegmentByPoint (s, p) {
     // No new segment if on ending point
-    if (Point.compare3d(s.p1, p) === 0 || Point.compare3d(s.p2, p) === 0) {
+    if (OR.Point.compare3d(s.p1, p) === 0 || OR.Point.compare3d(s.p2, p) === 0) {
       return s;
     }
     // Create new Segment
@@ -300,7 +301,7 @@ function Model (list) {
   // Splits Segment by a ratio k in  ]0 1[ counting from p1 @testOK
   function splitSegmentByRatio (s, k) {
     // Create new Point
-    var p = new Point();
+    var p = new OR.Point();
     p.set3d(
       s.p1.x + k * (s.p2.x - s.p1.x),
       s.p1.y + k * (s.p2.y - s.p1.y),
@@ -353,7 +354,7 @@ function Model (list) {
             // Set i 2D coordinates from 3D
             this.align2dFrom3d(i, s);
             // Add new segment
-            this.addSegment(i, b, Segment.PLAIN);
+            this.addSegment(i, b, OR.Segment.PLAIN);
             // Modify existing set b = i
             // this.segments.splice(index, 1); has drawback
             if (s.p1 === a) {
@@ -365,7 +366,7 @@ function Model (list) {
           }
           // Eventually add segment from last intersection
           if (lastinter !== null) {
-            this.addSegment(lastinter, i, Segment.PLAIN);
+            this.addSegment(lastinter, i, OR.Segment.PLAIN);
             lastinter = null;
           } else {
             lastinter = i;
@@ -398,7 +399,7 @@ function Model (list) {
             // Set i 2D coordinates from 3D
             this.align2dFrom3d(i, s);
             // Add new segment
-            this.addSegment(i, b, Segment.PLAIN);
+            this.addSegment(i, b, OR.Segment.PLAIN);
             // Modify existing
             // this.segments.splice(index, 1); has drawback
             if (s.p1 === a) {
@@ -422,7 +423,7 @@ function Model (list) {
           }
           // Eventually add segment from last inter
           if (lastinter !== null && lastinter !== a) {
-            this.addSegment(lastinter, a, Segment.PLAIN);
+            this.addSegment(lastinter, a, OR.Segment.PLAIN);
             lastinter = null;
           } else {
             lastinter = a;
@@ -449,7 +450,7 @@ function Model (list) {
           if (lastinter !== null && lastinter !== b) {
             s = this.searchSegmentTwoPoints(lastinter, b);
             if (s === null) {
-              this.addSegment(lastinter, b, Segment.PLAIN);
+              this.addSegment(lastinter, b, OR.Segment.PLAIN);
             }
             lastinter = null;
           } else {
@@ -474,7 +475,7 @@ function Model (list) {
       if (f1 !== null) {
         f1.points = back;
       } else {
-        var f    = new Face();
+        var f    = new OR.Face();
         f.points = back;
         this.faces.push(f);
       }
@@ -494,19 +495,19 @@ function Model (list) {
 
   // Split all or given faces Across two points @testOK
   function splitCross (p1, p2, list) {
-    var pl = Plane.across(p1, p2);
+    var pl = OR.Plane.across(p1, p2);
     this.splitFacesByPlane(pl, list);
   }
 
   // Split all or given faces By two points @testOK
   function splitBy (p1, p2, list) {
-    var pl = Plane.by(p1, p2);
+    var pl = OR.Plane.by(p1, p2);
     this.splitFacesByPlane(pl, list);
   }
 
   // Split faces by a plane Perpendicular to a Segment passing by a Point "p" @testOK
   function splitOrtho (s, p, list) {
-    var pl = Plane.ortho(s, p);
+    var pl = OR.Plane.ortho(s, p);
     this.splitFacesByPlane(pl, list);
   }
 
@@ -524,24 +525,24 @@ function Model (list) {
     var y    = p1.y + k * (p2.y - p1.y);
     var z    = p1.z + k * (p2.z - p1.z);
     // e is on p1p2 symmetric of p0
-    var e    = new Point(x, y, z);
+    var e    = new OR.Point(x, y, z);
     // Define Plane
-    var pl   = Plane.by(p0, e);
+    var pl   = OR.Plane.by(p0, e);
     this.splitFacesByPlane(pl, list);
   }
 
   // Split faces by a plane between two segments @testOK
   function splitLineToLine (s1, s2, list) {
-    var s = Segment.closestLine(s1, s2);
+    var s = OR.Segment.closestLine(s1, s2);
     if (s.length3d() < 1) {
       // Segments cross at c Center
       var c = s.p1;
-      var a = Point.sub(s1.p1, c).length() > Point.sub(s1.p2, c).length() ? s1.p1 : s1.p2;
-      var b = Point.sub(s2.p1, c).length() > Point.sub(s2.p2, c).length() ? s2.p1 : s2.p2;
+      var a = OR.Point.sub(s1.p1, c).length() > OR.Point.sub(s1.p2, c).length() ? s1.p1 : s1.p2;
+      var b = OR.Point.sub(s2.p1, c).length() > OR.Point.sub(s2.p2, c).length() ? s2.p1 : s2.p2;
       this.splitLineToLineByPoints(a, c, b, list);
     } else {
       // Segments do not cross, parallel
-      var pl = Plane.across(s.p1, s.p2);
+      var pl = OR.Plane.across(s.p1, s.p2);
       this.splitFacesByPlane(pl, list);
     }
   }
@@ -579,7 +580,7 @@ function Model (list) {
       dmax = 0;
       // Iterate over all segments
       // Pm is the medium point
-      var pm = new Point(0, 0, 0);
+      var pm = new OR.Point(0, 0, 0);
       for (var j = 0; j < segs.length; j++) {
         var s = segs[j];
         var lg3d = s.length3d();
@@ -832,5 +833,5 @@ function Model (list) {
 
 // For NodeJS, will be discarded by uglify
 if (NODE_ENV === true && typeof module !== 'undefined') {
-  module.exports = Model;
+  module.exports = OR.Model;
 }

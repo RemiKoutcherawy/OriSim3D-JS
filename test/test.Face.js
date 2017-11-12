@@ -6,8 +6,9 @@ NODE_ENV = true;
 
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
-  var Point = require('../js/Point.js');
-  var Face = require('../js/Face.js');
+  var OR = OR || {};
+  OR.Point = require('../js/Point.js');
+  OR.Face = require('../js/Face.js');
 }
 function ok(expr, msg) {
   if (!expr) throw new Error(msg);
@@ -20,7 +21,7 @@ before(function () {
 });
 
 test('init', function () {
-  let f = new Face();
+  let f = new OR.Face();
   ok(Array.isArray(f.points), "Got:"+f.points);
   ok(Array.isArray(f.normal), "Got:"+f.normal);
   ok(f.select === 0, "Got:"+f.select);
@@ -29,10 +30,10 @@ test('init', function () {
 });
 
 test('computeFaceNormal', function () {
-  let p1 = new Point(0, 0, 0);
-  let p2 = new Point(30, 0, 0);
-  let p3 = new Point(0, 0, 40);
-  let f = new Face();
+  let p1 = new OR.Point(0, 0, 0);
+  let p2 = new OR.Point(30, 0, 0);
+  let p3 = new OR.Point(0, 0, 40);
+  let f = new OR.Face();
   f.points.push(p1);
   f.points.push(p2);
   f.points.push(p3);

@@ -1,10 +1,11 @@
 // File:src/Point.js
 // Point to hold Points
+var OR = OR || {};
 
 // 3D : x y z
 // Crease pattern flat : xf, yf
 
-function Point (xf, yf, x, y, z) {
+OR.Point = function (xf, yf, x, y, z) {
 
   // Create new Point(x,y,z)
   if (arguments.length === 3) {
@@ -118,22 +119,22 @@ function Point (xf, yf, x, y, z) {
 // Static methods
 
 // Dot a with b
-Point.dot = function dot(a, b) {
+OR.Point.dot = function dot(a, b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 };
 
 // New Vector a + b
-Point.add = function add(a, b) {
-  return new Point(a.x + b.x, a.y + b.y, a.z + b.z);
+OR.Point.add = function add(a, b) {
+  return new OR.Point(a.x + b.x, a.y + b.y, a.z + b.z);
 };
 
 // New Vector a - b
-Point.sub = function sub(a, b) {
-  return new Point(a.x - b.x, a.y - b.y, a.z - b.z);
+OR.Point.sub = function sub(a, b) {
+  return new OR.Point(a.x - b.x, a.y - b.y, a.z - b.z);
 };
 
-// Return 0 if Point is near x,y,z
-Point.compare3d = function compare3D(p1, p2, y, z) {
+// Return 0 if OR.Point is near x,y,z
+OR.Point.compare3d = function compare3D(p1, p2, y, z) {
   if (arguments.length === 2) {
     // compare3D (p1, p2)
     var dx2 = (p1.x - p2.x) * (p1.x - p2.x);
@@ -152,8 +153,8 @@ Point.compare3d = function compare3D(p1, p2, y, z) {
   return d;
 };
 
-// Return 0 if Point is near xf,yf
-Point.compare2d = function compare2D(p1, p2) {
+// Return 0 if OR.Point is near xf,yf
+OR.Point.compare2d = function compare2D(p1, p2) {
   var dx2 = (p1.xf - p2.xf) * (p1.xf - p2.xf);
   var dy2 = (p1.yf - p2.yf) * (p1.yf - p2.yf);
   return Math.sqrt(dx2 + dy2);
@@ -161,5 +162,5 @@ Point.compare2d = function compare2D(p1, p2) {
 
 // For NodeJS, will be discarded by uglify
 if (NODE_ENV === true && typeof module !== 'undefined') {
-  module.exports = Point;
+  module.exports = OR.Point;
 }

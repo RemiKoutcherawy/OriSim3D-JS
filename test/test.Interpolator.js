@@ -4,7 +4,8 @@
 NODE_ENV = true;
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
-  var Interpolator = require("../js/Interpolator.js");
+  var OR = OR || {};
+  OR.Interpolator = require("../js/Interpolator.js");
 }
 function ok(expr, msg) {
   if (!expr) throw new Error(msg);
@@ -17,9 +18,9 @@ before(function () {
 after(function() {
   // after all test draw all the Graphic curves
   if ((typeof window) !== 'undefined') {
-    for (let m = 0; m < Object.getOwnPropertyNames(Interpolator).length; m++) {
-      const name = Object.keys(Interpolator)[m];
-      const fn   = window["Interpolator"][name];
+    for (let m = 0; m < Object.getOwnPropertyNames(OR.Interpolator).length; m++) {
+      const name = Object.keys(OR.Interpolator)[m];
+      const fn   = window["OR"]["Interpolator"][name];
       // var fn = eval("Interpolator."+name);
       draw(fn);
     }
@@ -56,49 +57,49 @@ function draw(fn, color) {
 }
 
 test('LinearInterpolator', function () {
-  const i  = Interpolator.LinearInterpolator;
-  const t0 = i(0); const t1 = i(1); const t05 = 0.5;
+  var i  = OR.Interpolator.LinearInterpolator;
+  var t0 = i(0); const t1 = i(1); const t05 = 0.5;
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 5 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('AccelerateDecelerateInterpolator', function () {
-  const i  = Interpolator.AccelerateDecelerateInterpolator;
+  const i  = OR.Interpolator.AccelerateDecelerateInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = 0.5;
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 5 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('SpringOvershootInterpolator', function () {
-  const i  = Interpolator.SpringOvershootInterpolator;
+  const i  = OR.Interpolator.SpringOvershootInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 9 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('SpringBounceInterpolator', function () {
-  const i  = Interpolator.SpringBounceInterpolator;
+  const i  = OR.Interpolator.SpringBounceInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 9 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('GravityBounceInterpolator', function () {
-  const i  = Interpolator.GravityBounceInterpolator;
+  const i  = OR.Interpolator.GravityBounceInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 10 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('BounceInterpolator', function () {
-  const i  = Interpolator.BounceInterpolator;
+  const i  = OR.Interpolator.BounceInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 7 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('OvershootInterpolator', function () {
-  const i  = Interpolator.OvershootInterpolator;
+  const i  = OR.Interpolator.OvershootInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 11 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('AnticipateInterpolator', function () {
-  const i  = Interpolator.AnticipateInterpolator;
+  const i  = OR.Interpolator.AnticipateInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 1 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
 });
 test('AnticipateOvershootInterpolator', function () {
-  const i  = Interpolator.AnticipateOvershootInterpolator;
+  const i  = OR.Interpolator.AnticipateOvershootInterpolator;
   const t0 = i(0); const t1 = i(1); const t05 = i(0.5);
   ok(Math.round(t0) === 0 && Math.round(t05*10) === 5 && Math.round(t1) === 1, "Got: "+t0+" "+t05+" "+t1);
-  draw(Interpolator.AnticipateOvershootInterpolator, 'red');
+  draw(OR.Interpolator.AnticipateOvershootInterpolator, 'red');
 });
 

@@ -4,11 +4,12 @@
 NODE_ENV = true;
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
-  var Point   = require('../js/Point.js');
-  var Segment = require('../js/Segment.js');
-  var Face    = require('../js/Face.js');
-  var Plane   = require('../js/Plane.js');
-  var Model   = require('../js/Model.js');
+  var OR = OR || {};
+  OR.Point   = require('../js/Point.js');
+  OR.Segment = require('../js/Segment.js');
+  OR.Face    = require('../js/Face.js');
+  OR.Plane   = require('../js/Plane.js');
+  OR.Model   = require('../js/Model.js');
 }
 function ok(expr, msg) {
   if (!expr) throw new Error(msg);
@@ -71,11 +72,11 @@ function area2(v, a, b, c) {
 }
 
 test('Split Bug 1', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init( [0,0,  0,-200, 200,-200]);
-  let p = new Point(-100, -100, 0);
-  let n = new Point(200, 200, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(-100, -100, 0);
+  let n = new OR.Point(200, 200, 0);
+  let pl = new OR.Plane(p, n);
   ok(model.faces[0].points.length === 3, "points :"+model.faces[0].points);
 
   model.splitFacesByPlane(pl); // bb bo ob
@@ -88,7 +89,7 @@ test('Split Bug 1', function () {
   ok(checkFaces(model));
 });
 test('Split Bug 2', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // b 0 2
   model.splitBy(model.points[0], model.points[2]);
@@ -103,7 +104,7 @@ test('Split Bug 2', function () {
   ok(checkFaces(model));
 });
 test('Split Bug 3', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 // b 0 2 b 1 3 c 0 3  c 0 1  c 0 4
   model.splitBy(model.points[0], model.points[2]);
@@ -115,7 +116,7 @@ test('Split Bug 3', function () {
   ok(checkFaces(model));
 });
 test('Rotate Bug 1', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // d -200 -200 200 -200  200 200 -200 200 ty 180  c 3 0
 

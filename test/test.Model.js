@@ -4,11 +4,12 @@
 NODE_ENV = true;
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
-  var Point   = require('../js/Point.js');
-  var Segment = require('../js/Segment.js');
-  var Face    = require('../js/Face.js');
-  var Plane   = require('../js/Plane.js');
-  var Model   = require('../js/Model.js');
+  var OR = OR || {};
+  OR.Point   = require('../js/Point.js');
+  OR.Segment = require('../js/Segment.js');
+  OR.Face    = require('../js/Face.js');
+  OR.Plane   = require('../js/Plane.js');
+  OR.Model   = require('../js/Model.js');
 }
 function ok(expr, msg) {
   if (!expr) throw new Error(msg);
@@ -19,14 +20,14 @@ before(function () {
   // runs before all test in this block
 });
 test('init', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   ok(model.points.length === 4,"Got:"+model.points.length);
   ok(model.segments.length === 4,"Got:"+model.segments.length);
   ok(model.faces.length === 1,"Got:"+model.faces.length);
 });
 test('addPointXY', function () {
-  let model = new Model();
+  let model = new OR.Model();
   // Create a new point (5)
   const p = model.addPointXYZ(10, 20);
   ok(p.xf === 10, "Got:"+p);
@@ -36,9 +37,9 @@ test('addPointXY', function () {
   ok(p.z === 0, "Got:"+p);
 });
 test('addPoint Warn', function () {
-  let model = new Model();
+  let model = new OR.Model();
   // Create a point
-  let p1 = new Point(100,100, 100,100,0);
+  let p1 = new OR.Point(100,100, 100,100,0);
   // Try to add it twice
   let p2 = model.addPoint(p1);
   // Warning
@@ -46,7 +47,7 @@ test('addPoint Warn', function () {
   ok(p2 === p3);
 });
 test('addSegment Warn', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   // Diagonal segment
   let p1 = model.points[0];
@@ -62,28 +63,28 @@ test('addSegment Warn', function () {
   ok(model.segments.length === 5,"Got:"+model.segments.length);
 });
 test('addFace', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   ok(model.faces.length === 1,"Got:"+model.faces.length);
   let f0 = model.faces[0];
   // Should no create a new face, but return existing face.
   model.addFace(f0);
   // ok(model.faces.length === 1,"Got:"+model.faces.length);
-  let f1 = new Face();
+  let f1 = new OR.Face();
   f1.points.push(f0.points[0],f0.points[1],f0.points[2],f0.points[3]);
   model.addFace(f1);
   // ok(model.faces.length === 1,"Got:"+model.faces.length);
-  f1 = new Face();
+  f1 = new OR.Face();
   f1.points.push(f0.points[3],f0.points[0],f0.points[1],f0.points[2]);
   model.addFace(f1);
   // ok(model.faces.length === 1,"Got:"+model.faces.length);
 });
 test('searchSegmentsOnePoint', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // Take point 0 (-200,-200)  on segment (-200,-200) to (200,-200)
   let p0    = model.points[0];
-  let p4 = model.addPoint(new Point(0,0, 0,0,0));
+  let p4 = model.addPoint(new OR.Point(0,0, 0,0,0));
   model.addSegment(p0, model.points[2]);
 
   let segs1 = model.searchSegmentsOnePoint(p0);
@@ -92,7 +93,7 @@ test('searchSegmentsOnePoint', function () {
   ok(segs2.length === 0);  // p1 is dangling on no segment
 });
 test('searchSegmentsTwoPoints', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   // Take point 0 (-200,-200) and point 1 (200,-200)
   let p0   = model.points[0];
@@ -101,19 +102,19 @@ test('searchSegmentsTwoPoints', function () {
   ok(s.p1 === p0 && s.p2 === p1); // p0,p1 is on 1 segment
 });
 test('align2dFrom3d', function () {
-  let model = new Model();
-  let p1 = model.addPoint(new Point(0,0, 0,0,0));
-  let p2 = model.addPoint(new Point(200,200, 200,200,0));
+  let model = new OR.Model();
+  let p1 = model.addPoint(new OR.Point(0,0, 0,0,0));
+  let p2 = model.addPoint(new OR.Point(200,200, 200,200,0));
   ok(p2.xf === 200 && p2.yf === 200,"p2.xf = "+p2.xf);
   let s = model.addSegment(p1,p2);
   // New Point in 3D
-  let p3 = model.addPoint(new Point(200,200, 100,100,0));
+  let p3 = model.addPoint(new OR.Point(200,200, 100,100,0));
   model.align2dFrom3d(p3, s);
   // 2D coords aligned on 3D
   ok(p3.xf === 100 && p3.yf === 100, "p3.xf = "+p3.xf)
 });
 test('faceRight faceLeft', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   // Take point 0 (-200,-200) and point 1 (200,-200)
   let p0 = model.points[0];
@@ -129,9 +130,9 @@ test('faceRight faceLeft', function () {
   ok(fr === model.faces[0]);
 
   // Split on X=0 to get 2 faces
-  let p = new Point(0, 0, 0);
-  let n = new Point(1, 0, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(0, 0, 0);
+  let n = new OR.Point(1, 0, 0);
+  let pl = new OR.Plane(p, n);
   model.splitFacesByPlane(pl);
   ok(model.points.length === 6, "Got:"+model.points.length);
   ok(model.faces.length === 2, "Got:"+model.faces.length);
@@ -144,7 +145,7 @@ test('faceRight faceLeft', function () {
   ok(fr === model.faces[1], "Got:"+fr);
 });
 test('searchFace', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   let s = model.segments[0];
   let f = model.searchFace(s, null);
@@ -153,11 +154,11 @@ test('searchFace', function () {
   ok(f === null);
 });
 test('splitSegmentByPoint', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   let s0 = model.segments[0];
   // p is the middle of segment s
-  let p4 = model.addPoint(new Point(0,-200, 0,-200,0));
+  let p4 = model.addPoint(new OR.Point(0,-200, 0,-200,0));
   // Split s0 on p4 => s0 is shorten, s5 is added
   model.splitSegmentByPoint(s0, p4);
   ok(model.segments.length === 5, "Got:"+model.segments.length);
@@ -168,11 +169,11 @@ test('splitSegmentByPoint', function () {
   ok(model.segments[4].p2 === model.segments[1].p1, "Got:"+model.segments[4].p2);
 });
 test('splitSegmentOnPoint', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   let s0 = model.segments[0];
   // p is the middle of segment s
-  let p4 = model.addPoint(new Point(0,-200, 0,-200,0));
+  let p4 = model.addPoint(new OR.Point(0,-200, 0,-200,0));
   // Split s0 on p4 => s0 is shorten, s5 is added
   model.splitSegmentOnPoint(s0, p4);
   ok(model.segments.length === 5, "Got:"+model.segments.length);
@@ -183,7 +184,7 @@ test('splitSegmentOnPoint', function () {
   ok(model.segments[4].p2 === model.segments[1].p1, "Got:"+model.segments[4].p2);
 });
 test('splitSegmentByRatio', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   let s0 = model.segments[0];
   // Split s0 by 0.2  => s0 is shorten -200 + 400*0.2 = -200 + 80 = -120
@@ -199,14 +200,14 @@ test('splitSegmentByRatio', function () {
 
 // Origami needs robust split face by plane
 test('splitFaceByPlane No intersection', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
   let f = model.faces[0];
   // Degenerate on left
   // console.log("No intersection on left");
-  let p = new Point(-400, 0, 0); // On left
-  let n = new Point(-1, 0, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(-400, 0, 0); // On left
+  let n = new OR.Point(-1, 0, 0);
+  let pl = new OR.Plane(p, n);
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces:"+model.faces.length);
   ok(model.segments.length === 4, "segs:"+model.segments.length);
@@ -214,22 +215,22 @@ test('splitFaceByPlane No intersection', function () {
   // Degenerate on right
   // console.log("No intersection on right");
   f = model.faces[0];
-  p = new Point(400, 0, 0); // On right
-  n = new Point(-1, 0, 0);
-  pl = new Plane(p, n);
+  p = new OR.Point(400, 0, 0); // On right
+  n = new OR.Point(-1, 0, 0);
+  pl = new OR.Plane(p, n);
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces:"+model.faces.length);
   ok(model.segments.length === 4, "segs:"+model.segments.length);
   ok(model.points.length === 4, "points:"+model.points.length);
 });
 test('splitFaceByPlane Cross on X=0', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200, -200, 200, -200, 200, 200, -200, 200]);
-  // Plane on YZ crossing X=0 => two intersections as new Points
+  // Plane on YZ crossing X=0 => two intersections as new OR.Points
   // console.log("Intersection on X=0");
-  let p = new Point(0, 0, 0);
-  let n = new Point(-1, 0, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(0, 0, 0);
+  let n = new OR.Point(-1, 0, 0);
+  let pl = new OR.Plane(p, n);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 2, "faces:"+model.faces.length);
@@ -237,11 +238,11 @@ test('splitFaceByPlane Cross on X=0', function () {
   ok(model.segments.length === 7, "segs:"+model.segments.length);
 });
 test('splitFaceByPlane On Diagonal', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // Diagonal Split one face only
   // console.log("Intersection on Diagonal");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   // let pl = Plane.by(model.points[2], model.points[0]);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
@@ -250,12 +251,12 @@ test('splitFaceByPlane On Diagonal', function () {
   ok(model.points.length === 4, "points :"+model.points.length);
 });
 test('splitFaceByPlane On side', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Plane by [0] [1] on left
   // console.log("Intersection On left side to left");
-  let pl = new Plane(new Point(-200,-200), new Point(-400,0));
+  let pl = new OR.Plane(new OR.Point(-200,-200), new OR.Point(-400,0));
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -264,7 +265,7 @@ test('splitFaceByPlane On side', function () {
 
   // Plane by [0] [1] on left
   // console.log("Intersection On left side to right");
-  pl = new Plane(new Point(-200,-200), new Point(400,0));
+  pl = new OR.Plane(new OR.Point(-200,-200), new OR.Point(400,0));
   f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -273,7 +274,7 @@ test('splitFaceByPlane On side', function () {
 
   // Plane by [0] [1] on bottom
   // console.log("Intersection On side bottom");
-  pl = Plane.by(model.points[0], model.points[1]);
+  pl = OR.Plane.by(model.points[0], model.points[1]);
   f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -281,12 +282,12 @@ test('splitFaceByPlane On side', function () {
   ok(model.points.length === 4, "points :"+model.points.length);
 });
 test('splitFaceByPlane On side 3 points', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 0,-200, 200,-200, 200,200, -200,200]);
 
   // Plane on y=-200 passing by 0,1,2
   // console.log("Intersection On side 3 points");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -294,12 +295,12 @@ test('splitFaceByPlane On side 3 points', function () {
   ok(model.points.length === 5, "points :"+model.points.length);
 });
 test('splitFaceByPlane On side 4 points', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 0,-200, 100,-200, 200,-200, 200,200, -200,200]);
 
   // Plane on y=-200 passing by 0,1,2
   // console.log("Intersection On side 4 points");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -307,12 +308,12 @@ test('splitFaceByPlane On side 4 points', function () {
   ok(model.points.length === 6, "points :"+model.points.length);
 });
 test('splitFaceByPlane Strange case', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, -100,-200, 0,0, 100,-200, 200,-200, 200,200, -200,200]);
 
   // Plane on y=-200 passing by 0,1,3
   // console.log("Intersection On side 4 points");
-  let pl = Plane.by(model.points[0], model.points[1]);
+  let pl = OR.Plane.by(model.points[0], model.points[1]);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.faces.length === 1, "faces :"+model.faces.length);
@@ -323,18 +324,18 @@ test('splitFaceByPlane Strange case', function () {
 });
 // Split all face by plane
 test('splitFacesByPlane all faces by', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Diagonal Split 0-1
   // console.log("Intersection on Diagonal");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   model.splitFacesByPlane(pl);
   ok(model.faces.length === 2, "faces :"+model.faces.length);
   ok(model.segments.length === 5, "segs :"+model.segments.length);
   ok(model.points.length === 4, "points :"+model.points.length);
   // Diagonal Split 1-2
-  pl = Plane.by(model.points[1], model.points[3]);
+  pl = OR.Plane.by(model.points[1], model.points[3]);
   model.splitFacesByPlane(pl);
   ok(model.faces.length === 4, "faces :"+model.faces.length);
   // console.log("segments : "+model.segments)
@@ -343,7 +344,7 @@ test('splitFacesByPlane all faces by', function () {
 });
 // Split list face by two points
 test('splitFacesByPlane list faces by', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // Make a list from faces numbers
   function listFaces() {
@@ -356,7 +357,7 @@ test('splitFacesByPlane list faces by', function () {
   }
   // Diagonal Split 0-1
   // console.log("Intersection on Diagonal");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   model.splitFacesByPlane(pl);
   ok(model.faces.length === 2, "faces :"+model.faces.length);
   ok(model.segments.length === 5, "segs :"+model.segments.length);
@@ -364,7 +365,7 @@ test('splitFacesByPlane list faces by', function () {
 
   // Diagonal Split 1-2 but just face 0
   let list = listFaces(0);
-  pl = Plane.by(model.points[1], model.points[3]);
+  pl = OR.Plane.by(model.points[1], model.points[3]);
   model.splitFacesByPlane(pl, list);
   ok(model.faces.length === 3, "faces :"+model.faces.length);
   ok(model.segments.length === 7, "segs :"+model.segments.length);
@@ -372,43 +373,43 @@ test('splitFacesByPlane list faces by', function () {
 });
 // Split all face across
 test('splitFacesByPlane all faces across', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Median Split X=0
   // console.log("Plane on X=0");
-  let p = new Point(0, 0, 0);
-  let n = new Point(1,0, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(0, 0, 0);
+  let n = new OR.Point(1,0, 0);
+  let pl = new OR.Plane(p, n);
   model.splitFacesByPlane(pl);
   ok(model.faces.length === 2, "faces :"+model.faces.length);
   ok(model.segments.length === 7, "segs :"+model.segments.length);
   ok(model.points.length === 6, "points :"+model.points.length);
   // Median Split Y=0
   // console.log("Plane on Y=0");
-  n = new Point(0, 1, 0);
-  pl = new Plane(p, n);  model.splitFacesByPlane(pl);
+  n = new OR.Point(0, 1, 0);
+  pl = new OR.Plane(p, n);  model.splitFacesByPlane(pl);
   ok(model.faces.length === 4, "faces :"+model.faces.length);
   ok(model.segments.length === 12, "segs :"+model.segments.length);
   ok(model.points.length === 9, "points :"+model.points.length);
 });
 test('splitCross', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
-  // Plane on YZ crossing X=0 => two intersections as new Points
+  // Plane on YZ crossing X=0 => two intersections as new OR.Points
   model.splitCross(model.points[0], model.points[1]);
   ok(model.faces.length === 2, "faces:"+model.faces.length);
   ok(model.segments.length === 7, "segs:"+model.segments.length);
   ok(model.points.length === 6, "points:"+model.points.length);
-  // Plane on YZ crossing Y=0 => two intersections as new Points
+  // Plane on YZ crossing Y=0 => two intersections as new OR.Points
   model.splitCross(model.points[1], model.points[2]);
   ok(model.faces.length === 4, "faces:"+model.faces.length);
   ok(model.segments.length === 12, "segs:"+model.segments.length);
   ok(model.points.length === 9, "points:"+model.points.length);
 });
 test('splitBy', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // On edge
@@ -423,7 +424,7 @@ test('splitBy', function () {
   ok(model.points.length === 4, "points:"+model.points.length);
 });
 test('splitOrtho', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // On edge
   model.splitOrtho(model.segments[0], model.points[0]);
@@ -431,14 +432,14 @@ test('splitOrtho', function () {
   ok(model.segments.length === 4, "segs:"+model.segments.length);
   ok(model.points.length === 4, "points:"+model.points.length);
   // Add center
-  model.points.push(new Point(0,0));
+  model.points.push(new OR.Point(0,0));
   model.splitOrtho(model.segments[0], model.points[4]);
   ok(model.faces.length === 2, "faces:"+model.faces.length);
   ok(model.segments.length === 7, "segs:"+model.segments.length);
   ok(model.points.length === 7, "points:"+model.points.length);
 });
 test('splitLineToLineByPoints', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   // On diagonal
   model.splitLineToLineByPoints(model.points[0], model.points[1], model.points[2]);
@@ -447,7 +448,7 @@ test('splitLineToLineByPoints', function () {
   ok(model.points.length === 4, "points:"+model.points.length);
 });
 test('splitLineToLine', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   model.splitLineToLine(model.segments[0], model.segments[1]);
   ok(model.faces.length === 2, "faces:"+model.faces.length);
@@ -457,12 +458,12 @@ test('splitLineToLine', function () {
 
 // Angle
 test('computeAngle Warn', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Diagonal Split
   // console.log("Intersection on Diagonal");
-  let pl = Plane.by(model.points[0], model.points[2]);
+  let pl = OR.Plane.by(model.points[0], model.points[2]);
   let f = model.faces[0];
   model.splitFaceByPlane(f, pl);
   ok(model.points.length === 4, "points :"+model.points.length);
@@ -474,13 +475,13 @@ test('computeAngle Warn', function () {
   ok(angle === 0,"Got:"+angle);
 
   // Angle with no right an left face Warning
-  s.type = Segment.PLAIN;
+  s.type = OR.Segment.PLAIN;
   angle = model.computeAngle(s);
   ok(angle === 0,"Got:"+angle);
 
   // Angle on flat = 0
   s = model.segments[4];
-  s.type = Segment.PLAIN;
+  s.type = OR.Segment.PLAIN;
   angle = model.computeAngle(s);
   ok(angle === 0,"Got:"+angle);
 
@@ -491,13 +492,13 @@ test('computeAngle Warn', function () {
   ok(Math.round(angle) === 45,"Got:"+angle);
 });
 test('rotate all', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Split on X=0
-  let p = new Point(0, 0, 0);
-  let n = new Point(1, 0, 0);
-  let pl = new Plane(p, n);
+  let p = new OR.Point(0, 0, 0);
+  let n = new OR.Point(1, 0, 0);
+  let pl = new OR.Plane(p, n);
   model.splitFacesByPlane(pl);
   ok(model.segments.length === 7, "segs :"+model.segments.length);
 
@@ -536,7 +537,7 @@ function listPoints(model, n) {
 
 // Rotate
 test('rotate list', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
 
   // Rotate around bottom s (y=-200), by 90°, points on axe[1] and up right [2]
@@ -586,7 +587,7 @@ test('rotate list', function () {
 
 // Turn
 test('Turn', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p = model.points[0];
   ok(p.x === -200,"Got"+p.x);
@@ -607,7 +608,7 @@ test('Turn', function () {
 
 // Adjust
 test('Adjust', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p = model.points[0];
   let s = model.segments[0];
@@ -623,7 +624,7 @@ test('Adjust', function () {
   ok(max < 0.01,"Got"+max);
 });
 test('Adjust List', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
@@ -635,7 +636,7 @@ test('Adjust List', function () {
   ok(max < 0.01,"Got"+max);
 });
 test('Evaluate Segments', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   p0.x = -100;
@@ -649,7 +650,7 @@ test('Evaluate Segments', function () {
 
 // Move
 test('Move List', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
@@ -666,7 +667,7 @@ test('Move List', function () {
 });
 // Move On
 test('Move on List', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
@@ -682,7 +683,7 @@ test('Move on List', function () {
 });
 // Flat
 test('Flat', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
@@ -702,7 +703,7 @@ test('Flat', function () {
 
 // Select Points
 test('selectPts', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   let p1 = model.points[1];
@@ -712,7 +713,7 @@ test('selectPts', function () {
 });
 // Select Segments
 test('selectSegs', function () {
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let s0 = model.segments[0];
   let s1 = model.segments[1];
@@ -723,7 +724,7 @@ test('selectSegs', function () {
 
 // Offset
 test('Offset', function(){
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   model.splitCross(model.points[0], model.points[2]);
   let f = model.faces[0];
@@ -734,7 +735,7 @@ test('Offset', function(){
 
 // get2DBounds
 test('get2DBounds', function(){
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let bounds = model.get2DBounds();
   ok(bounds.xmin === -200,"Got:"+bounds.xmin);
@@ -744,7 +745,7 @@ test('get2DBounds', function(){
 });
 // get3DBounds
 test('get3DBounds', function(){
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let bounds = model.get3DBounds();
   ok(bounds.xmin === -200,"Got:"+bounds.xmin);
@@ -755,7 +756,7 @@ test('get3DBounds', function(){
 
 // ScaleModel
 test('scaleModel', function(){
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-200,-200, 200,-200, 200,200, -200,200]);
   let p0 = model.points[0];
   model.scaleModel(4);
@@ -766,7 +767,7 @@ test('scaleModel', function(){
 
 // ZoomFit
 test('zoomFit', function(){
-  let model = new Model();
+  let model = new OR.Model();
   model.init([-400,-400, 200,-200, 400,400, -200,300]);
   let p0 = model.points[0];
   model.zoomFit();

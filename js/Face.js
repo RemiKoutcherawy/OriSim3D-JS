@@ -3,11 +3,12 @@
 // Test in NodeJS
 
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  var Point = require('./Point.js');
+  var OR = OR || {};
+  OR.Point = require('./Point.js');
 }
 
 // Face contains points, segments, normal
-function Face () {
+OR.Face = function () {
   this.points    = [];
   this.normal    = [0, 0, 1];
   this.select    = 0;
@@ -65,5 +66,5 @@ function Face () {
 
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined') {
-  module.exports = Face;
+  module.exports = OR.Face;
 }

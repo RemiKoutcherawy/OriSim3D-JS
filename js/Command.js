@@ -1,11 +1,12 @@
 // File: js/Command.js
 // Dependencies : import them before Command.js in browser
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  var Interpolator = require('./Interpolator.js');
+  var OR = OR || {};
+  OR.Interpolator = require('./Interpolator.js');
 }
 
 // Interprets a list of commands, and apply them on Model
-var Command = function Command(modele) {
+OR.Command = function (modele) {
   var model        = modele;
   var toko         = [];
   var done         = [];
@@ -18,7 +19,7 @@ var Command = function Command(modele) {
   // scale, cx, cy, cz used in ZoomFit
   var za           = [0, 0, 0, 0];
   // Interpolator used in anim() to map tn (time normalized) to tni (time interpolated)
-  var interpolator = Interpolator.LinearInterpolator;
+  var interpolator =  OR.Interpolator.LinearInterpolator;
   // Coefficient to multiply value given in Offset commands
   var kOffset = 1; // 0.2 for real rendering, can be 10 to debug
   //
@@ -243,38 +244,38 @@ var Command = function Command(modele) {
     // Interpolators
     else if (toko[iTok] === "il") { // "il : Interpolator Linear"
       iTok++;
-      context.interpolator = Interpolator.LinearInterpolator;
+      context.interpolator = OR.Interpolator.LinearInterpolator;
     }
     else if (toko[iTok] === "ib") { // "ib : Interpolator Bounce"
       iTok++;
-      context.interpolator = Interpolator.BounceInterpolator;
+      context.interpolator = OR.Interpolator.BounceInterpolator;
     } else if (toko[iTok] === "io") { // "io : Interpolator OverShoot"
       iTok++;
-      context.interpolator = Interpolator.OvershootInterpolator;
+      context.interpolator = OR.Interpolator.OvershootInterpolator;
     }
     else if (toko[iTok] === "ia") { // "ia : Interpolator Anticipate"
       iTok++;
-      context.interpolator = Interpolator.AnticipateInterpolator;
+      context.interpolator = OR.Interpolator.AnticipateInterpolator;
     }
     else if (toko[iTok] === "iao") { // "iao : Interpolator Anticipate OverShoot"
       iTok++;
-      context.interpolator = Interpolator.AnticipateOvershootInterpolator;
+      context.interpolator = OR.Interpolator.AnticipateOvershootInterpolator;
     }
     else if (toko[iTok] === "iad") { // "iad : Interpolator Accelerate Decelerate"
       iTok++;
-      context.interpolator = Interpolator.AccelerateDecelerateInterpolator;
+      context.interpolator = OR.Interpolator.AccelerateDecelerateInterpolator;
     }
     else if (toko[iTok] === "iso") { // "iso Interpolator Spring Overshoot"
       iTok++;
-      context.interpolator = Interpolator.SpringOvershootInterpolator;
+      context.interpolator = OR.Interpolator.SpringOvershootInterpolator;
     }
     else if (toko[iTok] === "isb") { // "isb Interpolator Spring Bounce"
       iTok++;
-      context.interpolator = Interpolator.SpringBounceInterpolator;
+      context.interpolator = OR.Interpolator.SpringBounceInterpolator;
     }
     else if (toko[iTok] === "igb") { // "igb : Interpolator Gravity Bounce"
       iTok++;
-      context.interpolator = Interpolator.GravityBounceInterpolator;
+      context.interpolator = OR.Interpolator.GravityBounceInterpolator;
     }
 
     // Mark points and segments
@@ -584,10 +585,7 @@ var Command = function Command(modele) {
 const State = {idle:0, run:1, anim:2, pause:3, undo:4};
 // console.log(Object.keys(State)[1]); // run
 
-// Class methods
-Command.prototype.constructor = Command;
-
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
-  module.exports = Command;
+  module.exports = OR.Command;
 }
