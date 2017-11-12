@@ -3,57 +3,71 @@
   <ID>JavaScript-modules-diagram</ID>
   <OriginalElement>/Users/remi/git/OriSim3D-JS/js</OriginalElement>
   <nodes>
-    <node x="684.8456375838928" y="209.72483221476512">/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;</node>
-    <node x="681.2953020134227" y="132.95973154362414">/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;</node>
+    <node x="417.0" y="267.0">/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;</node>
+    <node x="860.2953020134227" y="34.959731543624144">/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;</node>
     <node x="885.6711409395973" y="574.241610738255">/Users/remi/git/OriSim3D-JS/js/Face.js#Point#177;</node>
+    <node x="33.0" y="832.0">/Users/remi/git/OriSim3D-JS/js/IndexedBufferGeometry.html</node>
     <node x="686.2550335570471" y="289.6174496644296">/Users/remi/git/OriSim3D-JS/js/Interpolator.js</node>
     <node x="874.8523489932884" y="436.26845637583887">/Users/remi/git/OriSim3D-JS/js/Model.js#Face#240;/Users/remi/git/OriSim3D-JS/js/Model.js#Plane#278;/Users/remi/git/OriSim3D-JS/js/Model.js#Point#160;/Users/remi/git/OriSim3D-JS/js/Model.js#Segment#199;</node>
     <node x="1160.9865771812083" y="134.04697986577187">/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Command#284;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#CommandArea#325;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View3d#245;</node>
-    <node x="865.03355704698" y="133.72483221476514">/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;</node>
+    <node x="860.03355704698" y="112.72483221476514">/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;</node>
     <node x="1020.5167785234898" y="580.3959731543623">/Users/remi/git/OriSim3D-JS/js/Plane.js#Point#160;</node>
     <node x="891.6442953020135" y="640.4765100671141">/Users/remi/git/OriSim3D-JS/js/Point.js</node>
     <node x="735.006711409396" y="576.1677852348995">/Users/remi/git/OriSim3D-JS/js/Segment.js#Point#165;</node>
     <node x="687.5503355704697" y="327.49664429530185">/Users/remi/git/OriSim3D-JS/js/View2d.js#Model#162;/Users/remi/git/OriSim3D-JS/js/View2d.js#Point#199;/Users/remi/git/OriSim3D-JS/js/View2d.js#Segment#236;</node>
-    <node x="1189.1275167785234" y="309.62416107382546">/Users/remi/git/OriSim3D-JS/js/View3d.js#Model#162;</node>
-    <node x="1008.7852348993288" y="324.98657718120796">/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;</node>
-    <node x="544.3489932885907" y="210.68456375838932">/Users/remi/Library/Preferences/WebStorm2017.2/javascript/nodejs/6.9.1/core-modules/fs.js</node>
-    <node x="1054.1208053691275" y="448.67785234899327">three</node>
+    <node x="1197.1275167785234" y="471.62416107382546">/Users/remi/git/OriSim3D-JS/js/View3d.js#Model#162;</node>
+    <node x="573.0" y="117.0">/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#OriSim3dThree#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;</node>
+    <node x="435.0" y="208.0">/Users/remi/Library/Preferences/WebStorm2017.2/javascript/nodejs/6.11.0/core-modules/fs.js</node>
+    <node x="0.0" y="751.0">/Users/remi/git/OriSim3D-JS/js/three.js</node>
+    <node x="634.1208053691275" y="58.67785234899327">three</node>
   </nodes>
   <notes />
   <edges>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/View2d.js#Model#162;/Users/remi/git/OriSim3D-JS/js/View2d.js#Point#199;/Users/remi/git/OriSim3D-JS/js/View2d.js#Segment#236;" target="/Users/remi/git/OriSim3D-JS/js/Point.js">
-      <point x="0.0" y="0.0" />
-      <point x="0.0" y="0.0" />
-    </edge>
     <edge source="/Users/remi/git/OriSim3D-JS/js/View2d.js#Model#162;/Users/remi/git/OriSim3D-JS/js/View2d.js#Point#199;/Users/remi/git/OriSim3D-JS/js/View2d.js#Segment#236;" target="/Users/remi/git/OriSim3D-JS/js/Segment.js#Point#165;">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Command#284;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#CommandArea#325;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View3d#245;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;">
+    <edge source="/Users/remi/git/OriSim3D-JS/js/View2d.js#Model#162;/Users/remi/git/OriSim3D-JS/js/View2d.js#Point#199;/Users/remi/git/OriSim3D-JS/js/View2d.js#Segment#236;" target="/Users/remi/git/OriSim3D-JS/js/Point.js">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;" target="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;">
-      <point x="-5.0002143301113335" y="0.0" />
-      <point x="-5.0002143301113335" y="0.0" />
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;" target="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#OriSim3dThree#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;">
+      <point x="0.0" y="-6.241556072374067" />
+      <point x="-8.353461898586772" y="0.0" />
     </edge>
     <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Command#284;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#CommandArea#325;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View3d#245;" target="/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;">
-      <point x="4.999785679075757" y="0.046294311843297464" />
-      <point x="4.999785679075757" y="0.04629431184326904" />
+    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#OriSim3dThree#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="/Users/remi/git/OriSim3D-JS/js/Model.js#Face#240;/Users/remi/git/OriSim3D-JS/js/Model.js#Plane#278;/Users/remi/git/OriSim3D-JS/js/Model.js#Point#160;/Users/remi/git/OriSim3D-JS/js/Model.js#Segment#199;">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/Users/remi/git/OriSim3D-JS/js/IndexedBufferGeometry.html" target="/Users/remi/git/OriSim3D-JS/js/three.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
     </edge>
     <edge source="/Users/remi/git/OriSim3D-JS/js/Model.js#Face#240;/Users/remi/git/OriSim3D-JS/js/Model.js#Plane#278;/Users/remi/git/OriSim3D-JS/js/Model.js#Point#160;/Users/remi/git/OriSim3D-JS/js/Model.js#Segment#199;" target="/Users/remi/git/OriSim3D-JS/js/Segment.js#Point#165;">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;" target="/Users/remi/git/OriSim3D-JS/js/Interpolator.js">
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Plane.js#Point#160;" target="/Users/remi/git/OriSim3D-JS/js/Point.js">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Plane.js#Point#160;" target="/Users/remi/git/OriSim3D-JS/js/Point.js">
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;" target="/Users/remi/git/OriSim3D-JS/js/Interpolator.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;" target="/Users/remi/Library/Preferences/WebStorm2017.2/javascript/nodejs/6.11.0/core-modules/fs.js">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
@@ -69,7 +83,7 @@
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;">
+    <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Command#284;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#CommandArea#325;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3d.js#View3d#245;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1553;">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
@@ -77,15 +91,11 @@
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="/Users/remi/git/OriSim3D-JS/js/Model.js#Face#240;/Users/remi/git/OriSim3D-JS/js/Model.js#Plane#278;/Users/remi/git/OriSim3D-JS/js/Model.js#Point#160;/Users/remi/git/OriSim3D-JS/js/Model.js#Segment#199;">
-      <point x="0.0" y="0.0" />
-      <point x="0.0" y="0.0" />
+    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#OriSim3dThree#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;">
+      <point x="2.9927711772085104" y="4.005411424669134" />
+      <point x="2.9927711772085033" y="4.005411424669148" />
     </edge>
     <edge source="/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;" target="/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;">
-      <point x="0.0" y="0.0" />
-      <point x="0.0" y="0.0" />
-    </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;" target="/Users/remi/Library/Preferences/WebStorm2017.2/javascript/nodejs/6.9.1/core-modules/fs.js">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
@@ -109,15 +119,11 @@
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/CommandArea.js#Command#169;" target="/Users/remi/git/OriSim3D-JS/js/Command.js#Interpolator#164;/Users/remi/git/OriSim3D-JS/js/Command.js#fs#1554;">
-      <point x="0.0" y="0.0" />
-      <point x="0.0" y="0.0" />
-    </edge>
-    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="three">
-      <point x="0.0" y="0.0" />
-      <point x="0.0" y="0.0" />
-    </edge>
     <edge source="/Users/remi/git/OriSim3D-JS/js/Model.js#Face#240;/Users/remi/git/OriSim3D-JS/js/Model.js#Plane#278;/Users/remi/git/OriSim3D-JS/js/Model.js#Point#160;/Users/remi/git/OriSim3D-JS/js/Model.js#Segment#199;" target="/Users/remi/git/OriSim3D-JS/js/Point.js">
+      <point x="0.0" y="0.0" />
+      <point x="0.0" y="0.0" />
+    </edge>
+    <edge source="/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#OriSim3dThree#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;" target="three">
       <point x="0.0" y="0.0" />
       <point x="0.0" y="0.0" />
     </edge>
@@ -130,9 +136,9 @@
       <point x="0.0" y="0.0" />
     </edge>
   </edges>
-  <settings layout="Hierarchic Group" zoom="1.0" x="942.5" y="400.5" />
+  <settings layout="Hierarchic Group" zoom="1.0" x="862.5" y="301.0" />
   <SelectedNodes>
-    <node>/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Model#181;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#Orisim3d#218;/Users/remi/git/OriSim3D-JS/js/View3dThree.js#THREE#149;</node>
+    <node>/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Command#294;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#CommandArea#335;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#Model#169;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View2d#206;/Users/remi/git/OriSim3D-JS/js/Orisim3dThree.js#View3dThree#245;</node>
   </SelectedNodes>
   <Categories>
     <Category>All</Category>

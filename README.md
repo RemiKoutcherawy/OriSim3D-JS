@@ -11,7 +11,7 @@ This application is a work in progress, don't expect more.
 
 ## Usage
 
-Download and open : [conception.html](https://remikoutcherawy.github.io/conception.html)
+Download and open : [app.html](https://remikoutcherawy.github.io/app.html)
 On the left the crease pattern, on the right the 3D view.  
 
 To bundle all files in `app.js`, lauch `node build.js`  
