@@ -9,16 +9,13 @@ if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
 }
 
 // Main Module
-var Orisim3d = function Orisim3d(model, view2d, view3d, command) {
+function Orisim3d(model, view2d, view3d, command) {
   // Instance variables
   this.model  = model;
   this.view2d = view2d;
   this.view3d = view3d;
   this.command = command;
 };
-Orisim3d.prototype.constructor = Orisim3d;
-
-// Global
 
 // Main startup
 if (typeof window !== 'undefined') {
@@ -41,6 +38,10 @@ function completed () {
 
   // Bind all in OriSim3d
   orisim3d = new Orisim3d(model, view2d, view3d, command);
+
+  // Read tag and launch
+  var tag = document.getElementById("cocotte.txt");
+  orisim3d.command.command(tag.textContent);
 
   // Launch animation
   requestAnimationFrame(loop);
