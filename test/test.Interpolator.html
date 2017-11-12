@@ -10,7 +10,10 @@
   <canvas id="view2d-canvas" width="600" height="600"
           style="position:absolute; top:200px; left:50px; z-index:-2"></canvas>
 </div>
-<script>var NODE_ENV = false;</script>
+<script>
+  var NODE_ENV = false;
+  var OR = OR || {};
+</script>
 <script src="mocha/mocha.js"></script>
 <script>mocha.setup('qunit')</script>
 
