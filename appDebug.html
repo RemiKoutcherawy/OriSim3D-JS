@@ -8,8 +8,6 @@
     #height100 { position:relative; width:100%; height:100%;}
     #canvas2d { position:absolute; width:50%; height:100%; left:0; top:0; border:1px solid darkblue;}
     #canvas3d { position:absolute; width:50%; height:100%; left:50%; top:0; border:1px solid darkblue;}
-    .menu {position:absolute; top:10px; right:10px; background-color:#ABD1FF; opacity:1; z-index:20}
-    .svg-icon {display: block; width: 36px; height: 36px;}
   </style>
 
   <script>var NODE_ENV = false;</script>
@@ -27,116 +25,12 @@
   <script src="js/View3d.js" type="application/javascript"></script>
   <script src="js/CommandArea.js" type="application/javascript"></script>
   <script src="js/Orisim3d.js" type="application/javascript"></script>
-  <script src="js/Menu.js" type="application/javascript"></script>
 
 </head>
 <body>
   <div id="height100">
     <canvas id="canvas2d"></canvas>
     <canvas id="canvas3d"></canvas>
-    <!-- Menu Element in html page-->
-    <div class="menu">
-      <svg class="svg-icon" viewBox="0 0 12 12" style="display:block">
-        <path id="d1" d="M 2,3 10,3 Z" style="stroke:#00f;stroke-width:1"/>
-        <path id="d2" d="M 2,6 10,6 Z" style="stroke:#00f;stroke-width:1"/>
-        <path id="d3" d="M 2,9 10,9 Z" style="stroke:#00f;stroke-width:1"/>
-        <rect id="d4" height="12" width="12" rx="2" style="fill:none;stroke:#000;stroke-width:0.4"/>
-      </svg>
-      <svg class="svg-icon" viewBox="0 0 12 12" style="display:none">
-        <path d="M 2,2 10,10 Z" style="stroke:#00f;stroke-width:1.0"/>
-        <path d="M 2,10 10,2 Z" style="fill:none;stroke:#00f;stroke-width:1.0"/>
-        <rect height="12" width="12" rx="2" style="fill:none;stroke:#000;stroke-width:0.4"/>
-      </svg>
-      <svg model="cocotte.txt" class="svg-icon" viewBox="36 0 36 36" style="display:none">
-        <linearGradient
-            id="BleuCiel">
-          <stop
-              style="stop-color:#bcd3ff;stop-opacity:1;"
-              offset="0"
-              id="stop3612-6" />
-          <stop
-              style="stop-color:#60afff;stop-opacity:1;"
-              offset="1"
-              id="stop3614-98" />
-        </linearGradient>
-        <linearGradient
-            id="Bleu">
-          <stop
-              style="stop-color:#216bff;stop-opacity:1;"
-              offset="0"
-              id="stop3612-1" />
-          <stop
-              style="stop-color:#003399;stop-opacity:1;"
-              offset="1"
-              id="stop3614-5" />
-        </linearGradient>
-        <linearGradient
-            id="Jaune">
-          <stop
-              id="stop5923-4-6"
-              offset="0"
-              style="stop-color:#ffcc00;stop-opacity:1;" />
-          <stop
-              id="stop5925-0-8"
-              offset="1"
-              style="stop-color:#ff6600;stop-opacity:1;" />
-        </linearGradient>
-        <linearGradient
-            xlink:href="#BleuCiel"
-            id="linearGradient4798"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="matrix(0.073224,0,0,0.073224,59.74168,-1.332436)"
-            x1="-95.261261"
-            y1="32.908539"
-            x2="-92.15432"
-            y2="484.8978" />
-        <linearGradient
-            xlink:href="#Bleu"
-            id="linearGradient4785"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="matrix(0.6102,0,0,0.524772,66.374554,56.355872)"
-            x1="-31.395815"
-            y1="-82.941772"
-            x2="-31.563984"
-            y2="-50.584309" />
-        <linearGradient
-            xlink:href="#Bleu"
-            id="linearGradient1194"
-            gradientUnits="userSpaceOnUse"
-            x1="31.346756"
-            y1="32.497768"
-            x2="31.185341"
-            y2="51.385605"
-            gradientTransform="matrix(0.6102,0,0,0.6102,36.31,0.3029)" />
-        <linearGradient
-            xlink:href="#Jaune"
-            id="linearGradient4789"
-            gradientUnits="userSpaceOnUse"
-            gradientTransform="matrix(0,0.036612,-0.036612,0,89.250952,29.946416)"
-            x1="-726.53772"
-            y1="1110.3765"
-            x2="-336.62952"
-            y2="1105.5341" />
-        <rect
-            id="rect5032"
-            rx="4.2714"
-            ry="4.2714"
-            y="0.30289999"
-            x="36.310001"
-            height="35.391602"
-            width="35.391602"
-            style="fill:url(#linearGradient4798);fill-opacity:1;stroke:#000000;stroke-width:1" />
-        <path
-            style="fill:url(#linearGradient4785)"
-            d="m 40.697338,31.886852 -0.06102,-16.71948 6.333876,-5.851818 8.457372,8.677044 z" />
-        <path
-            d="m 47.012908,25.864178 8.414658,-7.87158 13.552542,14.58378 H 53.188132 Z"
-            style="fill:url(#linearGradient1194)"/>
-        <path
-            d="M 55.403158,2.963372 V 17.992598 L 40.929214,3.042698 Z"
-            style="fill:url(#linearGradient4789)" />
-      </svg>
-    </div>
   </div>
 
   <!-- Inlined models -->

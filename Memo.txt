@@ -4,11 +4,10 @@ TODO
 x double click sur WebGL
 x chargement texture
 x enlever matrix4D
-x Menu
-- Icones
+x Icones
 - clic sur cocotte à l'image de conception
-- zoom sans scale
-- menu pour 2D 3D Cde Model upload, download
+x zoom sans scale
+x menu pour 2D 3D Cde Model upload, download
 - bateau.txt
 - select 2D 3D
 - 1080 x 617

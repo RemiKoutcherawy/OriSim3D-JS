@@ -17,7 +17,6 @@ var code = {
   "View3d.js": fs.readFileSync("js/View3d.js", "utf8"),
   "CommandArea.js": fs.readFileSync("js/CommandArea.js", "utf8"),
   "Orisim3d.js": fs.readFileSync("js/Orisim3d.js", "utf8"),
-  "Menu.js": fs.readFileSync("js/Menu.js", "utf8")
 };
 var options = {
   toplevel: false,
