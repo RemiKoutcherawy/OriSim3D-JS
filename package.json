@@ -23,8 +23,8 @@
     "url": "git://github.com/remikoutcherawy/OriSim3D-JS.git"
   },
   "devDependencies": {
-    "mocha": "^4.1.0",
-    "three": "^0.87.1",
+    "mocha": "^5.0.4",
+    "three": "^0.90.0",
     "uglify-es": "^3.3.10"
   },
   "dependencies": {},
