@@ -16,7 +16,7 @@ function Orisim3d(model, view2d, view3d, command) {
   this.view2d = view2d;
   this.view3d = view3d;
   this.command = command;
-};
+}
 
 // Main startup
 if (typeof window !== 'undefined') {
@@ -38,11 +38,11 @@ function completed () {
   commandarea ? new CommandArea(command, commandarea) : null;
 
   // Bind all in OriSim3d
-  orisim3d = new Orisim3d(model, view2d, view3d, command);
+  OR.orisim3d = new Orisim3d(model, view2d, view3d, command);
 
   // Read tag and launch
   var tag = document.getElementById("cocotte.txt");
-  orisim3d.command.command(tag.textContent);
+  OR.orisim3d.command.command(tag.textContent);
 
   // Launch animation
   requestAnimationFrame(loop);
@@ -50,16 +50,17 @@ function completed () {
 
 // Animation loop
 function loop() {
-  if (orisim3d.model.change) {
-    if (orisim3d.view2d !== null) {
-      orisim3d.view2d.draw();
+  if (OR.orisim3d.model.change) {
+    if (OR.orisim3d.view2d !== null) {
+      OR.orisim3d.view2d.draw();
     }
-    if (orisim3d.view3d !== null) {
-      orisim3d.view3d.initBuffers();
+    if (OR.orisim3d.view3d !== null) {
+      OR.orisim3d.view3d.initBuffers();
     }
-    orisim3d.model.change = !!orisim3d.command.anim()
+    // !! convert to boolean (should not be necessary)
+    OR.orisim3d.model.change = !!OR.orisim3d.command.anim()
   }
-  orisim3d.view3d.draw();
+  OR.orisim3d.view3d.draw();
   requestAnimationFrame(loop);
 }
 

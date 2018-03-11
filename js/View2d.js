@@ -215,8 +215,7 @@ function View2d (model, canvas2d) {
   this.drawSegment = drawSegment;
   this.drawFaces = drawFaces;
   this.draw = draw;
-};
-
+}
 // Just for Node.js
 if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
   module.exports = View2d;

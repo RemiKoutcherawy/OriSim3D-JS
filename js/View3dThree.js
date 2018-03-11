@@ -17,6 +17,9 @@ function View3dThree () {
   var lines3d;
   var faces3d;
   var mesh;
+  // Three mesh
+  var faces3dFront
+  var faces3dBack
 
   // Set Points positions for points3d and faces3d
   function setPointsPositions(model, geometry) {
@@ -226,22 +229,22 @@ function View3dThree () {
         var tag = document.getElementById("cocotte.txt");
         if (tag) {
           var model = tag.textContent;
-          // Global var : orisim3d
-          if (typeof orisim3d !== "undefined") {
-            orisim3d.command.command(model);
+          // Global var : OR.orisim3d
+          if (typeof OR.orisim3d !== "undefined") {
+            OR.orisim3d.command.command(model);
           }
         }
       },
       pause:function () {
-        // Global var : orisim3d
-        if (typeof orisim3d !== "undefined") {
-          orisim3d.command.command("pa");
+        // Global var : OR.orisim3d
+        if (typeof OR.orisim3d !== "undefined") {
+          OR.orisim3d.command.command("pa");
         }
       },
       play:function () {
-        // Global var : orisim3d
-        if (typeof orisim3d !== "undefined") {
-          orisim3d.command.command("co");
+        // Global var : OR.orisim3d
+        if (typeof OR.orisim3d !== "undefined") {
+          OR.orisim3d.command.command("co");
         }
       }
     };

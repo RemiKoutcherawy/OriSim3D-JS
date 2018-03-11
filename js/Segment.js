@@ -50,7 +50,7 @@ OR.Segment = function (p1, p2, type) {
   this.length3d = length3d;
   this.length2d = length2d;
   this.toString = toString;
-}
+};
 
 // Static values
 OR.Segment.PLAIN     = 0;
