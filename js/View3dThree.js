@@ -18,8 +18,8 @@ function View3dThree () {
   var faces3d;
   var mesh;
   // Three mesh
-  var faces3dFront
-  var faces3dBack
+  var faces3dFront;
+  var faces3dBack;
 
   // Set Points positions for points3d and faces3d
   function setPointsPositions(model, geometry) {
@@ -157,9 +157,11 @@ function View3dThree () {
     // Update Faces
     setFacesIndices( model, faces3dFront.geometry );
     faces3dFront.geometry.attributes.position.needsUpdate = true;
+    faces3dFront.geometry.attributes.uv.needsUpdate = true;
     faces3dFront.geometry.index.needsUpdate = true;
     setFacesIndices( model, faces3dBack.geometry );
     faces3dBack.geometry.attributes.position.needsUpdate = true;
+    faces3dBack.geometry.attributes.uv.needsUpdate = true;
     faces3dBack.geometry.index.needsUpdate = true;
   }
 
@@ -220,11 +222,11 @@ function View3dThree () {
 // dat.GUI
     var gui = new dat.GUI();
     var params = {
-      "reset rotation":function () {
+      "Reset rotation":function () {
         controls.reset();
         scene.rotation.y = 0;
       },
-      cocotte:function () {
+      Cocotte:function () {
         // Expect a tag <script id="cocotte.txt" type="not-javascript">d ...< /script> in html file
         var tag = document.getElementById("cocotte.txt");
         if (tag) {
@@ -234,24 +236,10 @@ function View3dThree () {
             OR.orisim3d.command.command(model);
           }
         }
-      },
-      pause:function () {
-        // Global var : OR.orisim3d
-        if (typeof OR.orisim3d !== "undefined") {
-          OR.orisim3d.command.command("pa");
-        }
-      },
-      play:function () {
-        // Global var : OR.orisim3d
-        if (typeof OR.orisim3d !== "undefined") {
-          OR.orisim3d.command.command("co");
-        }
       }
     };
-    gui.add(params, 'reset rotation');
-    gui.add(params, 'cocotte');
-    gui.add(params, 'pause');
-    gui.add(params, 'play');
+    gui.add(params, 'Reset rotation');
+    gui.add(params, 'Cocotte');
     gui.close();
 
 // Resize
