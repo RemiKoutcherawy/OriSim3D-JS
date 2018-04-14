@@ -2,7 +2,7 @@
 // Dependencies : import them before Face.js in browser
 // Test in NodeJS
 
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Point = require('./Point.js');
 }
@@ -65,6 +65,6 @@ OR.Face = function () {
 // Static values
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof exports !== 'undefined') {
   module.exports = OR.Face;
 }

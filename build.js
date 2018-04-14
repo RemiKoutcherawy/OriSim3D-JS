@@ -2,7 +2,7 @@
 // run with $ node build.js
 // or $ uglifyjs js/Point.js js/Segment.js js/Face.js js/Plane.js js/Model.js js/View2d.js \
 // js/View3d.js js/Interpolator.js js/Command.js js/CommandArea.js -c -m -o app.js
-// or $ uglifyjs js/* -c -m -d NODE_ENV=false -o app.js
+// or $ uglifyjs js/* -c -m -o app.js
 var UglifyJS = require("uglify-es");
 var fs = require("fs");
 var code = {
@@ -21,10 +21,7 @@ var code = {
 var options = {
   toplevel: false,
   compress: {
-    dead_code: true,
-    global_defs: {
-      NODE_ENV: false,
-    }
+    dead_code: true
   }
 };
 var result = UglifyJS.minify(code, options);

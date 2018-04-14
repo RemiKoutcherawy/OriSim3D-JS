@@ -2,7 +2,7 @@
 
 // Dependencies : import them before Segment.js in browser
 // Test in NodeJS
-if (NODE_ENV === true && typeof require === 'function') {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Point = require('./Point.js');
 }
@@ -224,6 +224,6 @@ OR.Segment.closestLine = function closestLine(s1, s2) {
 };
 
 // For NodeJS, will be discarded by uglify
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof exports !== 'undefined') {
   module.exports = OR.Segment;
 }

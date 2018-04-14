@@ -1,6 +1,6 @@
 // Main Entry Point : Orisim3D
 // NodeJS dependencies : import them before Orisim3d.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Model = require('./Model.js');
   OR.View2d = require('./View2d.js');
@@ -65,6 +65,6 @@ function loop() {
 }
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof exports !== 'undefined') {
   module.exports = Orisim3d;
 }

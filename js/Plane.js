@@ -1,6 +1,6 @@
 // File: js/Plane.js
 // Dependencies : import them before Plane.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Point = require("./Point.js");
 }
@@ -98,6 +98,6 @@ OR.Plane.ortho  = function (s, p) {
 };
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof exports !== 'undefined') {
   module.exports = OR.Plane;
 }

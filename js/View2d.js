@@ -1,6 +1,6 @@
 // File: js/View2d.js
 // Dependencies : import them before View2d.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var Model = require('./Model.js');
   var Point = require('./Point.js');
   var Segment = require('./Segment.js');
@@ -217,6 +217,6 @@ function View2d (model, canvas2d) {
   this.draw = draw;
 }
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof exports !== 'undefined') {
   module.exports = View2d;
 }

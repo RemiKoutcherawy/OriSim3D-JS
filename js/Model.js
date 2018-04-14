@@ -1,6 +1,6 @@
 // File: js/Model.js
 // Dependencies : import them before Model.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Point   = require('./Point.js');
   OR.Segment = require('./Segment.js');
@@ -832,6 +832,6 @@ OR.Model = function (list) {
 };
 
 // For NodeJS, will be discarded by uglify
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof exports !== 'undefined') {
   module.exports = OR.Model;
 }

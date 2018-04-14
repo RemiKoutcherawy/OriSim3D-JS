@@ -1,6 +1,6 @@
 // File: js/View3d.js
 // Dependencies : import them before View3d.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var Model = require('./Model.js');
 }
 
@@ -496,6 +496,6 @@ View3d.wTexBack  = 1;
 View3d.hTexBack  = 1;
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof exports !== 'undefined') {
   module.exports = View3d;
 }

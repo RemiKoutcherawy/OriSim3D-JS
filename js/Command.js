@@ -1,6 +1,6 @@
 // File: js/Command.js
 // Dependencies : import them before Command.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Interpolator = require('./Interpolator.js');
 }
@@ -42,7 +42,7 @@ OR.Command = function (modele) {
   function readfile (filename) {
     var text = null;
     // If we are in NodeJS fs is required
-    if (NODE_ENV === true && typeof require !== 'undefined') {
+    if (typeof require === 'function') { // test for nodejs environment
       const fs = require('fs');
       text     = fs.readFileSync(filename, 'utf-8');
     }
@@ -586,6 +586,6 @@ const State = {idle:0, run:1, anim:2, pause:3, undo:4};
 // console.log(Object.keys(State)[1]); // run
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof exports !== 'undefined') {
   module.exports = OR.Command;
 }

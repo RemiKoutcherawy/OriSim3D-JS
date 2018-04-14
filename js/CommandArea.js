@@ -1,6 +1,6 @@
 // File: js/CommandArea
 // Dependencies : import them before CommandArea.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var Command = require ('./Command.js');
 }
 
@@ -47,7 +47,7 @@ CommandArea.prototype = {
 };
 
 // Just for Node.js
-if (NODE_ENV === true && typeof module !== 'undefined' && module.exports) {
+if (typeof exports !== 'undefined') {
   module.exports = CommandArea;
 }
 

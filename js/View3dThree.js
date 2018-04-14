@@ -1,6 +1,6 @@
 // File: js/View3dThree.js
 // Dependencies : import them before View3d.js in browser
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof require === 'function') { // test for nodejs environment
   var THREE = require('three');
   var Model = require('./Model.js');
   var OriSim3dThree = require('./OriSim3dThree.js');
@@ -284,6 +284,6 @@ function View3dThree () {
 View3dThree.prototype.constructor = View3dThree;
 
 // For NodeJS, will be discarded by uglify
-if (NODE_ENV === true && typeof module !== 'undefined') {
+if (typeof exports !== 'undefined') {
   module.exports = View3dThree;
 }

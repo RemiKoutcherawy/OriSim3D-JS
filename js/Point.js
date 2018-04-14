@@ -160,7 +160,7 @@ OR.Point.compare2d = function compare2D(p1, p2) {
   return Math.sqrt(dx2 + dy2);
 };
 
-// For NodeJS, will be discarded by uglify
-if (NODE_ENV === true && typeof module !== 'undefined') {
+// For NodeJS
+if (typeof exports !== 'undefined') {
   module.exports = OR.Point;
 }

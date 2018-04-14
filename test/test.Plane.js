@@ -1,9 +1,8 @@
 // file 'test/test.Plane.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
-NODE_ENV = true;
 // Dependencies : import them before Model in browser
-if (typeof module !== 'undefined' && module.exports) {
+ if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Point   = require('../js/Point.js');
   OR.Segment = require('../js/Segment.js');

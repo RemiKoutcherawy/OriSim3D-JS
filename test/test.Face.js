@@ -1,9 +1,6 @@
 // file 'test/test.Face.js
-
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.html
-NODE_ENV = true;
-
 // Dependencies : import them before Model in browser
 if (typeof module !== 'undefined' && module.exports) {
   var OR = OR || {};

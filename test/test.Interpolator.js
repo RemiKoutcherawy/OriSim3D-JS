@@ -1,9 +1,8 @@
 // file 'test/test.Interpolator.js
 // run with $ mocha --ui qunit
 // or $ mocha or $ npm test or open test.Interpolator.html
-NODE_ENV = true;
 // Dependencies : import them before Model in browser
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof require === 'function') { // test for nodejs environment
   var OR = OR || {};
   OR.Interpolator = require("../js/Interpolator.js");
 }
