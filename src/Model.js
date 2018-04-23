@@ -72,7 +72,8 @@ Object.assign(Model.prototype, {
     }
     // Add new Point if not already in model
     if (p === null) {
-      p = this.points.push(pt);
+      this.points.push(pt);
+      p = pt;
     }
     return p;
   },
