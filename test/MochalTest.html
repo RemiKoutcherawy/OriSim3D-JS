@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ThreeJS Unit Tests - Using Files in /src</title>
+  <link rel="stylesheet" href="./node_modules/mocha/mocha.css">
+</head>
+<body>
+
+  <div id="mocha"></div>
+
+  <script src="./node_modules/mocha/mocha.js"></script>
+  <script src="./node_modules/should/should.js"></script>
+
+  <script>mocha.setup('bdd')</script>
+
+  <!-- sources to test below with type="module" -->
+  <script type="module" src="./test/Mocha.test.js"></script>
+
+  <script type="module" src="./test/Vec3.test.js"></script>
+  <script type="module" src="./test/Point.test.js"></script>
+  <script type="module" src="./test/Segment.test.js"></script>
+  <script type="module" src="./test/Plane.test.js"></script>
+  <!--<script type="module" src="./test/Face.test.js"></script>-->
+
+  <script type="module" >
+    mocha.checkLeaks();
+    mocha.run();
+  </script>
+</body>
+</html>

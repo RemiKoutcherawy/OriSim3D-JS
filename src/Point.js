@@ -49,14 +49,46 @@ Object.assign(Point.prototype, {
 
   // Add vector (only in 3d)
   add: function add(b) {
-    this.x += b.x;
-    this.y += b.y;
-    this.z += b.z;
-    return this;
+    const p = new Point(0, 0, this.x + b.x, this.y + b.y, this.z += b.z);
+    return p;
+  },
+
+  // Sub vector (only in 3d)
+  sub: function add(b) {
+    const p = new Point(0, 0, this.x - b.x, this.y - b.y, this.z -= b.z);
+    return p;
+  },
+
+  // Return distance to this
+  compare3d: function compare3D(x, y, z) {
+    const dx2 = (this.x - x) * (this.x - x);
+    const dy2 = (this.y - y) * (this.y - y);
+    const dz2 = (this.z - z) * (this.z - z);
+    return dx2 + dy2 + dz2;
+  },
+
+  // Return distance to this
+  compare3dPt: function compare3D(p) {
+    const dx2 = (this.x - p.x) * (this.x - p.x);
+    const dy2 = (this.y - p.y) * (this.y - p.y);
+    const dz2 = (this.z - p.z) * (this.z - p.z);
+    return dx2 + dy2 + dz2;
+  },
+
+  // Return distance to origin
+  dist: function dist() {
+    return (this.x) * (this.x)+ (this.y) * (this.y) + (this.z) * (this.z);
+  },
+
+  // Return 0 if Point is near xf,yf
+  compare2d: function compare2D(xf, yf) {
+    const dx2 = (this.xf - xf) * (this.xf - xf);
+    const dy2 = (this.yf - yf) * (this.yf - yf);
+    return dx2 + dy2;
   },
 
   clone: function () {
-    return new this.constructor( this.xf, this.yf, this.x, this.y, this.z );
+    return new this.constructor(this.xf, this.yf, this.x, this.y, this.z);
   },
 
   // String representation [x,y,z xf,yf]
@@ -66,35 +98,5 @@ Object.assign(Point.prototype, {
   },
 
 });
-
-// Static values
-
-// Return 0 if Point is near x,y,z
-Point.compare3d = function compare3D(p1, p2, y, z) {
-  let d, dz2, dy2, dx2;
-  if (arguments.length === 2) {
-    // compare3D (p1, p2)
-    dx2 = (p1.x - p2.x) * (p1.x - p2.x);
-    dy2 = (p1.y - p2.y) * (p1.y - p2.y);
-    dz2 = (p1.z - p2.z) * (p1.z - p2.z);
-    d = dx2 + dy2 + dz2;
-    d = d > 1 ? d : 0;
-  } else {
-    // compare3D (p1, x,y,z)
-    dx2 = (p1.x - p2) * (p1.x - p2);
-    dy2 = (p1.y - y) * (p1.y - y);
-    dz2 = (p1.z - z) * (p1.z - z);
-    d = dx2 + dy2 + dz2;
-    d = d > 1 ? d : 0;
-  }
-  return d;
-};
-
-// Return 0 if Point is near xf,yf
-Point.compare2d = function compare2D(p1, p2) {
-  const dx2 = (p1.xf - p2.xf) * (p1.xf - p2.xf);
-  const dy2 = (p1.yf - p2.yf) * (p1.yf - p2.yf);
-  return Math.sqrt(dx2 + dy2);
-};
 
 export {Point};

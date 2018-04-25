@@ -1,0 +1,30 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Tests</title>
+  <link rel="stylesheet" href="./node_modules/mocha/mocha.css">
+</head>
+<body>
+
+  <div id="mocha"></div>
+
+  <div>
+    <canvas id="view2d-canvas" width="600" height="600"
+            style="position:absolute; top:200px; left:50px; z-index:-2"></canvas>
+  </div>
+
+  <script src="./node_modules/mocha/mocha.js"></script>
+  <script src="./node_modules/should/should.js"></script>
+
+  <script>mocha.setup('bdd')</script>
+
+  <script type="module" src="./src/Interpolator.js"></script>
+  <script type="module" src="./test/Interpolator.test.js"></script>
+
+  <script type="module">
+    mocha.checkLeaks();
+    mocha.run();
+  </script>
+
+</body>
+</html>

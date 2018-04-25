@@ -1,6 +1,4 @@
 // File: src/Face.js
-// Dependencies : Point
-
 // Face contains points, segments, normal
 
 function Face() {

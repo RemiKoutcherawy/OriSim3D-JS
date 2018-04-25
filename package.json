@@ -1,13 +1,13 @@
 {
   "name": "orisim3d",
   "version": "0.1.1",
-  "description": "OriSim3D origami folding simulation with raw WebGL no libs.",
+  "description": "OriSim3D origami folding simulation with three.js.",
   "main": "Orisim3d.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha --require babel-polyfill --require babel-register --require should"
   },
   "keywords": [
     "origami",
@@ -23,11 +23,18 @@
     "url": "git://github.com/remikoutcherawy/OriSim3D-JS.git"
   },
   "devDependencies": {
-    "mocha": "^5.0.4",
-    "three": "^0.90.0",
-    "uglify-es": "^3.3.10"
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-register": "^6.26.0",
+    "mocha": "^5.1.1",
+    "nyc": "^11.7.1",
+    "qunit": "^2.6.0",
+    "should": "^13.2.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "npm": "^6.0.0",
+    "three": "^0.92.0"
+  },
   "bugs": {
     "url": "https://github.com/remikoutcherawy/OriSim3D-JS/issues"
   },

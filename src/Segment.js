@@ -5,16 +5,17 @@ import {Point} from './Point.js';
 import {Vec3} from './Vec3.js';
 
 // Segment to hold Segments : Two points p1 p2
-function Segment(p1, p2, type) {
+function Segment(p1, p2) {
   // API
-  this.p1        = p1;
-  this.p2        = p2;
-  this.type      = Segment.PLAIN | type;
-  this.angle     = 0;
-  this.select    = false;
+  this.p1 = p1;
+  this.p2 = p2;
+  this.type = Segment.PLAIN;
+  this.angle = 0;
+  this.select = false;
 }
 
 Object.assign(Segment.prototype, {
+
   // Reverse order of the 2 points of this Segment
   reverse: function reverse() {
     const p = this.p1;
@@ -22,11 +23,12 @@ Object.assign(Segment.prototype, {
     this.p2 = p;
   },
 
-  // 3D Length in space
+  // 3d Length between segment points
   length3d: function length3d() {
-    return Math.sqrt((this.p1.x - this.p2.x) * (this.p1.x - this.p2.x)
+    const sq = (this.p1.x - this.p2.x) * (this.p1.x - this.p2.x)
       + (this.p1.y - this.p2.y) * (this.p1.y - this.p2.y)
-      + (this.p1.z - this.p2.z) * (this.p1.z - this.p2.z));
+      + (this.p1.z - this.p2.z) * (this.p1.z - this.p2.z);
+    return Math.sqrt(sq);
   },
 
   // 2D Length in flat view
@@ -38,7 +40,7 @@ Object.assign(Segment.prototype, {
 
   // String representation
   toString: function toString() {
-    return "S(P1:"+this.p1.toString()+" "+this.p1.toString()+", P2:"+this.p2.toString()+" "+this.p2.toString()+")";
+    return "S(P1:" + this.p1.toString() + ", P2:" + this.p2.toString() + ")";
     // +" type:"+this.type+" angle:"+this.angle
     // +" 2d:"+this.lg2d+" 3d:"+this.lg3d+" "
     // +" L="+faceLeft+" R="+faceRight+")";
@@ -47,18 +49,18 @@ Object.assign(Segment.prototype, {
 });
 
 // Static values
-Segment.PLAIN     = 0;
-Segment.EDGE      = 1;
-Segment.MOUNTAIN  = 2;
-Segment.VALLEY    = 3;
+Segment.PLAIN = 0;
+Segment.EDGE = 1;
+Segment.MOUNTAIN = 2;
+Segment.VALLEY = 3;
 Segment.TEMPORARY = -1;
-Segment.EPSILON   = 0.01;
+Segment.EPSILON = 0.01;
 
 // Static methods
 
 // Compares segments s1 with s2
 Segment.compare = function (s1, s2) {
-  const d = Point.compare3d(s1.p1, s2.p1) + Point.compare3d(s2.p2, s2.p2);
+  const d = s1.p1.compare3d(s2.p1.x, s2.p1.y, s2.p1.z) + s1.p2.compare3d(s2.p2.x, s2.p2.y, s2.p2.z);
   return d > 1 ? d : 0;
 };
 
@@ -97,9 +99,9 @@ Segment.closestLine = function closestLine(s1, s2) {
   const v1 = new Vec3(s1.p2.x - s1.p1.x, s1.p2.y - s1.p1.y, s1.p2.z - s1.p1.z); // s1 direction
   const v2 = new Vec3(s2.p2.x - s2.p1.x, s2.p2.y - s2.p1.y, s2.p2.z - s2.p1.z); // s direction
   const r = new Vec3(s1.p1.x - s2.p1.x, s1.p1.y - s2.p1.y, s1.p1.z - s2.p1.z); // s2.p1 to s1.p1
-  const a = Vec3.dot(v1, v1); // squared length of s1
-  const e = Vec3.dot(v2, v2); // squared length of s
-  const f = Vec3.dot(v2, r);  //
+  const a = v1.dot(v1); // squared length of s1
+  const e = v2.dot(v2); // squared length of s
+  const f = v2.dot(r);  //
   // Check degeneration of segments into points
   let closest;
   if (a <= Segment.EPSILON && e <= Segment.EPSILON) {
@@ -112,14 +114,14 @@ Segment.closestLine = function closestLine(s1, s2) {
       t1 = 0.0;
       t2 = f / e; // t1=0 => t2 = (b*t1+f)/e = f/e
     } else {
-      let c = Vec3.dot(v1, r);
+      let c = v1.dot(r);
       if (e <= Segment.EPSILON) {
         // Second segment degenerate into point
         t2 = 0.0;
         t1 = -c / a; // t2=0 => t1 = (b*t2-c)/a = -c/a
       } else {
         // General case
-        const b = Vec3.dot(v1, v2); // Delayed computation of b
+        const b = v1.dot(v2); // Delayed computation of b
         const denom = a * e - b * b; // Denominator of Cramer system
         // Segments not parallel, compute closest
         if (denom !== 0.0) {
@@ -133,8 +135,8 @@ Segment.closestLine = function closestLine(s1, s2) {
         t2 = (b * t1 + f) / e;
       }
     }
-    const c1 = Vec3.add(s1.p1, v1.scale(t1)); // c1 = p1+t1*(p2-p1)
-    const c2 = Vec3.add(s2.p1, v2.scale(t2)); // c2 = p1+t2*(p2-p1)
+    const c1 = s1.p1.add(v1.scale(t1)); // c1 = p1+t1*(p2-p1)
+    const c2 = s2.p1.add(v2.scale(t2)); // c2 = p1+t2*(p2-p1)
     closest = new Segment(c1, c2);
   }
   return closest;
