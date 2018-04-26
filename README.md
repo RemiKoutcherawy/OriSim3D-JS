@@ -18,6 +18,15 @@ To bundle all files in `app.js`, lauch `node build.js`
 This requires `npm update --save-dev` to download mocha and uglify-es.
 Run  `./node_modules/mocha/bin/mocha --ui qunit` to execute node tests.
 
+Compile with [roolupjs](https://rollupjs.org/guide/en)
+
+```bash
+$ rollup js/Origami.js --o dist/Origami.js -f amd --name "Origami"
+```
+or using "scripts" in package.json
+```bash
+$ npm run-script build
+```
 
 ## Comment est organisé le code ?
 Dans le répertoire `js` :
@@ -75,7 +84,7 @@ Sous la racine :
   
 Dans le répertoire `test` :
 - les tests sous Mocha qui permettent de débugger en reconstituant le contexte d'un problème.
-- `test.Interpolator.js` présente graphiquement les trajectoires suivies par les animations.
+- `Interpolator.test.js` présente graphiquement les trajectoires suivies par les animations.
 
 Dans le répertoire `textures` : les textures .jpg et .txt pour vue3dLocal.html`
 

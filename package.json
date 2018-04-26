@@ -29,6 +29,7 @@
     "mocha": "^5.1.1",
     "nyc": "^11.7.1",
     "qunit": "^2.6.0",
+    "rollup": "^0.58.2",
     "should": "^13.2.1"
   },
   "dependencies": {
