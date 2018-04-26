@@ -1,5 +1,5 @@
 // import {describe} from "mocha";
-// Run with $ mocha --require babel-polyfill --require babel-register --require should test/Mocha.test.js
+// Run with $ mocha --require babel-polyfill --require babel-register --require should test
 
 describe('Array', function() {
 

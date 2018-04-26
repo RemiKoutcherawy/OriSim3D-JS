@@ -62,26 +62,26 @@ describe('Segment', function () {
     ok(d === 900, "got:" + d);
   });
 
-  it('Segment.distanceToSegment', function () {
-    let p1 = new Point(0, 0, 0, 0, 0);
-    let p2 = new Point(0, 0, 30, 40, 0);
+  it('Segment.distanceToSegment2d', function () {
+    let p1 = new Point(0, 0); // let xyz undefined
+    let p2 = new Point(30, 40);
     let s = new Segment(p1, p2);
 
-    let d = Segment.distanceToSegment(s, p1);
+    let d = s.distanceToSegment2d(p1.xf, p1.yf);
     ok(d === 0, "got:" + d);
-    d = Segment.distanceToSegment(s, p2);
+    d = s.distanceToSegment2d(p2.xf, p2.yf);
     ok(d === 0, "got:" + d);
 
-    let p3 = new Point(0, 0, 0, -30, 0);
-    d = Segment.distanceToSegment(s, p3);
+    let p3 = new Point(0, -30);
+    d = s.distanceToSegment2d(p3.xf, p3.yf);
     ok(d === 30, "got:" + d);
 
-    p3 = new Point(0, 0, 30, 50, 0);
-    d = Segment.distanceToSegment(s, p3);
+    p3 = new Point(30, 50);
+    d = s.distanceToSegment2d(p3.xf, p3.yf);
     ok(d === 10, "got:" + d);
 
-    p3 = new Point(0, 0, 30, 10, 0);
-    d = Segment.distanceToSegment(s, p3);
+    p3 = new Point(30, 10);
+    d = s.distanceToSegment2d(p3.xf, p3.yf);
     ok(d === 18, "got:" + d);
   });
 
