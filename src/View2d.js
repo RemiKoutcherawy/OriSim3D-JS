@@ -229,7 +229,7 @@ Object.assign(View2d.prototype, {
       });
 
       ctx.closePath();
-      ctx.fillStyle = f.select ? f.highlight ? 'turquoise' : 'skyblue' : f.highlight ? 'lightskyblue' : 'lightblue';
+      ctx.fillStyle = f.select ? f.highlight ? 'plum' : 'salmon' : f.highlight ? 'lightskyblue' : 'lightblue';
       ctx.fill();
 
       // Circle
