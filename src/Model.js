@@ -3,7 +3,6 @@
 
 import {Point} from "./Point.js";
 import {Segment} from "./Segment.js";
-import {Vec3} from "./Vec3.js";
 import {Face} from "./Face.js";
 import {Plane} from "./Plane.js";
 
@@ -153,12 +152,13 @@ Object.assign(Model.prototype, {
     return left;
   },
 
-  // Search a point at xf,yf
+  // Search a point near xf,yf
   searchPoint2d: function (xf, yf) {
     let p = null;
     // Search existing points
     for (let i = 0; i < this.points.length; i++) {
-      if (this.points[i].compare2d(xf, yf) < 1) {
+      let d = this.points[i].compare2d(xf, yf);
+      if (d < 5) { // 5 unit for click
         p = this.points[i];
         break;
       }
@@ -166,7 +166,7 @@ Object.assign(Model.prototype, {
     return p;
   },
 
-  // Search a point at x,y,z
+  // Search a point near x,y,z
   searchPoint3d: function (x, y, z) {
     let p = null;
     // Search existing points
@@ -177,6 +177,20 @@ Object.assign(Model.prototype, {
       }
     }
     return p;
+  },
+
+  // Search a segment near xf,yf
+  searchSegment2d: function (xf, yf) {
+    let s = null;
+    // Search existing segments
+    for (let i = 0; i < this.segments.length; i++) {
+      let d = this.segments[i].distanceToSegment2d(xf, yf);
+      if (d < 5) { // 5 unit for click
+        s = this.segments[i];
+        break;
+      }
+    }
+    return s;
   },
 
   // Search face containing a and b but which is not f0 

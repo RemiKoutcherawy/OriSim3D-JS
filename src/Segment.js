@@ -6,12 +6,18 @@ import {Vec3} from './Vec3.js';
 
 // Segment to hold Segments : Two points p1 p2
 function Segment(p1, p2) {
-  // API
+
+  // Two Points
   this.p1 = p1;
   this.p2 = p2;
+
+  // Properties
   this.type = Segment.PLAIN;
   this.angle = 0;
+
+  // Selected
   this.select = false;
+  this.highlight = false;
 }
 
 Object.assign(Segment.prototype, {
@@ -38,6 +44,26 @@ Object.assign(Segment.prototype, {
       + (this.p1.yf - this.p2.yf) * (this.p1.yf - this.p2.yf));
   },
 
+  // 2D Distance between Segment and Point
+  distanceToSegment2d: function (xf, yf) {
+    const x1 = this.p1.xf;
+    const y1 = this.p1.yf;
+    const x2 = this.p2.xf;
+    const y2 = this.p2.yf;
+    const l2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
+    const r = ((y1 - yf) * (y1 - y2) + (x1 - xf) * (x1 - x2)) / l2;
+    const s = ((y1 - yf) * (x2 - x1) - (x1 - xf) * (y2 - y1)) / l2;
+    let d = 0;
+    if (r <= 0) {
+      d = Math.sqrt((xf - x1) * (xf - x1) + (yf - y1) * (yf - y1));
+    } else if (r >= 1) {
+      d = Math.sqrt((xf - x2) * (xf - x2) + (yf - y2) * (yf - y2));
+    } else {
+      d = (Math.abs(s) * Math.sqrt(l2));
+    }
+    return d;
+  },
+
   // String representation
   toString: function toString() {
     return "S(P1:" + this.p1.toString() + ", P2:" + this.p2.toString() + ")";
@@ -62,28 +88,6 @@ Segment.EPSILON = 0.01;
 Segment.compare = function (s1, s2) {
   const d = s1.p1.compare3d(s2.p1.x, s2.p1.y, s2.p1.z) + s1.p2.compare3d(s2.p2.x, s2.p2.y, s2.p2.z);
   return d > 1 ? d : 0;
-};
-
-// 2D Distance between Segment and Point @testOK
-Segment.distanceToSegment = function (seg, pt) {
-  const x1 = seg.p1.x;
-  const y1 = seg.p1.y;
-  const x2 = seg.p2.x;
-  const y2 = seg.p2.y;
-  const x = pt.x;
-  const y = pt.y;
-  const l2 = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
-  const r = ((y1 - y) * (y1 - y2) + (x1 - x) * (x1 - x2)) / l2;
-  const s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1)) / l2;
-  let d = 0;
-  if (r <= 0) {
-    d = Math.sqrt((x - x1) * (x - x1) + (y - y1) * (y - y1));
-  } else if (r >= 1) {
-    d = Math.sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2));
-  } else {
-    d = (Math.abs(s) * Math.sqrt(l2));
-  }
-  return d;
 };
 
 Segment.closestLine = function closestLine(s1, s2) {

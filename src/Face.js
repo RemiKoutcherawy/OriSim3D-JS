@@ -2,11 +2,17 @@
 // Face contains points, segments, normal
 
 function Face() {
+
+  // A face is made of points
   this.points = [];
-  this.normal = [0, 0, 1];
-  this.select = 0;
-  this.highlight = false;
+
+  // Properties
   this.offset = 0;
+  this.normal = [0, 0, 1];
+
+  //Selected
+  this.select = false;
+  this.highlight = false;
 }
 
 Object.assign(Face.prototype, {
@@ -40,6 +46,63 @@ Object.assign(Face.prototype, {
     n[2] /= d;
 
     return n;
+  },
+
+  // Look if face contains point x,y in 2D view
+  onFace2d: function (xf, yf) {
+    let points = this.points;
+    let hits = 0;
+    let last = points[points.length - 1];
+    let lastx = last.xf, lasty = last.yf;
+    let curx, cury;
+
+    // Walk the edges of the polygon, count crossings on horizontal
+    for (let i = 0; i < points.length; lastx = curx, lasty = cury, i++) {
+      curx = points[i].xf;
+      cury = points[i].yf;
+      // Ignore if on horizontal edge
+      if (cury === lasty)
+        continue;
+
+      // Edge on the left
+      let leftx;
+      if (curx < lastx) {
+        if (xf >= lastx)
+          continue;
+        leftx = curx;
+      } else {
+        if (xf >= curx)
+          continue;
+        leftx = lastx;
+      }
+
+      let test1, test2;
+      if (cury < lasty) {
+        if (yf < cury || yf >= lasty)
+          continue;
+        if (xf < leftx) {
+          // Got a hit when yf in[cury,lasty] and xf in[curx,lastx]
+          hits++;
+          continue;
+        }
+        test1 = xf - curx;
+        test2 = yf - cury;
+      } else {
+        if (yf < lasty || yf >= cury)
+          continue;
+        if (xf < leftx) {
+          // Got a hit when yf in[cury,lasty] and xf in[curx,lastx]
+          hits++;
+          continue;
+        }
+        test1 = xf - lastx;
+        test2 = yf - lasty;
+      }
+      // Check if real crossing
+      if (test1 < (test2 / (lasty - cury) * (lastx - curx)))
+        hits++;
+    }
+    return ((hits & 1) !== 0);
   },
 
   // String representation

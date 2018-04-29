@@ -1,4 +1,4 @@
-// File: src/View2Ds
+// File: src/View2D.js
 
 // View2d Constructor
 function View2d(model) {
@@ -7,12 +7,17 @@ function View2d(model) {
   this.model = model;
 
   if (this.canvas2d === undefined) {
+
     // Canvas2d in front
-    this.canvas2d = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+    this.canvas2d = window.document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
     this.canvas2d.width = window.innerWidth;
     this.canvas2d.height = window.innerHeight;
     this.canvas2d.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;z-index:1';
+
+    // Add to window
+    window.document.body.appendChild(this.canvas2d);
   }
+
   // Keep ref to this View2d for event
   this.canvas2d.view2d = this;
 
@@ -24,12 +29,16 @@ function View2d(model) {
   this.xOffset = 0;
   this.yOffset = 0;
 
-  // Mouse
-  this.canvas2d.addEventListener( 'mousedown', onMouseDown, false );
+  // Inset
+  this.inset = false;
 
-  function onMouseDown( event ) {
-    // event.preventDefault();
-    console.log("onMouseDown Event:"+event.clientX+" "+event.clientY);
+  // Mouse
+  this.canvas2d.addEventListener('mousemove', this, false);
+  this.canvas2d.addEventListener('mousedown', this, false);
+  // this.canvas2d.addEventListener('mouseup', this, false);
+
+  // Mouse Event handler
+  this.handleEvent = function (event) {
 
     // Event clic
     const rect = event.target.getBoundingClientRect();
@@ -45,9 +54,63 @@ function View2d(model) {
     // Model clic
     const xf = (x - xOffset) / scale;
     const yf = -(y - yOffset) / scale;
-    console.log("onMouseDown Model:"+xf+" "+yf);
 
-    const pt = model.find(xf, yf);
+    let onPoint = false;
+    let onSegment = false;
+
+    // Search a point near xf,yf
+    let points = this.model.points;
+    for (let i = 0; i < points.length; i++) {
+      let p = points[i];
+      let d = p.compare2d(xf, yf);
+      if (d < 5) { // 5 unit for click
+        onPoint = true;
+        p.highlight = true;
+        if (event.type === 'mousedown') {
+          p.select = !p.select;
+        }
+      } else {
+        p.highlight = false;
+      }
+    }
+
+    // Not on a point
+    if (!onPoint) {
+      // Search segments and highlight or select
+      let segments = this.model.segments;
+      for (let i = 0; i < segments.length; i++) {
+        let s = segments[i];
+        let d = s.distanceToSegment2d(xf, yf);
+        if (d < 5) { // 5 unit for click
+          onSegment = true;
+          s.highlight = true;
+          if (event.type === 'mousedown') {
+            s.select = !s.select;
+          }
+        } else {
+          s.highlight = false;
+        }
+      }
+    }
+
+    // Not on a point or on a segment
+    if (!onSegment && !onPoint) {
+      // Search Faces and highlight or select
+      let faces = this.model.faces;
+      for (let i = 0; i < faces.length; i++) {
+        let f = faces[i];
+        let hit = f.onFace2d(xf, yf);
+        if (hit) {
+          f.highlight = true;
+          if (event.type === 'mousedown') {
+            f.select = !f.select;
+          }
+        } else {
+          f.highlight = false;
+        }
+      }
+    }
+
   }
 
 }
@@ -63,18 +126,22 @@ Object.assign(View2d.prototype, {
 
     const points = this.model.points;
     ctx.font = '18px serif';
-    ctx.strokeStyle = 'blue';
     for (let i = 0; i < points.length; i++) {
       const p = points[i];
       const xf = p.xf * scale + xOffset;
       const yf = -p.yf * scale + yOffset;
+
+      // Select
+      ctx.strokeStyle = p.select ? p.highlight ? 'violet' : 'red' : p.highlight ? 'blue' : 'black';
+
       // Circle
-      ctx.fillStyle = 'skyblue';
+      ctx.fillStyle = p.select ? p.highlight ? 'violet' : 'red' : p.highlight ? 'blue' : 'white';
       ctx.beginPath();
       ctx.arc(xf, yf, 12, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.fill();
-      // label
+
+      // Label
       ctx.fillStyle = 'black';
       if (i < 10) {
         ctx.fillText(String(i), xf - 4, yf + 5);
@@ -93,7 +160,7 @@ Object.assign(View2d.prototype, {
 
     const segments = this.model.segments;
     ctx.font = '18px serif';
-    ctx.strokeStyle = 'green';
+
     for (let i = 0; i < segments.length; i++) {
       const s = segments[i];
       const xf1 = s.p1.xf * scale + xOffset;
@@ -102,25 +169,25 @@ Object.assign(View2d.prototype, {
       const yf2 = -s.p2.yf * scale + yOffset;
       const xc = (xf1 + xf2) / 2;
       const yc = (yf1 + yf2) / 2;
-      // Highlight
-      if (s.highlight) {
-        ctx.strokeStyle = 'red';
-      } else {
-        ctx.strokeStyle = 'green';
-      }
+
+      // Select
+      ctx.strokeStyle = s.select ? s.highlight ? 'violet' : 'red' : s.highlight ? 'blue' : 'black';
+
       // Segment
       ctx.beginPath();
       ctx.moveTo(xf1, yf1);
       ctx.lineTo(xf2, yf2);
       ctx.closePath();
       ctx.stroke();
+
       // Circle
-      ctx.fillStyle = 'lightgreen';
+      ctx.fillStyle = s.select ? s.highlight ? 'violet' : 'red' : s.highlight ? 'blue' : 'white';
       ctx.beginPath();
       ctx.arc(xc, yc, 12, 0, 2 * Math.PI);
       ctx.stroke();
       ctx.fill();
-      // label
+
+      // Label
       ctx.fillStyle = 'black';
       if (i < 10) {
         ctx.fillText(String(i), xc - 4, yc + 5);
@@ -140,15 +207,19 @@ Object.assign(View2d.prototype, {
     const faces = this.model.faces;
     ctx.font = '18px serif';
     ctx.strokeStyle = 'black';
+
     for (let i = 0; i < faces.length; i++) {
+
       const f = faces[i];
       const pts = f.points;
       let cx = 0;
       let cy = 0;
+
       ctx.beginPath();
       let xf = pts[0].xf * scale + xOffset;
       let yf = -pts[0].yf * scale + yOffset;
       ctx.moveTo(xf, yf);
+
       pts.forEach(function (p) {
         xf = p.xf * scale + xOffset;
         yf = -p.yf * scale + yOffset;
@@ -156,8 +227,9 @@ Object.assign(View2d.prototype, {
         cx += xf;
         cy += yf;
       });
+
       ctx.closePath();
-      ctx.fillStyle = 'lightblue';
+      ctx.fillStyle = f.select ? f.highlight ? 'turquoise' : 'skyblue' : f.highlight ? 'lightskyblue' : 'lightblue';
       ctx.fill();
 
       // Circle
@@ -168,6 +240,7 @@ Object.assign(View2d.prototype, {
       ctx.stroke();
       ctx.fillStyle = 'lightcyan';
       ctx.fill();
+
       // label
       ctx.fillStyle = 'black';
       if (i < 10) {
@@ -180,11 +253,7 @@ Object.assign(View2d.prototype, {
 
   // Draw the Model
   draw: function draw() {
-    if (this.canvas2d === null) {
-      console.log("draw with no canvas");
-      return;
-    }
-    this.fit();
+    // this.fit();
     this.ctx.clearRect(0, 0, this.canvas2d.width, this.canvas2d.height);
     this.drawFaces();
     this.drawSegment();
@@ -193,27 +262,24 @@ Object.assign(View2d.prototype, {
 
   // Fit to show all the model in the view, ie compute scale
   fit: function fit() {
+
     // Model
     const bounds = this.model.get2DBounds();
     const modelWidth = bounds.xmax - bounds.xmin;
     const modelHeight = bounds.ymax - bounds.ymin;
 
-    // <div> containing Canvas
-    const viewWidth = this.canvas2d.clientWidth;
-    const viewHeight = this.canvas2d.clientHeight;
-
-    // Resize canvas to fit <div>, should not be necessary but is
-    this.canvas2d.width = viewWidth;
-    this.canvas2d.height = viewHeight;
+    // Window
+    const viewWidth = this.inset ? window.innerWidth / 4 : window.innerWidth;
+    const viewHeight = this.inset ? window.innerHeight / 4 : window.innerHeight;
 
     // Compute Scale to fit
     const scaleX = viewWidth / modelWidth;
     const scaleY = viewHeight / modelHeight;
-    this.scale = Math.min(scaleX, scaleY) / 1.2;
+    this.scale = Math.min(scaleX, scaleY) / 1.3;
 
     // Compute Offset to center drawing
     this.xOffset = viewWidth / 2;
-    this.yOffset = viewHeight / 2;
+    this.yOffset = window.innerHeight - viewHeight / 2;
   },
 
 });

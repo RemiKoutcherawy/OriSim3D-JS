@@ -16,6 +16,7 @@ function Point(xf, yf, x, y, z) {
 
   // Selected
   this.select = false;
+  this.highlight = false;
 }
 
 Object.assign(Point.prototype, {
@@ -84,7 +85,7 @@ Object.assign(Point.prototype, {
   compare2d: function compare2D(xf, yf) {
     const dx2 = (this.xf - xf) * (this.xf - xf);
     const dy2 = (this.yf - yf) * (this.yf - yf);
-    return dx2 + dy2;
+    return Math.sqrt(dx2 + dy2);
   },
 
   clone: function () {
