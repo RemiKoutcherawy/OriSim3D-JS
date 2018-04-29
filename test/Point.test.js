@@ -27,14 +27,14 @@ describe('Point', function () {
 
   it('Point.add', function () {
     let p1 = new Point(0, 0, 0, 0, 0);
-    let p2 = new Vec3( 1, 2, 3);
+    let p2 = new Vec3(1, 2, 3);
     let p = p1.add(p2);
     ok(p.xf === 0 && p.yf === 0 && p.x === 1 && p.y === 2 && p.z === 3, " Got:" + p.toString());
   });
 
   it('Point.sub', function () {
     let p1 = new Point(0, 0, 0, 0, 0);
-    let p2 = new Vec3( 1, 2, 3);
+    let p2 = new Vec3(1, 2, 3);
     let p = p1.sub(p2);
     ok(p.xf === 0 && p.yf === 0 && p.x === -1 && p.y === -2 && p.z === -3, " Got:" + p.toString());
   });
@@ -65,8 +65,8 @@ describe('Point', function () {
 
   it('Point.compare2d', function () {
     let p1 = new Point(0, 0, 0, 0, 0);
-    ok(p1.compare2d(1, 2, 3) === 5, "expect 5 got:" + p1.compare2d(1, 2, 3));
-    ok(p1.compare2d(0, 3) === 9, "expect 3 got:" + p1.compare2d(0, 3));
+    ok(p1.compare2d(3, 4) === 5, "Got:" + p1.compare2d(3, 4));
+    ok(p1.compare2d(0, 3) === 3, "expect 3 got:" + p1.compare2d(0, 3));
   });
 
 });
