@@ -32,10 +32,10 @@
     // Origami model
     const model = new Model();
     model.init([-200,-200, 200,-200, 200,200, -200,200]);
+    model.splitCross(model.points[0],model.points[1]);
 
     // View2d for crease pattern
     view2D = new View2d(model);
-    window.document.body.appendChild(view2D.canvas2d);
 
     // Listeners
     window.addEventListener('resize', onWindowResize, false);

@@ -1,6 +1,6 @@
 export default {
-	input: 'src/Origami.js',
-	// sourceMap: true,
+	input: 'HandleEvent.js',
+	sourceMap: true,
 	output: [
 		{
 			format: 'umd',
