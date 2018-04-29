@@ -11,3 +11,42 @@ x menu pour 2D 3D Cde Model upload, download
 - bateau.txt
 - select 2D 3D
 - 1080 x 617
+
+Using Rollup
+- package.json
+ "devDependencies": {
+    "rollup": "^0.57.1",
+  "scripts": {
+    "build": "rollup -c rollup.config.js",
+    "build-test": "rollup -c test/rollup.unit.config.js",
+Permet d'appeler
+$ npm run-script build
+$ rollup -c rollup.config.js
+
+- rollup.config.js
+  input: 'src/Origami.js',
+- src/Origami.js
+  export { Point } from './Point.js';
+- src/Point.js
+  function Point(xf,yf, x,y,z)
+  Object.assign( Point.prototype, { // class functions
+- test/rollup.unit.config.js
+
+Utiliser Mocha avec ES6 et Should https://mochajs.org
+1/ npm install --save-dev mocha should babel-polyfill babel-preset-env babel-register
+2/ Dans la configuration du test sous Webstorm
+   Extra Mocha options : --require babel-register --require should
+3/ Ajout .babelrc avec { "presets": ["env"] }
+
+https://www.jetbrains.com/help/webstorm/running-unit-tests-on-mocha.html#ws_mocha_running
+
+Coverage https://github.com/istanbuljs/nyc
+1/ npm install --save-dev nyc
+2/ Au lancement du test sous Webstorm choisir l'icone grisée avec un triangele vert
+3/ En ligne de commande
+4/ Dans les scripts de package.json "test": "nyc mocha"
+
+
+
+
+
