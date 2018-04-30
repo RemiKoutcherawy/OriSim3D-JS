@@ -1,4 +1,4 @@
-// File: js/Interpolator.js
+// File: src/Interpolator.js
 
 // Maps time to time
 // interpolate(tn) returns t for tn.
@@ -6,7 +6,7 @@
 // between 0 and 1, t can be < 0 (anticipate) and >1 (overshoot)
 // Use Padé approximations to speed up complex calculations
 
-const Interpolator = {};
+const Interpolator = function () {};
 
 // Linear "il"
 Interpolator.Linear = function (t) {
@@ -20,7 +20,9 @@ Interpolator.AccelerateDecelerate = function (t) {
 };
 
 // Model of a spring with overshoot "iso"
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.SpringOvershoot = function (t) {
   let x = 0;
   if (t < 0.1825)
@@ -38,7 +40,9 @@ Interpolator.SpringOvershoot = function (t) {
 
 // Model of a spring with bounce "isb"
 // 1.0-Math.exp(-4.0*t)*Math.cos(2*Math.PI*t)
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.SpringBounce = function (t) {
   let x = 0.0;
   if (t < 0.185)
@@ -55,7 +59,9 @@ Interpolator.SpringBounce = function (t) {
 
 // Model of a gravity with bounce "igb"
 // a = 8.0, k=1.5; x=(a*t*t-v0*t)*Math.exp(-k*t);
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.GravityBounce = function (t) {
   let x = 0.0;
   if (t < 0.29)
@@ -71,7 +77,6 @@ Interpolator.GravityBounce = function (t) {
 };
 
 // Bounce at the end "ib"
-/** @return {number} */
 Interpolator.Bounce = function (t) {
   function bounce(t) {
     return t * t * 8.0;
@@ -91,7 +96,9 @@ Interpolator.Bounce = function (t) {
 };
 
 // Overshoot "io"
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.Overshoot = function (t) {
   const mTension = 2;
   t -= 1.0;
@@ -99,14 +106,18 @@ Interpolator.Overshoot = function (t) {
 };
 
 // Anticipate "ia"
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.Anticipate = function (t) {
   const mTension = 0; // 2
   return t * t * ((mTension + 1) * t - mTension);
 };
 
 // Anticipate Overshoot "iao"
-/** @return {number} */
+/**
+ * @return {number}
+ */
 Interpolator.AnticipateOvershoot = function (t) {
   const mTension = 3;
 

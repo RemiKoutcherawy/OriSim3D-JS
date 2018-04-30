@@ -1,9 +1,11 @@
 // File: js/View3dThree.js
 // Dependencies : import them before View3d.js in browser
+
 if (typeof require === 'function') { // test for nodejs environment
   var THREE = require('three');
   var Model = require('./Model.js');
   var OriSim3dThree = require('./OriSim3dThree.js');
+  var OrbitControls = require('../libs/OrbitControls.js');
 }
 
 function View3dThree () {
@@ -108,6 +110,7 @@ function View3dThree () {
     geometry.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayPoint, 3 ).setDynamic(true) );
     var uvFaces = new Float32Array( MAX_POINTS * 2 ); // 2 UV per point
     geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvFaces, 2 ).setDynamic(true) );
+
     // Create object, and add it to scene
     points3d = new THREE.Points( geometry, materialPoint );
     scene.add( points3d );
@@ -116,6 +119,7 @@ function View3dThree () {
     var indicesArray = new Uint32Array( MAX_POINTS * 3 );
     var indicesFacesBuffer = new THREE.BufferAttribute( indicesArray, 1 ).setDynamic(true);
     geometry.setIndex( indicesFacesBuffer );
+
     // Create object, same geometry, and add it to scene
     faces3dFront = new THREE.Mesh( geometry,  materialFront );
     scene.add( faces3dFront );
@@ -126,10 +130,12 @@ function View3dThree () {
     var geometryline = new THREE.BufferGeometry();
     var positionsArrayLine = new Float32Array( MAX_POINTS * 3 );
     geometryline.addAttribute( 'position', new THREE.BufferAttribute( positionsArrayLine, 3 ).setDynamic(true) );
+
     // Indices
     var indicesSegmentArray = new Uint32Array( MAX_POINTS * 2 );
     var indicesSegmentBuffer = new THREE.BufferAttribute( indicesSegmentArray, 1 ).setDynamic(true);
     geometryline.setIndex( indicesSegmentBuffer );
+
     // Create object, and add it to scene
     lines3d = new THREE.LineSegments( geometryline,  materialLine );
     scene.add( lines3d );
@@ -159,6 +165,7 @@ function View3dThree () {
     faces3dFront.geometry.attributes.position.needsUpdate = true;
     faces3dFront.geometry.attributes.uv.needsUpdate = true;
     faces3dFront.geometry.index.needsUpdate = true;
+
     setFacesIndices( model, faces3dBack.geometry );
     faces3dBack.geometry.attributes.position.needsUpdate = true;
     faces3dBack.geometry.attributes.uv.needsUpdate = true;
@@ -175,7 +182,7 @@ function View3dThree () {
     camera.position.z = 700;
 
 // Controls
-    controls = new THREE.TrackballControls( camera , canvas3d);
+    controls = new THREE.OrbitControls( camera , canvas3d);
     controls.rotateSpeed = 4.0;
 
 // Scenes

@@ -1,7 +1,6 @@
 // File: src/Segment.js
 // Segment holds Two points p1 p2
 
-import {Point} from './Point.js';
 import {Vec3} from './Vec3.js';
 
 // Segment to hold Segments : Two points p1 p2

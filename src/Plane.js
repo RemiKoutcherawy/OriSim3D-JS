@@ -1,6 +1,5 @@
 // File: src/Plane.js
 
-import {Point} from "./Point.js";
 import {Vec3} from "./Vec3.js";
 
 // Plane is defined by an origin point R and a normal vector N

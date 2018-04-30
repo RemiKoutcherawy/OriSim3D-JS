@@ -8,17 +8,21 @@ function Command(modele) {
   this.toko = []; // list of tokens
   this.done = []; // list of tokens used in animation
   this.iTok = 0;
+
   // State machine
   this.state = State.idle;
+
   // Time interpolated at instant 'p' preceding and at instant 'n' current
   this.tni = 1;
   this.tpi = 0;
+
   // scale, cx, cy, cz used in ZoomFit
   this.za = [0, 0, 0, 0];
+
   // Interpolator used in anim() to map tn (time normalized) to tni (time interpolated)
   this.interpolator = Interpolator.Linear;
 
-  // instance variables
+  // Instance variables for animation
   this.pauseStart = 0;
   this.pauseDuration = 0;
   this.duration = 0;
@@ -37,12 +41,15 @@ Object.assign(Command.prototype, {
 
   // Read a File
   readfile: function readfile(filename) {
+
     let text = null;
+
     // If we are in NodeJS fs is required
     if (typeof require === 'function') { // test for nodejs environment
       const fs = require('fs');
       text = fs.readFileSync(filename, 'utf-8');
     }
+
     // If we are in browser XHR or Script embedded
     else {
       const request = new XMLHttpRequest();
@@ -61,6 +68,7 @@ Object.assign(Command.prototype, {
       request.open('GET', filename, false);
       request.send(null);
     }
+
     if (text === null) {
       console.log("Error reading:" + filename);
     }
@@ -69,6 +77,7 @@ Object.assign(Command.prototype, {
 
   // Execute one command token on model
   execute: function execute() {
+
     // Make a list from following points numbers
     function listPoints() {
       const list = [];
@@ -393,7 +402,7 @@ Object.assign(Command.prototype, {
         state = State.anim;
         this.animStart();
         // Return breaks the loop, giving control to anim
-        return;
+        break;
       }
       else if (this.toko[this.iTok] === "rparent") {
         // Finish pushing command

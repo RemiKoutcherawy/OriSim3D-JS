@@ -1,4 +1,5 @@
 // File:src/Point.js
+
 // Point to hold Points
 // 3D : x y z
 // Crease pattern flat : xf, yf
@@ -50,14 +51,12 @@ Object.assign(Point.prototype, {
 
   // Add vector (only in 3d)
   add: function add(b) {
-    const p = new Point(0, 0, this.x + b.x, this.y + b.y, this.z += b.z);
-    return p;
+    return new Point(0, 0, this.x + b.x, this.y + b.y, this.z += b.z);
   },
 
   // Sub vector (only in 3d)
   sub: function add(b) {
-    const p = new Point(0, 0, this.x - b.x, this.y - b.y, this.z -= b.z);
-    return p;
+    return new Point(0, 0, this.x - b.x, this.y - b.y, this.z -= b.z);
   },
 
   // Return distance to this
