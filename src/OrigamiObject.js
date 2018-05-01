@@ -1,11 +1,19 @@
 // File: src/OrigamiObject.js
 
-import {
-  Object3D,
-  BufferGeometry, BufferAttribute,
-  TextureLoader,
-  Mesh, Points, FrontSide, SmoothShading, BackSide, PointsMaterial, LineBasicMaterial, LineSegments, MeshPhongMaterial
-} from '../libs/three.module.js';
+// import {
+//   THREE.Object3D,
+//   BufferGeometry, BufferAttribute,
+//   TextureLoader,
+//   Mesh,
+//   Points,
+//   FrontSide,
+//   SmoothShading,
+//   BackSide,
+//   PointsMaterial,
+//   LineBasicMaterial,
+//   LineSegments,
+//   MeshPhongMaterial
+// } from '../libs/three.js';
 
 import {Model} from "./Model.js";
 
@@ -14,7 +22,7 @@ import {Model} from "./Model.js";
 function OrigamiObject(model) {
 
   // Build like a THREE.Group
-  Object3D.call(this);
+  THREE.Object3D.call(this);
 
   this.type = 'Group';
 
@@ -27,7 +35,7 @@ function OrigamiObject(model) {
   this.update();
 }
 
-OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
+OrigamiObject.prototype = Object.assign(Object.create(THREE.Object3D.prototype), {
 
   constructor: OrigamiObject,
 
@@ -37,36 +45,36 @@ OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
   buildMaterials: function () {
 
     // Textures
-    let textureFront = new TextureLoader().load('textures/cocotte256x256.jpg');
+    let textureFront = new THREE.TextureLoader().load('textures/cocotte256x256.jpg');
     textureFront.repeat.set(1, 1);
 
-    this.materialFront = new MeshPhongMaterial({
+    this.materialFront = new THREE.MeshPhongMaterial({
       map: textureFront,
-      side: FrontSide,
-      flatShading: SmoothShading
+      side: THREE.FrontSide,
+      flatShading: THREE.SmoothShading
     });
 
-    let textureBack = new TextureLoader().load('textures/back256x256.jpg');
-    this.materialBack = new MeshPhongMaterial({
+    let textureBack = new THREE.TextureLoader().load('textures/back256x256.jpg');
+    this.materialBack = new THREE.MeshPhongMaterial({
       map: textureBack,
-      side: BackSide,
-      flatShading: SmoothShading
+      side: THREE.BackSide,
+      flatShading: THREE.SmoothShading
     });
 
     // Points Materials
-    this.materialPoint = new PointsMaterial({size: 20, color: 0x0000ff});
-    this.materialPointSelected = new PointsMaterial({size: 40, color: 0xff0000});
+    this.materialPoint = new THREE.PointsMaterial({size: 20, color: 0x0000ff});
+    this.materialPointSelected = new THREE.PointsMaterial({size: 40, color: 0xff0000});
 
     // Lines Materials
-    this.materialLine = new LineBasicMaterial({color: 0x0000ff, linewidth: 3});
-    this.materialLineSelected = new LineBasicMaterial({color: 0xff0000, linewidth: 6});
+    this.materialLine = new THREE.LineBasicMaterial({color: 0x0000ff, linewidth: 3});
+    this.materialLineSelected = new THREE.LineBasicMaterial({color: 0xff0000, linewidth: 6});
   },
 
-  // Build Buffers and Object3Ds
+  // Build Buffers and THREE.Object3Ds
   buildObjects: function () {
 
     // Clean eventually
-    if (this.points3d) {
+    if (this.points3d !== undefined) {
       this.remove(this.points3d);
       this.remove(this.faces3dFront);
       this.remove(this.faces3dBack);
@@ -76,42 +84,43 @@ OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
     const MAX_POINTS = 512;
 
     // Build Points Mesh
-    const geometry = new BufferGeometry();
+    const geometry = new THREE.BufferGeometry();
     const positionsArrayPoint = new Float32Array(MAX_POINTS * 3);
-    geometry.addAttribute('position', new BufferAttribute(positionsArrayPoint, 3).setDynamic(true));
+    geometry.addAttribute('position', new THREE.BufferAttribute(positionsArrayPoint, 3).setDynamic(true));
+    geometry.computeVertexNormals();
 
     const uvFaces = new Float32Array(MAX_POINTS * 2); // 2 UV per point
-    geometry.addAttribute('uv', new BufferAttribute(uvFaces, 2).setDynamic(true));
+    geometry.addAttribute('uv', new THREE.BufferAttribute(uvFaces, 2).setDynamic(true));
 
     // Create object, and add it to this group
-    this.points3d = new Points(geometry, this.materialPoint);
+    this.points3d = new THREE.Points(geometry, this.materialPoint);
 
     this.add(this.points3d);
 
     // Build Faces Mesh : Indices only, faces share the same geometry
     const indicesArray = new Uint32Array(MAX_POINTS * 3);
-    const indicesFacesBuffer = new BufferAttribute(indicesArray, 1).setDynamic(true);
+    const indicesFacesBuffer = new THREE.BufferAttribute(indicesArray, 1).setDynamic(true);
     geometry.setIndex(indicesFacesBuffer);
 
     // Create object, same geometry, and add it to scene
-    this.faces3dFront = new Mesh(geometry, this.materialFront);
+    this.faces3dFront = new THREE.Mesh(geometry, this.materialFront);
     this.add(this.faces3dFront);
-    this.faces3dBack = new Mesh(geometry, this.materialBack);
+    this.faces3dBack = new THREE.Mesh(geometry, this.materialBack);
 
     this.add(this.faces3dBack);
 
     // Build Segments Mesh : Points and indices
-    const geometryline = new BufferGeometry();
+    const geometryline = new THREE.BufferGeometry();
     const positionsArrayLine = new Float32Array(MAX_POINTS * 3);
-    geometryline.addAttribute('position', new BufferAttribute(positionsArrayLine, 3).setDynamic(true));
+    geometryline.addAttribute('position', new THREE.BufferAttribute(positionsArrayLine, 3).setDynamic(true));
 
     // Indices
     const indicesSegmentArray = new Uint32Array(MAX_POINTS * 2);
-    const indicesSegmentBuffer = new BufferAttribute(indicesSegmentArray, 1).setDynamic(true);
+    const indicesSegmentBuffer = new THREE.BufferAttribute(indicesSegmentArray, 1).setDynamic(true);
     geometryline.setIndex(indicesSegmentBuffer);
 
     // Create object, and add it to this group
-    this.lines3d = new LineSegments(geometryline, this.materialLine);
+    this.lines3d = new THREE.LineSegments(geometryline, this.materialLine);
 
     this.add(this.lines3d);
   },
@@ -123,7 +132,9 @@ OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
     let points = this.model.points;
 
     for (let i = 0; i < points.length; i++) {
+
       let pt = points[i];
+
       pos[3 * i] = pt.x;
       pos[3 * i + 1] = pt.y;
       pos[3 * i + 2] = pt.z;
@@ -131,6 +142,8 @@ OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
       // UV are just flat coordinates on crease pattern
       uv[2 * i] = (200.0 + pt.xf) / 400.0;
       uv[2 * i + 1] = (200.0 + pt.yf) / 400.0;
+
+
     }
   },
 
@@ -201,6 +214,7 @@ OrigamiObject.prototype = Object.assign(Object.create(Object3D.prototype), {
 
     // Rebuild if needed
     if (this.model.needRebuild) {
+      console.log("needRebuild");
       this.buildObjects()
     }
 

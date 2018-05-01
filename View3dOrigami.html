@@ -29,6 +29,7 @@
   let renderer, scene, camera, controls;
   let gui;
   let model, origamiObject;
+  let particleLight;
 
   init();
   animate();
@@ -49,10 +50,10 @@
     scene.background = new THREE.Color( 0xf0f0f0 );
 
     // Lights
-    scene.add( new THREE.AmbientLight( 0x505050 ) );
+    scene.add( new THREE.AmbientLight( 0x808080 ) );
 
     const light = new THREE.SpotLight(0xffffff, 0.5);
-    light.position.set( 0, 500, 200000 );
+    light.position.set( 0, 0, 2000 );
     light.castShadow = true;
 
     light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
@@ -61,6 +62,13 @@
     light.shadow.mapSize.height = 2048;
 
     scene.add( light );
+
+    particleLight = new THREE.Mesh(
+      new THREE.SphereBufferGeometry( 10, 8, 8 ),
+      new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
+    scene.add( particleLight );
+    var pointLight = new THREE.PointLight( 0xffffff, 5, 400 );
+    particleLight.add( pointLight );
 
     // Origami model
     model = new Model();
@@ -104,7 +112,11 @@
     controls.update();
     origamiObject.update();
 
-    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+    var timer = Date.now() * 0.00025;
+    particleLight.position.x = Math.sin( timer * 5 ) * 400;
+    particleLight.position.z = Math.cos( timer * 5 ) * 400;
+
+    // renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.render(scene, camera);
 
   }
@@ -116,7 +128,7 @@
 
     gui.add( { size: 12 }, 'size', 0, 360 ).step( 0.1 ).onChange( function( value ){
       console.log("value:"+value);
-      model.rotate(model.segments[6],1,[model.points[1],model.points[2]]);
+      model.rotate(model.segments[6], 1 ,[model.points[1],model.points[2]]);
       origamiObject.update();
     });
 

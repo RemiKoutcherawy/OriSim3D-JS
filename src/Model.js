@@ -13,7 +13,7 @@ function Model() {
   this.points = [];
   this.segments = [];
   this.faces = [];
-  this.change = true; // should trigger a redraw
+  this.change = false; // true should trigger a rebuild of geometry
 }
 
 Object.assign(Model.prototype, {
@@ -24,6 +24,7 @@ Object.assign(Model.prototype, {
     this.segments = [];
     this.faces = [];
     const f = new Face();
+
     // Add XY as XYZ points, make EDGE segments
     let p1 = null;
     for (let i = 0; i < list.length; i += 2) {
@@ -90,6 +91,7 @@ Object.assign(Model.prototype, {
 
   // Adds a face to this model 
   addFace: function (f) {
+    this.change = true;
     // TODO search existing faces
     this.faces.push(f);
     return f;
@@ -514,7 +516,7 @@ Object.assign(Model.prototype, {
     }
 
     // Modify initial face f1 and add new face if not degenerated
-    // this.faces.splice(this.faces.indexOf(f1), 1); change Array
+    // this.faces.splice(this.faces.indexOf(f1), 1); changes Array
     if (inFront) {
       f1.points = front;
       f1 = null;
