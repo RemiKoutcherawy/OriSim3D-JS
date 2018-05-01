@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Origami Three</title>
+  <title>View3dOrigami</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
   <style>
@@ -18,73 +18,72 @@
 
 <script src="./libs/three.js"></script>
 <script src="./libs/OrbitControls.js"></script>
-<script src="./libs/stats.min.js"></script>
+<script src="./libs/TrackballControls.js"></script>
 <script src='./libs/dat.gui.min.js'></script>
 
 <script type="module">
 
-  import {View2d} from "./src/View2d.js";
   import {Model} from "./src/Model.js";
-  import {OrigamiGeometry} from "./src/OrigamiGeometry.js";
+  import {OrigamiObject} from "./src/OrigamiObject.js";
 
-  let renderer, scene, camera, camera2, controls;
-  let stats, gui, vue3d = false;
-
-  // Inset viewport
-  let insetWidth, insetHeight;
-
-  // Origami Crease pattern
-  let view2D;
+  let renderer, scene, camera, controls;
+  let gui;
+  let model, origamiObject;
 
   init();
   animate();
 
   function init() {
 
-    renderer = new THREE.WebGLRenderer({antialias: false});
+    // Renderer adds a domElement
+    renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
+
     window.document.body.appendChild(renderer.domElement);
 
-    // renderer.autoClear = false;
-
+    // Scene
     scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0xf0f0f0 );
 
-    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 10, 2000);
+    // Lights
+    scene.add( new THREE.AmbientLight( 0x505050 ) );
+
+    const light = new THREE.SpotLight(0xffffff, 0.5);
+    light.position.set( 0, 500, 200000 );
+    light.castShadow = true;
+
+    light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 200, 10000 ) );
+    light.shadow.bias = - 0.00022;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+
+    scene.add( light );
+
+    // Origami model
+    model = new Model();
+    model.init([-200,-200, 200,-200, 200,200, -200,200]);
+    model.splitCross(model.points[0],model.points[1]);
+    model.rotate(model.segments[6],-45,[model.points[1],model.points[2]]);
+
+    // Origami object inherits from Object3D
+    origamiObject = new OrigamiObject(model);
+    scene.add( origamiObject );
+
+    // Perspective cameras
+    camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 10, 4000);
     camera.position.set(-40, 0, 500);
-
-    camera2 = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 10, 2000);
-    camera2.position.set(-40, 0, 1000);
 
     // Orbit control
     controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.minDistance = 200;
     controls.maxDistance = 2000;
 
-    const texture = new THREE.TextureLoader().load('./textures/back256x256.jpg');
-
-    // Origami model
-    const model = new Model();
-    model.init([-200,-200, 200,-200, 200,200, -200,200]);
-
-    // Origami geometry inspired by PlaneBufferGeometry
-    const geometry = new OrigamiGeometry(model);
-    const material = new THREE.MeshBasicMaterial({map: texture});
-
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add( mesh );
-
-    // View2d for crease pattern
-    view2D = new View2d(model);
-    document.body.appendChild(view2D.canvas2d);
-
     // Listeners
-
     window.addEventListener('resize', onWindowResize, false);
     onWindowResize();
-
-    stats = new Stats();
-    document.body.appendChild(stats.dom);
 
     initGui();
 
@@ -94,14 +93,7 @@
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize(window.innerWidth, window.innerHeight);
-
-    insetWidth = window.innerHeight / 4; // square
-    insetHeight = window.innerHeight / 4;
-
-    camera2.aspect = insetWidth / insetHeight;
-    camera2.updateProjectionMatrix();
 
   }
 
@@ -109,34 +101,12 @@
 
     requestAnimationFrame(animate);
 
-    stats.update();
+    controls.update();
+    origamiObject.update();
 
-    // main scene
-    if (vue3d){
+    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
 
-      view2D.canvas2d.style.zIndex = '-1';
-      // view2D.draw(); no need
-
-      renderer.setClearColor(0xFFFFFF, 0);
-      renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-      renderer.render(scene, camera);
-
-    } else {
-
-      view2D.canvas2d.style.zIndex = '0';
-      view2D.draw();
-
-      // inset scene in grey
-      renderer.setClearColor(0x222222, 1);
-      renderer.clearDepth(); // important!
-      renderer.setScissorTest(true);
-      renderer.setScissor(20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight);
-      renderer.setViewport(20, window.innerHeight - insetHeight - 20, insetWidth, insetHeight);
-      camera2.position.copy(camera.position);
-      camera2.quaternion.copy(camera.quaternion);
-      renderer.render(scene, camera2);
-      renderer.setScissorTest(false);
-    }
   }
 
   // dat.GUI
@@ -144,20 +114,14 @@
 
     gui = new dat.GUI();
 
-    const param = {
-      'width (px)': 5,
-      'vue3d': false
-    };
-
-
-    gui.add(param, 'width (px)', 1, 10).onChange(function (val) {
-      console.log("val:"+val);
+    gui.add( { size: 12 }, 'size', 0, 360 ).step( 0.1 ).onChange( function( value ){
+      console.log("value:"+value);
+      model.rotate(model.segments[6],1,[model.points[1],model.points[2]]);
+      origamiObject.update();
     });
 
-
-    gui.add(param, 'vue3d').onChange(function (swaptest) {
-      vue3d = swaptest;
-    });
+    gui.add({ wireframe: false}, 'wireframe').onChange(function (flag) { origamiObject.test(flag); });
+    gui.add({ reset: function () { controls.reset(); }}, 'reset');
 
   }
 
