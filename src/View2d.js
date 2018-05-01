@@ -1,6 +1,6 @@
 // File: src/View2D.js
+// View2d  to show Origami crease pattern
 
-// View2d Constructor
 function View2d(model) {
 
   // Instance variables

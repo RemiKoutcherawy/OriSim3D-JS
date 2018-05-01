@@ -1,12 +1,12 @@
 export default {
-	input: 'HandleEvent.js',
-	sourceMap: true,
+	input: 'src/Origami.js',
 	output: [
 		{
 			format: 'umd',
 			name: 'OriSim3d',
 			file: 'dist/origami.js',
-			indent: '\t'
+      sourcemap: true,
+      indent: '\t'
 		},
 		{
 			format: 'es',

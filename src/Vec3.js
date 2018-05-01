@@ -1,4 +1,5 @@
 // File src/Vec3.js
+// Just a vector
 
 function Vec3(x, y, z) {
   this.x = x || 0;

@@ -1,5 +1,4 @@
 // File:src/Point.js
-
 // Point to hold Points
 // 3D : x y z
 // Crease pattern flat : xf, yf

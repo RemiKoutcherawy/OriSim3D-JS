@@ -113,6 +113,7 @@ Object.assign(Command.prototype, {
       }
       model.init(list);
     }
+
     // Origami splits
     // "b : by"
     else if (toko[iTok] === "b" || toko[iTok] === "by") {
@@ -167,6 +168,7 @@ Object.assign(Command.prototype, {
       list = listPoints();
       model.rotate(s, angle, list);
     }
+
     // "f : fold to angle"
     else if (toko[iTok] === "f" || toko[iTok] === "fold") {
       iTok++;

@@ -1,13 +1,11 @@
 // File: src/Model.js
-// Dependencies : import them before Model.js in browser
+// Model to hold Points, Segments, Faces
 
 import {Point} from "./Point.js";
 import {Segment} from "./Segment.js";
 import {Face} from "./Face.js";
 import {Plane} from "./Plane.js";
 
-
-// Model to hold Points, Segments, Faces
 function Model() {
   // Arrays to hold points, faces, segments
   this.points = [];
