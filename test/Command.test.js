@@ -1,5 +1,5 @@
 // file 'test/Command.test.js
-// run with $ mocha --require babel-polyfill --require babel-register test/Command.test.js
+// run with $ mocha --require babel-register test/Command.test.js
 
 import {Point} from '../src/Point.js';
 import {Model} from '../src/Model.js';
