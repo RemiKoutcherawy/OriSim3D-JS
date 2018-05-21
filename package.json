@@ -24,16 +24,16 @@
   },
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
-    "mocha": "^5.1.1",
-    "nyc": "^11.7.1",
-    "qunit": "^2.6.0",
+    "mocha": "^5.2.0",
+    "nyc": "^11.8.0",
+    "qunit": "^2.6.1",
     "rollup": "^0.58.2",
     "should": "^13.2.1"
   },
   "dependencies": {
-    "npm": "^6.0.0",
+    "npm": "^6.0.1",
     "three": "^0.92.0"
   },
   "bugs": {

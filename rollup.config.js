@@ -4,13 +4,13 @@ export default {
 		{
 			format: 'umd',
 			name: 'OriSim3d',
-			file: 'dist/origami.js',
+			file: 'build/origami.js',
       sourcemap: true,
       indent: '\t'
 		},
 		{
 			format: 'es',
-			file: 'dist/origami.module.js',
+			file: 'build/origami.module.js',
 			indent: '\t'
 		}
 	]
