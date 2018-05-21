@@ -7,32 +7,39 @@ import {Face} from "./Face.js";
 import {Plane} from "./Plane.js";
 
 function Model() {
+
   // Arrays to hold points, faces, segments
   this.points = [];
   this.segments = [];
   this.faces = [];
-  this.change = false; // true should trigger a rebuild of geometry
+
+  // Set to true to trigger a rebuild of geometry
+  this.change = false;
+
 }
 
 Object.assign(Model.prototype, {
 
   // Initializes this Model with XY points CCW 
   init: function (list) {
+
     this.points = [];
     this.segments = [];
     this.faces = [];
+
     const f = new Face();
 
     // Add XY as XYZ points, make EDGE segments
     let p1 = null;
     for (let i = 0; i < list.length; i += 2) {
-      const p2 = this.addPointXYXYZ(list[i],list[i + 1], list[i],list[i + 1],0);
+      const p2 = this.addPointXYXYZ(list[i], list[i + 1], list[i], list[i + 1], 0);
       f.points.push(p2);
       if (p1 !== null) {
         this.addSegment(p1, p2);
       }
       p1 = p2;
     }
+
     this.addSegment(p1, f.points[0]);
     this.addFace(f);
   },
@@ -267,7 +274,7 @@ Object.assign(Model.prototype, {
       console.log("Error More than one segment on 2 points:" + list.length
         + " " + list[0].p1 + list[0].p2 + " " + list[1].p1 + list[1].p2);
     }
-    if (list.length === 0){
+    if (list.length === 0) {
       return null;
     }
     return list[0];
@@ -595,6 +602,7 @@ Object.assign(Model.prototype, {
       this.splitFacesByPlane(pl, list);
     }
   },
+
 
   // Rotate around axis Segment by angle a list of Points 
   rotate: function (s, angle, list) {

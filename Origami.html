@@ -14,18 +14,22 @@
 </head>
 <body>
 
-<script src="./libs/three.js"></script>
-<script src="./libs/stats.min.js"></script>
-<script src="./libs/dat.gui.min.js"></script>
-<script src="./libs/OrbitControls.js"></script>
+<script type="module" >
 
-<script type="module">
-
-  import {Model} from "./src/Model.js";
-  import {OrigamiObject} from "./src/OrigamiObjectSimple.js";
+  import { Model } from "./src/Model.js";
+  // import { OrigamiObject } from "./src/OrigamiObjectSimple.js";
+  import { OrigamiObject } from "./src/OrigamiObject.js";
+  import { OrbitControls } from "./libs/OrbitControls.module.js";
+  import {
+    Scene, PlaneBufferGeometry, BoxBufferGeometry, Color, PerspectiveCamera,
+    AmbientLight, SpotLight, LightShadow, ShadowMaterial, CameraHelper,
+    Mesh, GridHelper, MeshPhongMaterial,
+    WebGLRenderer
+  } from "./libs/three.module.js";
+  import {GUI} from "./libs/dat.gui.module.js";
 
   let camera, scene, renderer, dirLight, hemiLight;
-  let stats, controls;
+  let controls;
 
   let model, origamiObject;
 
@@ -34,64 +38,61 @@
 
   function init() {
 
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
+    camera = new PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 5000);
     camera.position.set(0, 0, 600);
 
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xb3c7e6);
+    scene = new Scene();
+    scene.background = new Color(0xb3c7e6);
 
     // CONTROL
-    controls = new THREE.OrbitControls(camera);
+    controls = new OrbitControls(camera);
     controls.maxPolarAngle = Math.PI;
     controls.enableZoom = true;
     controls.minDistance = 200;
     controls.maxDistance = 1000;
 
-    // HEMISPHERIC LIGHT
-    hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
-    hemiLight.color.setHSL(0.6, 1, 0.6);
-    hemiLight.groundColor.setHSL(0.095, 1, 0.75);
-    hemiLight.position.set(0, 400, 0);
-    scene.add(hemiLight);
+    // LIGHT
+    scene.add(new AmbientLight(0x505050));
 
-    // POINT LIGHT
-    let light = new THREE.PointLight(0xffffff, 1, 800);
-    light.position.set(0, 200, 400);
+    const light = new SpotLight(0xffffff, 1.5);
+    light.position.set(500, 500, 500);
     light.castShadow = true;
-    light.shadow.camera.fov = 80;
-    light.shadow.camera.far = 1000;
+    light.shadow = new LightShadow(new PerspectiveCamera(60, 1, 200, 10000));
+    light.shadow.bias = -0.00022;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.mapSize.height = 2048;
+
     scene.add(light);
 
-    // Helper for shadow camera (optional)
-    let cameraHelper = new THREE.CameraHelper(light.shadow.camera);
-    scene.add(cameraHelper);
+    // // Helper for shadow camera (optional)
+    // let cameraHelper = new CameraHelper(light.shadow.camera);
+    // scene.add(cameraHelper);
 
     // GROUND
-    let planeGeometry = new THREE.PlaneBufferGeometry(2000, 2000);
+    let planeGeometry = new PlaneBufferGeometry(2000, 2000);
     planeGeometry.rotateX(-Math.PI / 2);
-    let planeMaterial = new THREE.ShadowMaterial({opacity: 0.2});
-    let ground = new THREE.Mesh(planeGeometry, planeMaterial);
+    let planeMaterial = new ShadowMaterial({opacity: 0.2});
+    let ground = new Mesh(planeGeometry, planeMaterial);
     ground.position.y = -200;
     ground.receiveShadow = true;
     scene.add(ground);
 
     // GROUND Grid
-    let gridHelper = new THREE.GridHelper(2000, 100);
+    let gridHelper = new GridHelper(2000, 100);
     gridHelper.position.y = -199;
     gridHelper.material.opacity = 0.25;
     gridHelper.material.transparent = true;
     scene.add(gridHelper);
 
     // BOX
-    let geometry = new THREE.BoxBufferGeometry(200, 200, 200);
-    let material = new THREE.MeshPhongMaterial({
+    let geometry = new BoxBufferGeometry(200, 200, 200);
+    let material = new MeshPhongMaterial({
       color: 0xe3738c,
       specular: 0xffffff,
       shininess: 2,
       flatShading: true
     });
-    let cube = new THREE.Mesh(geometry, material);
-    cube.position.y = -100;
+    let cube = new Mesh(geometry, material);
     cube.castShadow = true;
     cube.receiveShadow = true;
     // scene.add(cube);
@@ -108,36 +109,34 @@
 
     // Gui
     let params = {
-      rotate: 0,
+      rotate_first: 180,
+      rotate_second: 180,
       shadows: true,
-      wireframe: false,
       reset : function () {
       controls.reset();
     }
     };
-    let gui = new dat.GUI();
-    gui.add(params, 'rotate', 0, 360).onChange(function (value) {
-      controls.enabled = false;
-        model.rotate(model.segments[6], 1, [model.points[1], model.points[2]]);
+    let gui = new GUI();
+    gui.add(params, 'rotate_first', 0, 360).onChange(function (value) {
+      controls.enabled = false; // needed to prevent orbit
+        model.rotate(model.segments[6], (value-180)/100, [model.points[1], model.points[2]]);
         origamiObject.update();
       });
+    gui.add(params, 'rotate_second', 0, 360).onChange(function (value) {
+      controls.enabled = false; // needed to prevent orbit
+      model.rotate(model.segments[6], (value-180)/100, [model.points[0], model.points[3]]);
+      origamiObject.update();
+    });
     gui.add(params, 'shadows');
-    gui.add(params, 'wireframe').onChange(function (flag) {
-        origamiObject.test(flag);
-      });
     gui.open();
     gui.add(params, 'reset');
 
     // RENDERER
-    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer = new WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     window.document.body.appendChild(renderer.domElement);
     renderer.shadowMap.enabled = true;
-
-    // STATS
-    stats = new Stats();
-    window.document.body.appendChild(stats.dom);
 
     // Resize
     window.addEventListener('resize', onWindowResize, false);
@@ -152,14 +151,12 @@
 
   }
 
-  //
-
   function animate() {
     requestAnimationFrame(animate);
     render();
-    stats.update();
     controls.enabled = true;
   }
+
   function render() {
     renderer.render(scene, camera);
   }
