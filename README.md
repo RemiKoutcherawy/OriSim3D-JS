@@ -16,7 +16,7 @@ On the left the crease pattern, on the right the 3D view.
 
 To bundle all files in `app.js`, lauch `node build.js`  
 This requires `npm update --save-dev` to download mocha and uglify-es.
-Run  `./node_modules/mocha/bin/mocha --ui qunit` to execute node tests.
+Run  `./node_modules/mocha/bin/mocha --require babel-core/register --ui qunit` to execute node tests.
 
 Compile with [roolupjs](https://rollupjs.org/guide/en)
 

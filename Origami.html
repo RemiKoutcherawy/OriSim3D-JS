@@ -3,7 +3,7 @@
 <head>
   <title>Origami</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
   <style>
     body {
       overflow: hidden;
@@ -14,12 +14,11 @@
 </head>
 <body>
 
-<script type="module" >
+<script type="module">
 
-  import { Model } from "./src/Model.js";
-  // import { OrigamiObject } from "./src/OrigamiObjectSimple.js";
-  import { OrigamiObject } from "./src/OrigamiObject.js";
-  import { OrbitControls } from "./libs/OrbitControls.module.js";
+  import {Model} from "./src/Model.js";
+  import {OrigamiObject} from "./src/OrigamiObject.js";
+  import {OrbitControls} from "./libs/OrbitControls.module.js";
   import {
     Scene, PlaneBufferGeometry, BoxBufferGeometry, Color, PerspectiveCamera,
     AmbientLight, SpotLight, LightShadow, ShadowMaterial, CameraHelper,
@@ -112,22 +111,25 @@
       rotate_first: 180,
       rotate_second: 180,
       shadows: true,
-      reset : function () {
-      controls.reset();
-    }
+      reset: function () {
+        controls.reset();
+      }
     };
+
     let gui = new GUI();
     gui.add(params, 'rotate_first', 0, 360).onChange(function (value) {
       controls.enabled = false; // needed to prevent orbit
-        model.rotate(model.segments[6], (value-180)/100, [model.points[1], model.points[2]]);
-        origamiObject.update();
-      });
-    gui.add(params, 'rotate_second', 0, 360).onChange(function (value) {
-      controls.enabled = false; // needed to prevent orbit
-      model.rotate(model.segments[6], (value-180)/100, [model.points[0], model.points[3]]);
+      let angle = model.computeAngle(model.segments[6]);
+      model.rotate(model.segments[6], (angle - value), [model.points[1], model.points[2]]);
       origamiObject.update();
     });
-    gui.add(params, 'shadows');
+    gui.add(params, 'rotate_second', 0, 360).onChange(function (value) {
+      controls.enabled = false; // needed to prevent orbit
+      let angle = model.computeAngle(model.segments[6]);
+      model.rotate(model.segments[6], (value - angle), [model.points[0], model.points[3]]);
+      origamiObject.update();
+    });
+    // gui.add(params, 'shadows');
     gui.open();
     gui.add(params, 'reset');
 
