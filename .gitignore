@@ -2,3 +2,5 @@ node_modules/
 snippets/
 three/
 .idea/
+/dist
+/build
