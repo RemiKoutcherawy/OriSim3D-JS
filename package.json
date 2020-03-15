@@ -23,20 +23,22 @@
     "url": "git://github.com/remikoutcherawy/OriSim3D-JS.git"
   },
   "devDependencies": {
-    "babel-cli": "^6.23.0",
+    "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-register": "^6.26.0",
+    "braces": "^2.3.1",
+    "kind-of": "^6.0.3",
     "mocha": "^5.2.0",
-    "nyc": "^11.9.0",
-    "qunit": "^2.9.2",
+    "nyc": "^15.0.0",
+    "qunit": "^2.9.3",
     "rollup": "^0.58.2",
     "should": "^13.2.3"
   },
   "dependencies": {
-    "npm": "^6.0.1",
-    "three": "^0.92.0"
+    "npm": "^6.14.2",
+    "three": "^0.114.0"
   },
   "bugs": {
     "url": "https://github.com/remikoutcherawy/OriSim3D-JS/issues"
