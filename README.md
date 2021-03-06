@@ -18,15 +18,7 @@ To bundle all files in `app.js`, lauch `node build.js`
 This requires `npm update --save-dev` to download mocha and uglify-es.
 Run  `./node_modules/mocha/bin/mocha --require babel-core/register --ui qunit` to execute node tests.
 
-Compile with [roolupjs](https://rollupjs.org/guide/en)
-
-```bash
-$ rollup js/Origami.js --o dist/Origami.js -f amd --name "Origami"
-```
-or using "scripts" in package.json
-```bash
-$ npm run-script build
-```
+No compilation needed, just open Origami.html
 
 ## Comment est organisé le code ?
 Dans le répertoire `js` :
